@@ -1,0 +1,97 @@
+{
+  "version": 3,
+  "targets": {
+    "net9.0-android": {}
+  },
+  "libraries": {},
+  "projectFileDependencyGroups": {
+    "net9.0-android": [
+      "MonoGame.Content.Builder.Task >= 3.8.*",
+      "MonoGame.Framework.Android >= 3.8.*"
+    ]
+  },
+  "packageFolders": {
+    "/home/Cubic/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/home/Cubic/repos/FrorgBattleV4/FrogBattleV4/FrogBattleV4.Android/FrogBattleV4.Android.csproj",
+      "projectName": "FrogBattleV4",
+      "projectPath": "/home/Cubic/repos/FrorgBattleV4/FrogBattleV4/FrogBattleV4.Android/FrogBattleV4.Android.csproj",
+      "packagesPath": "/home/Cubic/.nuget/packages/",
+      "outputPath": "/home/Cubic/repos/FrorgBattleV4/FrogBattleV4/FrogBattleV4.Android/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/home/Cubic/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net9.0-android"
+      ],
+      "sources": {
+        "/usr/lib64/dotnet/library-packs": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net9.0-android": {
+          "targetAlias": "net9.0-android",
+          "projectReferences": {
+            "/home/Cubic/repos/FrorgBattleV4/FrogBattleV4/FrogBattleV4.Core/FrogBattleV4.Core.csproj": {
+              "projectPath": "/home/Cubic/repos/FrorgBattleV4/FrogBattleV4/FrogBattleV4.Core/FrogBattleV4.Core.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "10.0.100"
+    },
+    "frameworks": {
+      "net9.0-android": {
+        "targetAlias": "net9.0-android",
+        "dependencies": {
+          "MonoGame.Content.Builder.Task": {
+            "target": "Package",
+            "version": "[3.8.*, )"
+          },
+          "MonoGame.Framework.Android": {
+            "target": "Package",
+            "version": "[3.8.*, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/10.0.100/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  },
+  "logs": [
+    {
+      "code": "NU1012",
+      "level": "Error",
+      "message": "Platform version is not present for one or more target frameworks, even though they have specified a platform: net9.0-android"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "9s6yuRPeH7s=",
+  "success": false,
+  "projectFilePath": "/home/Cubic/repos/FrorgBattleV4/FrogBattleV4/FrogBattleV4.iOS/FrogBattleV4.iOS.csproj",
+  "expectedPackageFiles": [],
+  "logs": [
+    {
+      "code": "NU1012",
+      "level": "Error",
+      "message": "Platform version is not present for one or more target frameworks, even though they have specified a platform: net9.0-ios",
+      "projectPath": "/home/Cubic/repos/FrorgBattleV4/FrogBattleV4/FrogBattleV4.iOS/FrogBattleV4.iOS.csproj",
+      "filePath": "/home/Cubic/repos/FrorgBattleV4/FrogBattleV4/FrogBattleV4.iOS/FrogBattleV4.iOS.csproj",
+      "targetGraphs": []
+    }
+  ]
+}
