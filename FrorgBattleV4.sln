@@ -1,12 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrogBattleV4.Android", "FrogBattleV4\FrogBattleV4.Android\FrogBattleV4.Android.csproj", "{C92A168C-0816-4A1B-B039-F5B9F33EB251}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrogBattleV4.Core", "FrogBattleV4\FrogBattleV4.Core\FrogBattleV4.Core.csproj", "{C76AEE84-F7FD-4A24-973C-236FB5442444}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrogBattleV4.DesktopGL", "FrogBattleV4\FrogBattleV4.DesktopGL\FrogBattleV4.DesktopGL.csproj", "{49195897-E977-46AE-B891-E1D787F551E8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrogBattleV4.iOS", "FrogBattleV4\FrogBattleV4.iOS\FrogBattleV4.iOS.csproj", "{C004892C-7C07-4D22-B9AA-254576DD5F7F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrogBattleV4", "FrogBattleV4\FrogBattleV4.csproj", "{96A86BAE-0B54-4EB1-810F-0B6017B9F067}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,25 +8,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C92A168C-0816-4A1B-B039-F5B9F33EB251}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C92A168C-0816-4A1B-B039-F5B9F33EB251}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C92A168C-0816-4A1B-B039-F5B9F33EB251}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{C92A168C-0816-4A1B-B039-F5B9F33EB251}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C92A168C-0816-4A1B-B039-F5B9F33EB251}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C92A168C-0816-4A1B-B039-F5B9F33EB251}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{C76AEE84-F7FD-4A24-973C-236FB5442444}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C76AEE84-F7FD-4A24-973C-236FB5442444}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C76AEE84-F7FD-4A24-973C-236FB5442444}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C76AEE84-F7FD-4A24-973C-236FB5442444}.Release|Any CPU.Build.0 = Release|Any CPU
-		{49195897-E977-46AE-B891-E1D787F551E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{49195897-E977-46AE-B891-E1D787F551E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{49195897-E977-46AE-B891-E1D787F551E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{49195897-E977-46AE-B891-E1D787F551E8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C004892C-7C07-4D22-B9AA-254576DD5F7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C004892C-7C07-4D22-B9AA-254576DD5F7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C004892C-7C07-4D22-B9AA-254576DD5F7F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{C004892C-7C07-4D22-B9AA-254576DD5F7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C004892C-7C07-4D22-B9AA-254576DD5F7F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C004892C-7C07-4D22-B9AA-254576DD5F7F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{96A86BAE-0B54-4EB1-810F-0B6017B9F067}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96A86BAE-0B54-4EB1-810F-0B6017B9F067}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96A86BAE-0B54-4EB1-810F-0B6017B9F067}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96A86BAE-0B54-4EB1-810F-0B6017B9F067}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
