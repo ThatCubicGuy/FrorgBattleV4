@@ -7,9 +7,9 @@ public class Bounce : ITargetingComponent
 {
     public required uint Count { get; init; }
 
-    public IEnumerable<ITargetable> SelectTargets(AbilityContext ctx, ITargetable mainTarget)
+    public IEnumerable<ITargetable> SelectTargets(AbilityContext ctx)
     {
-        List<ITargetable> result = [mainTarget];
+        List<ITargetable> result = [ctx.MainTarget];
         for (var i = 1; i < Count; i++)
         {
             result.Add(ctx.ValidTargets[ctx.Rng.Next(ctx.ValidTargets.Count)]);

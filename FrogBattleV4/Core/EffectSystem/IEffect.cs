@@ -5,5 +5,5 @@ namespace FrogBattleV4.Core.EffectSystem;
 
 public interface IEffect
 {
-    List<ISubeffectComponent> SubEffects { get; init; }
+    List<IModifierComponent> SubEffects { get; init; }
 }

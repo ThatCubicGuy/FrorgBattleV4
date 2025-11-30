@@ -1,6 +1,7 @@
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
-public interface ISubeffectComponent
+public interface IModifierComponent
 {
+    double Amount { get; }
     string GetKey();
 }

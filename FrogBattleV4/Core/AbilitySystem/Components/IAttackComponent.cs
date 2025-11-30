@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using FrogBattleV4.Core.CharacterSystem;
 using FrogBattleV4.Core.DamageSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components;
 
-public interface IAttackComponent
+public interface IAttackComponent : IAbilityComponent
 {
-    IEnumerable<Damage> GetDamage(AbilityContext ctx, ITargetable mainTarget);
+    IEnumerable<Damage> GetDamage(AbilityContext ctx);
 }

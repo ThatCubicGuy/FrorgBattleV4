@@ -5,8 +5,8 @@ namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
 public class Single : ITargetingComponent
 {
-    public IEnumerable<ITargetable> SelectTargets(AbilityContext ctx, ITargetable mainTarget)
+    public IEnumerable<ITargetable> SelectTargets(AbilityContext ctx)
     {
-        return [mainTarget];
+        return [ctx.MainTarget];
     }
 }

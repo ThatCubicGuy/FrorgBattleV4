@@ -1,6 +1,6 @@
 namespace FrogBattleV4.Core.CharacterSystem;
 
-public enum Stats
+public enum Stat
 {
     None,
     MaxHp,

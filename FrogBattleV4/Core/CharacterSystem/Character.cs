@@ -1,9 +1,7 @@
 using System.Collections.Generic;
-using System.Linq;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.CharacterSystem.Components;
 using FrogBattleV4.Core.EffectSystem;
-using FrogBattleV4.Core.EffectSystem.Components;
 
 namespace FrogBattleV4.Core.CharacterSystem;
 
@@ -24,28 +22,29 @@ public class Character : ICharacter
     // Base stats for any character
     public IReadOnlyDictionary<string, double> BaseStats { get; } = new Dictionary<string, double>()
     {
-        { nameof(Stats.MaxHp), 400000 },
-        { nameof(Stats.MaxMana), 100 },
-        { nameof(Stats.MaxEnergy), 120 },
-        { nameof(Stats.Atk), 1000 },
-        { nameof(Stats.Def), 500 },
-        { nameof(Stats.Spd), 100 },
-        { nameof(Stats.Dex), 0 },
-        { nameof(Stats.CritRate), 0.1 },
-        { nameof(Stats.CritDamage), 0.5 },
-        { nameof(Stats.HitRateBonus), 0 },
-        { nameof(Stats.EffectHitRate), 1 },
-        { nameof(Stats.EffectRes), 0 },
-        { nameof(Stats.ManaCost), 1 },
-        { nameof(Stats.ManaRegen), 1 },
-        { nameof(Stats.EnergyRecharge), 1 },
-        { nameof(Stats.IncomingHealing), 1 },
-        { nameof(Stats.OutgoingHealing), 1 },
-        { nameof(Stats.ShieldToughness), 1 },
+        { nameof(Stat.MaxHp), 400000 },
+        { nameof(Stat.MaxMana), 100 },
+        { nameof(Stat.MaxEnergy), 120 },
+        { nameof(Stat.Atk), 1000 },
+        { nameof(Stat.Def), 500 },
+        { nameof(Stat.Spd), 100 },
+        { nameof(Stat.Dex), 0 },
+        { nameof(Stat.CritRate), 0.1 },
+        { nameof(Stat.CritDamage), 0.5 },
+        { nameof(Stat.HitRateBonus), 0 },
+        { nameof(Stat.EffectHitRate), 1 },
+        { nameof(Stat.EffectRes), 0 },
+        { nameof(Stat.ManaCost), 1 },
+        { nameof(Stat.ManaRegen), 1 },
+        { nameof(Stat.EnergyRecharge), 1 },
+        { nameof(Stat.IncomingHealing), 1 },
+        { nameof(Stat.OutgoingHealing), 1 },
+        { nameof(Stat.ShieldToughness), 1 },
     };
     
     public List<AbilityDefinition> Abilities { get; } = [];
-    public List<IEffect> ActiveEffects { get; } = [];
+    public List<IAttributeModifier> ActiveEffects { get; } = [];
+    public List<IAttributeModifier> PassiveEffects { get; } = [];
     public double GetStat(string stat)
     {
         return BaseStats[stat] + TODO;
@@ -53,6 +52,6 @@ public class Character : ICharacter
 
     public double GetStatVersus(string stat, ICharacter target)
     {
-        return GetStat(stat) + TODO;
+        return BaseStats[stat] + TODO;
     }
 }

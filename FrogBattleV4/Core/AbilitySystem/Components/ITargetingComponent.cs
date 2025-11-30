@@ -5,7 +5,7 @@ namespace FrogBattleV4.Core.AbilitySystem.Components;
 
 public interface ITargetingComponent
 {
-    IEnumerable<ITargetable> SelectTargets(AbilityContext ctx, ITargetable mainTarget);
+    IEnumerable<ITargetable> SelectTargets(AbilityContext ctx);
 }
 /// <summary>
 /// Applied by the ability at the start to actually generate the list of possible targets,

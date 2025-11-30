@@ -4,9 +4,10 @@ using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem;
 
-public struct AbilityContext
+public struct AbilityContext : IContext
 {
     public ICharacter User;
+    public ICharacter MainTarget;
     public ReadOnlyCollection<ITargetable> ValidTargets;
     public AbilityDefinition Definition;
     public System.Random Rng;
