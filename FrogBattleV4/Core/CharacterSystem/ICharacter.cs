@@ -8,6 +8,5 @@ public interface ICharacter : ITargetable, ISupportsEffects, IHasAbilities
 {
     IReadOnlyDictionary<string, double> BaseStats { get; }
     
-    double GetStat(string stat);
-    double GetStatVersus(string stat, ICharacter target);
+    double GetStat(string stat, ICharacter target = null);
 }

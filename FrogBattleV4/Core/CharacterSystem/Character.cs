@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.CharacterSystem.Components;
 using FrogBattleV4.Core.EffectSystem;
+using FrogBattleV4.Core.EffectSystem.ActiveEffects;
 
 namespace FrogBattleV4.Core.CharacterSystem;
 
@@ -45,13 +47,14 @@ public class Character : ICharacter
     public List<AbilityDefinition> Abilities { get; } = [];
     public List<IAttributeModifier> ActiveEffects { get; } = [];
     public List<IAttributeModifier> PassiveEffects { get; } = [];
-    public double GetStat(string stat)
+    public double GetStat(string stat, ICharacter target = null)
     {
-        return BaseStats[stat] + TODO;
-    }
-
-    public double GetStatVersus(string stat, ICharacter target)
-    {
-        return BaseStats[stat] + TODO;
+        return ActiveEffects.Aggregate(BaseStats[stat],
+            (val, mod) => val + mod.GetModifiedStat(stat, val, new EffectContext()
+            {
+                EffectSource = (mod as ActiveEffectInstance)?.Source,
+                Holder = this,
+                Target = target,
+            }));
     }
 }

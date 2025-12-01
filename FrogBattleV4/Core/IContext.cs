@@ -1,6 +1,3 @@
 namespace FrogBattleV4.Core;
 
-public interface IContext
-{
-    
-}
+public interface IContext;

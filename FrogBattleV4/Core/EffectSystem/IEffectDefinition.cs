@@ -3,7 +3,8 @@ using FrogBattleV4.Core.EffectSystem.Components;
 
 namespace FrogBattleV4.Core.EffectSystem;
 
-public interface IEffect
+public interface IEffectDefinition
 {
-    List<IModifierComponent> SubEffects { get; init; }
+    string Id { get; }
+    List<IModifierComponent> Modifiers { get; }
 }

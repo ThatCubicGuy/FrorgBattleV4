@@ -4,10 +4,10 @@ using FrogBattleV4.Core.EffectSystem.Components;
 
 namespace FrogBattleV4.Core.EffectSystem.ActiveEffects;
 
-public class ActiveEffectDefinition : IAttributeModifier
+public class ActiveEffectDefinition : IEffectDefinition
 {
+    public required string Id { get; init; }
     public required List<IModifierComponent> Modifiers { get; init; }
-    
     public required List<IMutatorComponent> Mutators { get; init; }
     
     public uint MaxStacks { get; init; }

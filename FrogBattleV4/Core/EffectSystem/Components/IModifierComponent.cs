@@ -2,6 +2,7 @@ namespace FrogBattleV4.Core.EffectSystem.Components;
 
 public interface IModifierComponent
 {
+    string Stat { get; }
     double Amount { get; }
-    string GetKey();
+    Operator Operator { get; }
 }
