@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using FrogBattleV4.Core.Extensions;
 
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
@@ -11,14 +12,6 @@ public class SimpleStatModifier : IStatModifier
 
     public double Apply(double currentValue, StatContext ctx)
     {
-        return Operation switch
-        {
-            ModifierOperation.AddValue => currentValue + Amount,
-            ModifierOperation.MultiplyBase => currentValue + Amount * ctx.Holder.BaseStats[Stat],
-            ModifierOperation.MultiplyTotal => currentValue * Amount,
-            ModifierOperation.Maximum => Math.Max(currentValue, Amount),
-            ModifierOperation.Minimum => Math.Min(currentValue, Amount),
-            _ => throw new System.InvalidOperationException($"Invalid operator: {Operation}")
-        };
+        return Operation.Apply(Amount, ctx.Holder.BaseStats[Stat], currentValue);
     }
 }

@@ -7,7 +7,10 @@ namespace FrogBattleV4.Core.EffectSystem.PassiveEffects;
 public class PassiveEffect : IEffectDefinition, IAttributeModifier
 {
     public required string Id { get; init; }
-    public required List<IModifierComponent> Modifiers { get; init; }
-    public required List<IConditionComponent> Conditions { get; init; }
-    // AA I FUCKED IT UP CUZ NOW THERE'S NO WRAPPER AND CONDITIONS ARE IGNORED WHAT IS WRONG WITH ME
+    public required IReadOnlyList<IModifierComponent> Modifiers { get; init; }
+    public required IReadOnlyList<IConditionComponent> Conditions { get; init; }
+    public double GetModifiedAttribute(string attribute, StatContext ctx)
+    {
+        throw new System.NotImplementedException();
+    }
 }

@@ -1,6 +1,8 @@
 #nullable enable
 
+using System;
 using FrogBattleV4.Core.DamageSystem;
+using FrogBattleV4.Core.Extensions;
 
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
@@ -9,9 +11,16 @@ public class DamageRes : IDamageModifier
     public string? Type { get; init; }
     public string? Source { get; init; }
     public required double Amount { get; init; }
+    public ModifierOperation Operation { get; init; } = ModifierOperation.MultiplyTotal;
 
-    public bool CanApply(DamagePhase phase, DamageContext ctx)
+
+    public DamagePhase Phase => Type is null ? DamagePhase.RawRes : DamagePhase.TypeRes;
+
+    public double Apply(double currentValue, DamageContext ctx)
     {
-        return (Type == null || Type == ctx.Properties.DamageType) && (Source == null || Source == ctx.DamageSource);
+        if ((Type ?? ctx.Properties.DamageType) != ctx.Properties.DamageType ||
+            (Source ?? ctx.DamageSource) != ctx.DamageSource) return currentValue;
+        
+        return Operation.Apply(Amount, ctx.RawDamage, currentValue);
     }
 }

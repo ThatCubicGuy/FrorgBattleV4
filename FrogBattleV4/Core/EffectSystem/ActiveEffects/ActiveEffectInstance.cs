@@ -13,5 +13,8 @@ public class ActiveEffectInstance : IAttributeModifier
     public uint Turns { get; set; }
     public uint Stacks { get; set; }
 
-    public List<IModifierComponent> Modifiers => Definition.Modifiers;
+    public double GetModifiedAttribute(string attribute, StatContext ctx)
+    {
+        throw new System.NotImplementedException();
+    }
 }

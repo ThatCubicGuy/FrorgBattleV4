@@ -12,18 +12,21 @@ public class Damage
     {
         Source = source;
         Target = target;
+        _baseAmount = amount;
+        Properties = properties;
     }
     public required ICharacter? Source { get; init; }
     public required ITargetable Target { get; init; }
 
     public DamageProperties Properties { get; init; }
-    public double Amount
-    {
-        get
+    public double Amount =>
+        DamagePipeline.ComputePipeline(new DamageContext
         {
-            var result = _baseAmount;
-
-            return result;
-        }
-    }
+            Attacker = Source,
+            Target = Target as ICharacter,
+            DamageSource = "idk lmao",
+            Properties = Properties,
+            RawDamage = _baseAmount,
+            // Rng = [uh oh]
+        });
 }
