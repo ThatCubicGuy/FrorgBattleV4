@@ -50,7 +50,7 @@ public class Character : ICharacter
     public double GetStat(string stat, ICharacter target = null)
     {
         return ActiveEffects.Aggregate(BaseStats[stat],
-            (val, mod) => val + mod.GetModifiedStat(stat, val, new EffectContext()
+            (val, mod) => val + mod.GetModifiedStat(stat, val, new EffectContext
             {
                 EffectSource = (mod as ActiveEffectInstance)?.Source,
                 Holder = this,
