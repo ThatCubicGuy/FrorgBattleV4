@@ -1,12 +1,18 @@
 using System.Collections.Generic;
-using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
 public class Single : ITargetingComponent
 {
-    public IEnumerable<ITargetable> SelectTargets(AbilityContext ctx)
+    public IEnumerable<TargetingContext> SelectTargets(AbilityContext ctx)
     {
-        return [ctx.MainTarget];
+        return
+        [
+            new TargetingContext
+            {
+                Target = ctx.MainTarget,
+                TargetRank = 0
+            }
+        ];
     }
 }

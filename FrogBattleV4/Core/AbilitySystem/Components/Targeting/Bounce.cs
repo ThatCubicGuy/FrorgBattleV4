@@ -1,19 +1,25 @@
 using System.Collections.Generic;
+using System.Linq;
 using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
 public class Bounce : ITargetingComponent
 {
-    public required uint Count { get; init; }
+    public required int Count { get; init; }
 
-    public IEnumerable<ITargetable> SelectTargets(AbilityContext ctx)
+    public IEnumerable<TargetingContext> SelectTargets(AbilityContext ctx)
     {
-        List<ITargetable> result = [ctx.MainTarget];
-        for (var i = 1; i < Count; i++)
+        List<TargetingContext> result = [new()
         {
-            result.Add(ctx.ValidTargets[ctx.Rng.Next(ctx.ValidTargets.Count)]);
-        }
+            Target = ctx.MainTarget,
+            TargetRank = 0
+        }];
+        result.AddRange(ctx.ValidTargets.OrderBy(x => ctx.Rng.NextDouble()).Select(x => new TargetingContext
+        {
+            Target = ctx.MainTarget,
+            TargetRank = 1
+        }).Take(Count));
         return result;
     }
 }

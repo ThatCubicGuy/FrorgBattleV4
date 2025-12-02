@@ -1,0 +1,14 @@
+using FrogBattleV4.Core.CharacterSystem;
+
+namespace FrogBattleV4.Core.AbilitySystem.Components;
+
+public struct TargetingContext
+{
+    public ITargetable Target;
+    /// <summary>
+    /// The rank of the target signifies whether it
+    /// is the primary target (rank 0), secondary, or further.
+    /// Especially useful for blast attacks. Most attacks don't go past rank 1.
+    /// </summary>
+    public int TargetRank;
+}
