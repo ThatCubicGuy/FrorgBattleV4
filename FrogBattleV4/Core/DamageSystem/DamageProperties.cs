@@ -1,8 +1,8 @@
 namespace FrogBattleV4.Core.DamageSystem;
 
-public record DamageInfo(DamageTypes DamageType, double DefPen, double TypeResPen);
+public record DamageProperties(string DamageType, double DefPen, double TypeResPen, bool CanCrit);
 
-public enum DamageTypes
+public enum DamageType
 {
     True,
     Blunt,

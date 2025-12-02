@@ -9,9 +9,5 @@ public class PassiveEffect : IEffectDefinition, IAttributeModifier
     public required string Id { get; init; }
     public required List<IModifierComponent> Modifiers { get; init; }
     public required List<IConditionComponent> Conditions { get; init; }
-
-    public double GetModifiedStat(string statName, double currentValue, EffectContext ctx)
-    {
-        throw new System.NotImplementedException();
-    }
+    // AA I FUCKED IT UP CUZ NOW THERE'S NO WRAPPER AND CONDITIONS ARE IGNORED WHAT IS WRONG WITH ME
 }

@@ -1,9 +1,11 @@
 #nullable enable
-using FrogBattleV4.Core.CharacterSystem;
+
+using System.Collections.Generic;
+using FrogBattleV4.Core.EffectSystem.Components;
 
 namespace FrogBattleV4.Core.EffectSystem;
 
 public interface IAttributeModifier
 {
-    double GetModifiedStat(string statName, double currentValue, EffectContext ctx);
+    List<IModifierComponent> Modifiers { get; }
 }

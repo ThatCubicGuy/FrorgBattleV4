@@ -1,17 +1,17 @@
 #nullable enable
 
+using FrogBattleV4.Core.DamageSystem;
+
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
-public class DamageBonus : IModifierComponent
+public class DamageBonus : IDamageModifier
 {
     public string? Type { get; init; }
     public string? Source { get; init; }
     public required double Amount { get; init; }
-    
-    public bool Modifies(string key, EffectContext? ctx = null)
-    {
-        return key == string.Join('.', nameof(DamageBonus), Type ?? "AllType", Source ?? "AllSource");
-    }
 
-    public double Apply(double currentValue, EffectContext ctx) => currentValue * Amount;
+    public bool CanApply(DamagePhase phase, DamageContext ctx)
+    {
+        return phase == DamagePhase.PreMitigation && (Type == null || Type == ctx.Properties.DamageType) && (Source == null || Source == ctx.DamageSource);
+    }
 }

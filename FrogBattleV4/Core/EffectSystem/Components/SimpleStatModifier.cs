@@ -1,22 +1,24 @@
 #nullable enable
+using System;
+
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
-public class SimpleStatModifier : IModifierComponent
+public class SimpleStatModifier : IStatModifier
 {
     public required string Stat { get; init; }
     public required double Amount { get; init; }
-    public required Operator Operator { get; init; }
+    public required ModifierOperation Operation { get; init; }
 
-    public bool Modifies(string key, EffectContext? ctx = null) => Stat == key;
-
-    public double Apply(double currentValue, EffectContext ctx)
+    public double Apply(double currentValue, StatContext ctx)
     {
-        return Operator switch
+        return Operation switch
         {
-            Operator.AddValue => currentValue + Amount,
-            Operator.MultiplyBase => currentValue + Amount * ctx.Holder.BaseStats[Stat],
-            Operator.MultiplyTotal => currentValue * Amount,
-            _ => throw new System.InvalidOperationException($"Invalid operator: {Operator}")
+            ModifierOperation.AddValue => currentValue + Amount,
+            ModifierOperation.MultiplyBase => currentValue + Amount * ctx.Holder.BaseStats[Stat],
+            ModifierOperation.MultiplyTotal => currentValue * Amount,
+            ModifierOperation.Maximum => Math.Max(currentValue, Amount),
+            ModifierOperation.Minimum => Math.Min(currentValue, Amount),
+            _ => throw new System.InvalidOperationException($"Invalid operator: {Operation}")
         };
     }
 }
