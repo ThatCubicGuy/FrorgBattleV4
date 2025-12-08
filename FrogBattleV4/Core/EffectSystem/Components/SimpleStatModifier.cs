@@ -10,7 +10,7 @@ public class SimpleStatModifier : IStatModifier
     public required double Amount { get; init; }
     public required ModifierOperation Operation { get; init; }
 
-    public double Apply(double currentValue, StatContext ctx)
+    public double Apply(double currentValue, EffectContext ctx)
     {
         return Operation.Apply(Amount, ctx.Holder.BaseStats[Stat], currentValue);
     }

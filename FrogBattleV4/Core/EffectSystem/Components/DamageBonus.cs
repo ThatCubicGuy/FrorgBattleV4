@@ -12,13 +12,13 @@ public class DamageBonus : IDamageModifier
     public string? Source { get; init; }
     public required double Amount { get; init; }
     public ModifierOperation Operation { get; init; } = ModifierOperation.MultiplyTotal;
-
+    
     public DamagePhase Phase => Type is null ? DamagePhase.RawBonus : DamagePhase.TypeBonus;
 
     public double Apply(double currentValue, DamageContext ctx)
     {
-        if ((Type ?? ctx.Properties.DamageType) != ctx.Properties.DamageType ||
-            (Source ?? ctx.DamageSource) != ctx.DamageSource) return currentValue;
+        if ((Type ?? ctx.Properties.Type) != ctx.Properties.Type ||
+            (Source ?? ctx.Source) != ctx.Source) return currentValue;
 
         return Operation.Apply(Amount, ctx.RawDamage, currentValue);
     }

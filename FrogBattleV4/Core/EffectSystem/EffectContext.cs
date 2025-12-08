@@ -3,7 +3,7 @@ using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.EffectSystem;
 
-public struct StatContext
+public struct EffectContext
 {
     public string Stat;
     public ICharacter Holder;

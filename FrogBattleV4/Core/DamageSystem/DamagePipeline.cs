@@ -7,22 +7,46 @@ namespace FrogBattleV4.Core.DamageSystem;
 
 public static class DamagePipeline
 {
-    // I don't like this. I just threw something together to feel better about myself.
-    // fricking chatgpt i gotta stop using it less if i wanna actually get anywhere
-    public static double ComputePipeline(DamageContext ctx)
+    public static double ComputePipeline(this DamageContext ctx)
     {
-        var mods = ctx.Attacker.ActiveEffects.SelectMany(x => x.Modifiers)
-            .OfType<DamageBonus>().Sum(x => x.Amount);
-        var total = ctx.RawDamage;
-        total *= 1 + mods;
-        total *= ctx.Properties.CanCrit &&
-                 ctx.Rng.NextDouble() < ctx.Attacker.GetStat(nameof(Stat.CritRate), ctx.Target)
-            ? 1 + ctx.Attacker.GetStat(nameof(Stat.CritDamage), ctx.Target)
-            : 1;
+        // Outgoing damage bonuses
+        var outMods = ctx.Attacker.AttachedEffects.SelectMany(x => x.Modifiers
+            .OfType<IDamageModifier>()
+            .Where(y => (y.Type ?? ctx.Type) == ctx.Type))
+            .ToArray();
+        
+        // Raw damage bonuses (universal Damage Boost)
+        var total = outMods.Where(x => x.Phase == DamagePhase.RawBonus)
+            .Aggregate(ctx.RawDamage, (current, modifier) => modifier.Apply(current, ctx));
+        
+        // Crit bonus
+        if (ctx.Properties.CanCrit && ctx.Attacker.GetStat(nameof(Stat.CritRate), ctx.Target) < ctx.Rng.NextDouble())
+        {
+            total *= ctx.Attacker.GetStat(nameof(Stat.CritDamage), ctx.Target);
+        }
+        
+        // Post crit bonuses (Type Bonus)
+        total = outMods.Where(x => x.Phase  == DamagePhase.TypeBonus)
+            .Aggregate(total, (current, modifier) => modifier.Apply(current, ctx));
+        
+        // Incoming damage resistances
+        var inMods = ctx.Target.AttachedEffects.SelectMany(x => x.Modifiers
+                .OfType<IDamageModifier>()
+                .Where(y => (y.Type ?? ctx.Type) == ctx.Type))
+            .ToArray();
+
+        // Pre DEF bonuses (Type Res)
+        total = inMods.Where(x => x.Phase == DamagePhase.TypeRes)
+            .Aggregate(total, (current, modifier) =>
+                modifier.Apply(current, ctx) * Math.Clamp(1 - ctx.Properties.TypeResPen, 0, 1));
+        
+        // DEF Application
         total -= ctx.Target.GetStat(nameof(Stat.Def), ctx.Attacker) * Math.Clamp(1 - ctx.Properties.DefPen, 0, 1);
-        mods = ctx.Target.ActiveEffects.SelectMany(x => x.Modifiers)
-            .OfType<DamageRes>().Sum(x => x.Amount);
-        total *= Math.Clamp(1 - mods * Math.Clamp(1 - ctx.Properties.TypeResPen, 0, 1), 0, 1);
+        
+        // Final touches (universal DMG Res)
+        total = inMods.Where(x => x.Phase == DamagePhase.RawRes)
+            .Aggregate(total, (current, modifier) => modifier.Apply(current, ctx));
+        
         return total;
     }
 }

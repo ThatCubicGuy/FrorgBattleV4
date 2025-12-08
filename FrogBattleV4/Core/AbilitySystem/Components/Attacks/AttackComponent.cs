@@ -10,7 +10,7 @@ public class AttackComponent : IAttackComponent
 {
     public required string Scalar { get; init; }
     public required double Ratio { get; init; }
-    public required DamageProperties DamageProperties { get; init; }
+    public required DamageProperties Properties { get; init; }
     public double? Falloff { get; init; }
     public double? HitRate { get; init; }
     public ITargetingComponent? Targeting { get; init; }
@@ -18,10 +18,16 @@ public class AttackComponent : IAttackComponent
     public IEnumerable<Damage> GetDamage(AbilityContext ctx)
     {
         Damage[] result = [];
-        foreach (var item in (Targeting ?? ctx.Definition.Targeting)!.SelectTargets(ctx))
+        foreach (var target in (Targeting ?? ctx.Definition.Targeting)!.SelectTargets(ctx))
         {
-            var ratio = Ratio * Math.Pow(Falloff ?? 1, item.TargetRank);
-            result[^1] = new Damage(ctx.User, item.Target, ratio * ctx.User.GetStat(Scalar, item.Target as ICharacter), DamageProperties);
+            var ratio = Ratio * Math.Pow(Falloff ?? 1, target.TargetRank);
+            result[^1] = new Damage
+            {
+                BaseAmount = ratio * ctx.User.GetStat(Scalar, target.Target as ICharacter),
+                Properties = Properties,
+                Source = ctx.User,
+                Target = target.Target
+            };
         }
         return result;
     }

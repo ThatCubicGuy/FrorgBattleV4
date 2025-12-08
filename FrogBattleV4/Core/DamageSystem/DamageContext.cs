@@ -9,11 +9,8 @@ public struct DamageContext
     public ICharacter Attacker;
     public ICharacter Target;
     public DamageProperties Properties;
-    /* It might make sense to forgo DamageProperties, honestly.
-     * public string Type;
-     * public double DefIgnore;
-     * public double TypeResPen;
-     */
-    public string DamageSource;
+    // It might make sense to forgo DamageProperties, honestly.
+    public string Type;
+    public string Source;
     public Random Rng;
 }

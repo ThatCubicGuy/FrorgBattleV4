@@ -1,7 +1,7 @@
 #nullable enable
 namespace FrogBattleV4.Core.DamageSystem;
 
-public record AttackProperties(string? DamageType, double DefPen, double TypeResPen, bool CanCrit);
+public record DamageProperties(string? Type, double DefPen, double TypeResPen, bool CanCrit);
 
 public enum DamageType
 {
