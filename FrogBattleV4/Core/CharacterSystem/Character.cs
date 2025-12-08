@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.CharacterSystem.Components;
 using FrogBattleV4.Core.EffectSystem;
 using FrogBattleV4.Core.EffectSystem.ActiveEffects;
+using FrogBattleV4.Core.EffectSystem.Components;
 
 namespace FrogBattleV4.Core.CharacterSystem;
 
@@ -13,16 +15,32 @@ public class Character : ICharacter
 
     public Character()
     {
-        _pools = new Dictionary<string, IPoolComponent>
+        _pools = new Dictionary<string, IPoolComponent>(StringComparer.OrdinalIgnoreCase)
         {
-            { "hp", new HealthComponent(this) },
-            { "mana", new ManaComponent(this) },
-            { "energy", new EnergyComponent(this) },
+            {
+                "hp", new HealthComponent(this)
+                {
+                    CurrentValue = BaseStats[nameof(Stat.MaxHp)]
+                }
+            },
+            {
+                "mana", new ManaComponent(this)
+                {
+                    CurrentValue = BaseStats[nameof(Stat.MaxMana)] / 2
+                }
+            },
+            {
+                "energy", new EnergyComponent(this)
+                {
+                    CurrentValue = 0
+                }
+            },
         };
     }
     
     // Base stats for any character
-    public IReadOnlyDictionary<string, double> BaseStats { get; } = new Dictionary<string, double>()
+    public IReadOnlyDictionary<string, double> BaseStats { get; } =
+        new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
     {
         { nameof(Stat.MaxHp), 400000 },
         { nameof(Stat.MaxMana), 100 },
@@ -45,17 +63,16 @@ public class Character : ICharacter
     };
     
     public List<AbilityDefinition> Abilities { get; } = [];
-    public List<IAttributeModifier> ActiveEffects { get; } = [];
-    public List<IAttributeModifier> PassiveEffects { get; } = [];
+    private List<IAttributeModifier> ActiveEffects { get; } = [];
+    private List<IAttributeModifier> PassiveEffects { get; } = [];
+    public List<IAttributeModifier> AttachedEffects => [..ActiveEffects, ..PassiveEffects];
     public double GetStat(string stat, ICharacter target = null)
     {
-        return ActiveEffects.Aggregate(BaseStats[stat],
-            (val, mod) => val + mod.GetModifiedStat(val, new StatContext
-            {
-                Stat = stat,
-                EffectSource = (mod as ActiveEffectInstance)?.Source,
-                Holder = this,
-                Target = target,
-            }));
+        return new StatContext
+        {
+            Stat = stat,
+            Owner = this,
+            Target = target
+        }.ComputePipeline();
     }
 }

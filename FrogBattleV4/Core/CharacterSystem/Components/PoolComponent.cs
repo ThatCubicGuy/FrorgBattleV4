@@ -12,9 +12,12 @@ public abstract class PoolComponent(ICharacter owner) : IPoolComponent
     public double CurrentValue
     {
         get => _currentValue;
-        set => _currentValue = Math.Max(0, Math.Min(value, MaxValue));
+        set => _currentValue = Math.Max(0, Math.Min(value, Capacity));
     }
-    public double MaxValue => Owner.GetStat("Max" + Id);
+    /// <summary>
+    /// The maximum value that this pool component can have.
+    /// </summary>
+    public double Capacity => Owner.GetStat("Max" + Id);
 }
 
 internal enum Pools
