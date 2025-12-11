@@ -20,7 +20,7 @@ public class AttackComponent : IAttackComponent
         Damage[] result = [];
         foreach (var target in (Targeting ?? ctx.Definition.Targeting)!.SelectTargets(ctx))
         {
-            var ratio = Ratio * Math.Pow(Falloff ?? 1, target.TargetRank);
+            var ratio = Ratio * Math.Pow(1 - (Falloff ?? 0), target.TargetRank);
             result[^1] = new Damage
             {
                 BaseAmount = ratio * ctx.User.GetStat(Scalar, target.Target as ICharacter),

@@ -5,6 +5,6 @@ public enum ModifierOperation
     AddValue = 0,
     AddBasePercent = 1,
     MultiplyTotal = 2,
-    Maximum = 3,
-    Minimum = 4,
+    Minimum = 3,
+    Maximum = 4,
 }

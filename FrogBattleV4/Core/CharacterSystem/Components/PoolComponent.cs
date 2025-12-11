@@ -1,4 +1,7 @@
+#nullable enable
 using System;
+using System.Collections.Generic;
+using FrogBattleV4.Core.EffectSystem.ActiveEffects;
 
 namespace FrogBattleV4.Core.CharacterSystem.Components;
 
@@ -7,6 +10,7 @@ public abstract class PoolComponent(ICharacter owner) : IPoolComponent
     private double _currentValue;
 
     public ICharacter Owner { get; init; } = owner;
+    public IEnumerable<IMutatorComponent>? Mutators { get; set; }
     public abstract string Id { get; }
 
     public double CurrentValue
@@ -17,7 +21,7 @@ public abstract class PoolComponent(ICharacter owner) : IPoolComponent
     /// <summary>
     /// The maximum value that this pool component can have.
     /// </summary>
-    public double Capacity => Owner.GetStat("Max" + Id);
+    public virtual double Capacity => Owner.GetStat("Max" + Id);
 }
 
 internal enum Pools

@@ -4,7 +4,7 @@ using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.BattleSystem;
 
-public struct BattleContext : IContext
+public struct BattleContext
 {
     public ICharacter ActiveCharacter { get; init; }
     public List<ICharacter> Allies { get; init; }

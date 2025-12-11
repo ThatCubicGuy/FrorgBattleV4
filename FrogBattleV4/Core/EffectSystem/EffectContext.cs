@@ -5,8 +5,7 @@ namespace FrogBattleV4.Core.EffectSystem;
 
 public struct EffectContext
 {
-    public string Stat;
-    public ICharacter Holder;
+    public ISupportsEffects Holder;
     public ICharacter? Target;
     public ICharacter? EffectSource;
 }

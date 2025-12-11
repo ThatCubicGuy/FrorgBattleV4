@@ -7,10 +7,20 @@ namespace FrogBattleV4.Core.EffectSystem.ActiveEffects;
 
 public class ActiveEffectInstance : IAttributeModifier
 {
-    public required ActiveEffectDefinition Definition { get; init; }
+    public ActiveEffectDefinition Definition { get; init; }
     public ICharacter? Source { get; init; }
+    public ISupportsEffects Holder { get; init; }
     public uint Turns { get; set; }
     public uint Stacks { get; set; }
+
+    public ActiveEffectInstance(ActiveEffectContext ctx)
+    {
+        Holder = ctx.Holder;
+        Source = ctx.Source;
+        Turns = ctx.Turns;
+        Stacks = ctx.Stacks;
+        Definition = ctx.Definition;
+    }
 
     IReadOnlyList<IModifierComponent> IAttributeModifier.Modifiers => Definition.Modifiers;
 }

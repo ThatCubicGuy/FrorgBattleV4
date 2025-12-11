@@ -1,13 +1,11 @@
 #nullable enable
-using System;
-using System.Linq;
 using System.Collections.Generic;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
 public class Blast : ITargetingComponent
 {
-    public uint Radius { get; init; } = 1;
+    public uint Radius { get; init; } = 0;
 
     public IEnumerable<TargetingContext> SelectTargets(AbilityContext ctx)
     {
@@ -18,7 +16,7 @@ public class Blast : ITargetingComponent
             Target = ctx.MainTarget,
             TargetRank = 0
         }];
-        for (var left = 1; left < Radius && index - left >= 0; left++)
+        for (var left = 1; left <= Radius && index - left >= 0; left++)
         {
             result.Add(new TargetingContext
             {
@@ -26,7 +24,7 @@ public class Blast : ITargetingComponent
                 TargetRank = left
             });
         }
-        for (var right = 1; right < Radius && index + right < ctx.ValidTargets.Count; right++)
+        for (var right = 1; right <= Radius && index + right < ctx.ValidTargets.Count; right++)
         {
             result.Add(new TargetingContext
             {

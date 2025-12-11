@@ -2,9 +2,9 @@ using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.EffectSystem.ActiveEffects;
 
-public struct ActiveEffectContext : IContext
+public struct ActiveEffectContext
 {
-    public ICharacter Holder;
+    public ISupportsEffects Holder;
     public ICharacter Source;
     public ActiveEffectDefinition Definition;
     public uint Turns;

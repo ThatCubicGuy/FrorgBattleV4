@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
+using FrogBattleV4.Core.DamageSystem;
 using FrogBattleV4.Core.CharacterSystem;
 using FrogBattleV4.Core.EffectSystem.Components;
 
-namespace FrogBattleV4.Core.DamageSystem;
+namespace FrogBattleV4.Core.Pipelines;
 
 public static class DamagePipeline
 {
