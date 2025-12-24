@@ -7,7 +7,7 @@ using FrogBattleV4.Core.CharacterSystem;
 namespace FrogBattleV4.Core.Pipelines;
 public static class StatPipeline
 {
-    public static double ComputePipeline(this StatContext ctx)
+    public static double ComputePipeline(this StatCalcContext ctx)
     {
         if (ctx.Owner is not ISupportsEffects owner) return ctx.Owner.BaseStats[ctx.Stat];
         var finalCtx = owner.AttachedEffects
@@ -15,12 +15,13 @@ public static class StatPipeline
             .OfType<IStatModifier>()
             .Aggregate(ctx, (current, mod) =>
                 mod.Apply(current));
-        var finalAmount = ctx.Owner.BaseStats[ctx.Stat];
-        finalAmount += finalCtx.ModifierValues[(int)ModifierOperation.AddValue];
-        finalAmount += finalCtx.ModifierValues[(int)ModifierOperation.AddBasePercent] * ctx.Owner.BaseStats[ctx.Stat];
-        finalAmount *= finalCtx.ModifierValues[(int)ModifierOperation.MultiplyTotal];
-        return Math.Clamp(finalAmount,
-            finalCtx.ModifierValues[(int)ModifierOperation.Minimum],
-            finalCtx.ModifierValues[(int)ModifierOperation.Maximum]);
+        if (!ctx.Owner.BaseStats.TryGetValue(ctx.Stat, out var finalAmount)) return 0;
+        finalAmount += finalCtx.Mods[ModifierOperation.AddValue];
+        finalAmount += finalCtx.Mods[ModifierOperation.AddBasePercent] * ctx.Owner.BaseStats[ctx.Stat];
+        finalAmount *= finalCtx.Mods[ModifierOperation.MultiplyTotal];
+        finalAmount = Math.Clamp(finalAmount,
+            finalCtx.Mods[ModifierOperation.Minimum],
+            finalCtx.Mods[ModifierOperation.Maximum]);
+        return finalAmount;
     }
 }

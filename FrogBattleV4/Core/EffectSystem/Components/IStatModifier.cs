@@ -11,5 +11,5 @@ public interface IStatModifier : IModifierComponent
     /// </summary>
     /// <param name="ctx">The context in which to calculate the modifier.</param>
     /// <returns>The modified stat value.</returns>
-    StatContext Apply(StatContext ctx);
+    StatCalcContext Apply(StatCalcContext ctx);
 }

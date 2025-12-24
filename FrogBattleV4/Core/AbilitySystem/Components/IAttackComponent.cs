@@ -5,5 +5,5 @@ namespace FrogBattleV4.Core.AbilitySystem.Components;
 
 public interface IAttackComponent : IAbilityComponent
 {
-    IEnumerable<Damage> GetDamage(AbilityContext ctx);
+    IEnumerable<Damage> GetDamage(AbilityExecContext ctx);
 }

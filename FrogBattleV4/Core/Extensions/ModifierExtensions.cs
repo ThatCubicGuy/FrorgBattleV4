@@ -25,8 +25,8 @@ public static class ModifierExtensions
     {
         return mod.Operation switch
         {
-            ModifierOperation.AddValue => $"{(mod.IsBuff() ? '+' : string.Empty)}{mod.Amount:N0} ",
-            ModifierOperation.AddBasePercent => $"{(mod.IsBuff() ? '+' : string.Empty)}{mod.Amount - 1:P0} ",
+            ModifierOperation.AddValue => $"{(mod.Amount > 0 ? '+' : string.Empty)}{mod.Amount:N0} ",
+            ModifierOperation.AddBasePercent => $"{(mod.Amount > 0 ? '+' : string.Empty)}{mod.Amount:P0} ",
             ModifierOperation.MultiplyTotal => $"{mod.Amount:0.##}x ",
             _ => $"{mod.Amount:F1}"
         } + mod.Stat;

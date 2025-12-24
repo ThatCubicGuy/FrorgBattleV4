@@ -6,7 +6,7 @@ public class StaticCost : ICostComponent
     public required string Stat { get; init; }
     public required double Amount { get; init; }
 
-    public void Tax(AbilityContext ctx)
+    public void Tax(AbilityExecContext ctx)
     {
         throw new System.NotImplementedException();
     }

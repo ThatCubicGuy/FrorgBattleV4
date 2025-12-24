@@ -7,7 +7,7 @@ public class Blast : ITargetingComponent
 {
     public uint Radius { get; init; } = 0;
 
-    public IEnumerable<TargetingContext> SelectTargets(AbilityContext ctx)
+    public IEnumerable<TargetingContext> SelectTargets(AbilityExecContext ctx)
     {
         var index = ctx.ValidTargets.IndexOf(ctx.MainTarget);
         if (index == -1) throw new System.ArgumentException("Main target is not a valid target!", nameof(ctx.MainTarget));

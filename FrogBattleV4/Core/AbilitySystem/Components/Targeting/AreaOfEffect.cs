@@ -6,7 +6,7 @@ namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
 public class AreaOfEffect : ITargetingComponent
 {
-    public IEnumerable<TargetingContext> SelectTargets(AbilityContext ctx)
+    public IEnumerable<TargetingContext> SelectTargets(AbilityExecContext ctx)
     {
         return ctx.ValidTargets.Select(x => new TargetingContext()
         {

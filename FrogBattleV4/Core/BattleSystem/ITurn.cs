@@ -1,9 +1,8 @@
-using FrogBattleV4.Core.BattleSystem;
+namespace FrogBattleV4.Core.BattleSystem;
 
-namespace FrogBattleV4.Core.CharacterSystem;
-
-public interface ITakesTurn
+public interface ITurn
 {
+    IBattleMember Entity { get; }
     TurnContext TurnStatus { get; }
     double BaseActionValue { get; }
     bool StartTurn(BattleContext ctx);

@@ -8,7 +8,7 @@ public class Bounce : ITargetingComponent
 {
     public required int Count { get; init; }
 
-    public IEnumerable<TargetingContext> SelectTargets(AbilityContext ctx)
+    public IEnumerable<TargetingContext> SelectTargets(AbilityExecContext ctx)
     {
         List<TargetingContext> result = [new()
         {

@@ -6,6 +6,6 @@ namespace FrogBattleV4.Core.EffectSystem;
 public interface ISupportsEffects
 {
     IReadOnlyList<IAttributeModifier> AttachedEffects { get; }
-    void ApplyEffect(EffectApplicationContext effect);
+    bool ApplyEffect(EffectApplicationContext effect);
     bool RemoveEffect(ActiveEffectDefinition effect);
 }

@@ -4,7 +4,7 @@ namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
 public class Single : ITargetingComponent
 {
-    public IEnumerable<TargetingContext> SelectTargets(AbilityContext ctx)
+    public IEnumerable<TargetingContext> SelectTargets(AbilityExecContext ctx)
     {
         return
         [

@@ -11,16 +11,16 @@ public class SimpleStatModifier : IStatModifier
     public required double Amount { get; init; }
     public required ModifierOperation Operation { get; init; }
 
-    public StatContext Apply(StatContext ctx)
+    public StatCalcContext Apply(StatCalcContext ctx)
     {
         if (ctx.Stat != Stat) return ctx;
-        ctx.ModifierValues[(int)Operation] = Operation switch
+        ctx.Mods[Operation] = Operation switch
         {
-            ModifierOperation.Maximum => Math.Max(Amount, ctx.ModifierValues[(int)Operation]),
-            ModifierOperation.Minimum => Math.Min(Amount, ctx.ModifierValues[(int)Operation]),
-            _ => ctx.ModifierValues[(int)Operation]
+            ModifierOperation.Maximum => Math.Min(Amount, ctx.Mods[Operation]),
+            ModifierOperation.Minimum => Math.Max(Amount, ctx.Mods[Operation]),
+            ModifierOperation.MultiplyTotal => ctx.Mods[Operation] * Amount,
+            _ => ctx.Mods[Operation] + Amount
         };
-        ctx.ModifierValues[(int)Operation] += Amount;
         return ctx;
     }
 }

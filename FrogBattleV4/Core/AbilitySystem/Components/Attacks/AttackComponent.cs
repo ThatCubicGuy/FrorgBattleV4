@@ -15,7 +15,7 @@ public class AttackComponent : IAttackComponent
     public double? HitRate { get; init; }
     public ITargetingComponent? Targeting { get; init; }
 
-    public IEnumerable<Damage> GetDamage(AbilityContext ctx)
+    public IEnumerable<Damage> GetDamage(AbilityExecContext ctx)
     {
         Damage[] result = [];
         foreach (var target in (Targeting ?? ctx.Definition.Targeting)!.SelectTargets(ctx))
@@ -26,7 +26,8 @@ public class AttackComponent : IAttackComponent
                 BaseAmount = ratio * ctx.User.GetStat(Scalar, target.Target as ICharacter),
                 Properties = Properties,
                 Source = ctx.User,
-                Target = target.Target
+                Target = target.Target,
+                Random = ctx.Rng
             };
         }
         return result;

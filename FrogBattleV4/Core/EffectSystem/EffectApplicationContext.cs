@@ -8,7 +8,6 @@ public struct EffectApplicationContext
 {
     public ICharacter Source;
     public ISupportsEffects Target;
-    public ActiveEffectContext Payload;
     public ActiveEffectDefinition Definition;
     public double ApplicationChance;
     public ChanceType ChanceType;

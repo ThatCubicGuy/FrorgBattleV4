@@ -1,6 +1,9 @@
+using FrogBattleV4.Core.BattleSystem;
+
 namespace FrogBattleV4.Core.CharacterSystem;
 
 public interface ITakesAction
 {
-    void TakeAction();
+    bool CanTakeAction(BattleContext ctx);
+    void TakeAction(BattleContext ctx);
 }

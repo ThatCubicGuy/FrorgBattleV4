@@ -4,10 +4,11 @@ using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.BattleSystem;
 
-public class ActionBarItem(ITakesTurn actor) : IComparable<ActionBarItem?>
+public class ActionBarItem(ITurn turn) : IComparable<ActionBarItem?>
 {
-    public required ITakesTurn Entity { get; init; } = actor;
-    public double ActionValue { get; protected set; }
+    public ITurn TurnEvent { get; init; } = turn;
+    public double ActionValue { get; protected set; } = turn.BaseActionValue;
+    public TurnState TurnState { get; set; }
 
     public void Advance(double value)
     {
@@ -21,4 +22,12 @@ public class ActionBarItem(ITakesTurn actor) : IComparable<ActionBarItem?>
         if (other is null) return -1;
         return ActionValue.CompareTo(other.ActionValue);
     }
+}
+
+public enum TurnState
+{
+    Inactive,
+    Starting,
+    Active,
+    Ending
 }

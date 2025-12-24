@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using FrogBattleV4.Core.CharacterSystem;
 using FrogBattleV4.Core.EffectSystem;
-using FrogBattleV4.Core.EffectSystem.ActiveEffects;
 
 namespace FrogBattleV4.Core.Extensions;
 

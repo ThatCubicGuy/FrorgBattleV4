@@ -4,7 +4,7 @@ using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem;
 
-public struct AbilityContext
+public struct AbilityExecContext
 {
     public ICharacter User;
     public ICharacter MainTarget;
