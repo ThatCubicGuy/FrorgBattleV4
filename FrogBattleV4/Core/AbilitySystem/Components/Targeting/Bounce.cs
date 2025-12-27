@@ -15,11 +15,14 @@ public class Bounce : ITargetingComponent
             Target = ctx.MainTarget,
             TargetRank = 0
         }];
-        result.AddRange(ctx.ValidTargets.OrderBy(x => ctx.Rng.NextDouble()).Select(x => new TargetingContext
+        for (var i = 0; i < Count; i++)
         {
-            Target = ctx.MainTarget,
-            TargetRank = 1
-        }).Take(Count));
+            result.Add(new TargetingContext
+            {
+                Target = ctx.ValidTargets.MinBy(_ => ctx.Rng.NextDouble()),
+                TargetRank = 1
+            });
+        }
         return result;
     }
 }

@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
@@ -9,27 +10,29 @@ public class Blast : ITargetingComponent
 
     public IEnumerable<TargetingContext> SelectTargets(AbilityExecContext ctx)
     {
-        var index = ctx.ValidTargets.IndexOf(ctx.MainTarget);
-        if (index == -1) throw new System.ArgumentException("Main target is not a valid target!", nameof(ctx.MainTarget));
-        List<TargetingContext> result = [new()
+        IEnumerable<TargetingContext> result = [new()
         {
             Target = ctx.MainTarget,
             TargetRank = 0
         }];
-        for (var left = 1; left <= Radius && index - left >= 0; left++)
+        var idx = 0;
+        for (var left = ctx.MainTarget.Left; left is not null; left = left.Left)
         {
-            result.Add(new TargetingContext
+            idx += 1;
+            result = result.Append(new TargetingContext
             {
-                Target = ctx.ValidTargets[index - left],
-                TargetRank = left
+                Target = left,
+                TargetRank = idx
             });
         }
-        for (var right = 1; right <= Radius && index + right < ctx.ValidTargets.Count; right++)
+        idx = 0;
+        for (var right = ctx.MainTarget.Right; right is not null; right = right.Right)
         {
-            result.Add(new TargetingContext
+            idx += 1;
+            result = result.Append(new TargetingContext
             {
-                Target = ctx.ValidTargets[index + right],
-                TargetRank = right
+                Target = right,
+                TargetRank = idx
             });
         }
         return result;

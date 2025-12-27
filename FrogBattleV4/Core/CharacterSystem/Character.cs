@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using FrogBattleV4.Core.Pipelines;
 using FrogBattleV4.Core.AbilitySystem;
@@ -17,7 +16,7 @@ namespace FrogBattleV4.Core.CharacterSystem;
 
 public class Character : ICharacter
 {
-    [NotNull] private readonly Dictionary<string, IPoolComponent> _pools;
+    private readonly Dictionary<string, IPoolComponent> _pools;
 
     public Character()
     {
@@ -62,10 +61,13 @@ public class Character : ICharacter
                 Flags = PoolFlags.UsedForBurst
             }
         }.ToDictionary(x => x.Id, StringComparer.OrdinalIgnoreCase);
+
+        Turns[0] = new CharacterTurn(this);
+        Parts[0] = new CharacterBody(this);
     }
 
-    public ITurn[]? Turns { get; }
-    public IAction[]? Actions { get; }
+    public IAction[] Turns { get; } = [];
+    public ITargetable[] Parts { get; } = [];
 
     #region Pools
 
@@ -89,24 +91,23 @@ public class Character : ICharacter
 
     #endregion
     
-    [NotNull] public IReadOnlyDictionary<string, double> BaseStats { get; }
-    [NotNull] public IReadOnlyDictionary<string, IPoolComponent> Pools => _pools;
-    public double BaseActionValue => 10000 / GetStat(nameof(Stat.Spd));
-    public TurnContext TurnStatus { get; private set; }
+    public IReadOnlyDictionary<string, double> BaseStats { get; }
+    public IReadOnlyDictionary<string, IPoolComponent> Pools => _pools;
+    public TurnContext TurnStatus { get; set; }
 
     public List<AbilityDefinition> Abilities { get; init; } = [];
     private List<ActiveEffectInstance> ActiveEffects { get; } = [];
     private List<PassiveEffect> PassiveEffects { get; } = [];
     public IReadOnlyList<IAttributeModifier> AttachedEffects => [..ActiveEffects, ..PassiveEffects];
     private List<ActiveEffectInstance> MarkedForDeathEffects { get; } = [];
-    
+
     /// <summary>
     /// Calculates the final value of a stat, optionally in relation to an enemy.
     /// </summary>
     /// <param name="stat">The name of the stat to calculate.</param>
     /// <param name="target">The enemy against which to calculate the stat. Optional.</param>
     /// <returns>The final value of the stat.</returns>
-    public double GetStat(string stat, IHasStats target = null)
+    public double GetStat(string stat, IBattleMember? target = null)
     {
         return new StatCalcContext
         {
@@ -131,11 +132,7 @@ public class Character : ICharacter
     /// Runs effect calculations (such as DoT and general effect turn ticks)
     /// </summary>
     /// <param name="ctx">The context in which to start the turn.</param>
-    /// <returns>
-    /// True if the character can select and execute an ability,
-    /// false if their turn is to be skipped.
-    /// </returns>
-    public bool StartTurn(BattleContext ctx)
+    public void InitTurn(BattleContext ctx)
     {
         TurnStatus = new TurnContext
         {
@@ -147,9 +144,8 @@ public class Character : ICharacter
             mutator.OnTurnStart(TurnStatus);
         }
         MarkedForDeathEffects.AddRange(ActiveEffects.Where(x => x.Expire(TurnStatus)));
-        return CanTakeAction(ctx);
     }
-    
+
     public void ExecuteAbility(AbilityExecContext ctx)
     {
         TurnStatus = TurnStatus with
@@ -159,7 +155,7 @@ public class Character : ICharacter
         throw new NotImplementedException();
     }
 
-    public void EndTurn()
+    public void FinalizeTurn()
     {
         TurnStatus = TurnStatus with
         {

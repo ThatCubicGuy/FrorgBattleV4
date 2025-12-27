@@ -1,19 +1,31 @@
 #nullable enable
 using System;
-using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.BattleSystem;
 
-public class ActionBarItem(ITurn turn) : IComparable<ActionBarItem?>
+public class ActionBarItem(IAction action) : IComparable<ActionBarItem?>
 {
-    public ITurn TurnEvent { get; init; } = turn;
-    public double ActionValue { get; protected set; } = turn.BaseActionValue;
-    public TurnState TurnState { get; set; }
+    private double _actionValue = action.BaseActionValue;
+
+    public IAction TurnEvent { get; } = action;
+    public double ActionValue
+    {
+        get => _actionValue;
+        private set
+        {
+            _actionValue = value;
+            if (_actionValue < 0) _actionValue = 0;
+        }
+    }
 
     public void Advance(double value)
     {
         ActionValue -= value;
-        if (ActionValue < 0) ActionValue = 0;
+    }
+
+    public void AdvancePercentage(double value)
+    {
+        ActionValue -= TurnEvent.BaseActionValue * value;
     }
     
     public int CompareTo(ActionBarItem? other)
@@ -22,12 +34,4 @@ public class ActionBarItem(ITurn turn) : IComparable<ActionBarItem?>
         if (other is null) return -1;
         return ActionValue.CompareTo(other.ActionValue);
     }
-}
-
-public enum TurnState
-{
-    Inactive,
-    Starting,
-    Active,
-    Ending
 }

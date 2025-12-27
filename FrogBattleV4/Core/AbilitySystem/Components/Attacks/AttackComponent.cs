@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using FrogBattleV4.Core.CharacterSystem;
 using FrogBattleV4.Core.DamageSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Attacks;
@@ -17,18 +16,18 @@ public class AttackComponent : IAttackComponent
 
     public IEnumerable<Damage> GetDamage(AbilityExecContext ctx)
     {
-        Damage[] result = [];
+        IList<Damage> result = [];
         foreach (var target in (Targeting ?? ctx.Definition.Targeting)!.SelectTargets(ctx))
         {
             var ratio = Ratio * Math.Pow(1 - (Falloff ?? 0), target.TargetRank);
-            result[^1] = new Damage
+            result.Add(new Damage
             {
-                BaseAmount = ratio * ctx.User.GetStat(Scalar, target.Target as ICharacter),
+                BaseAmount = ratio * ctx.User.GetStat(Scalar, target.Target.This),
                 Properties = Properties,
                 Source = ctx.User,
                 Target = target.Target,
                 Random = ctx.Rng
-            };
+            });
         }
         return result;
     }

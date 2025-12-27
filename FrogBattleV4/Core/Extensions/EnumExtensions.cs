@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.CharacterSystem;
 using FrogBattleV4.Core.EffectSystem;
 
@@ -35,8 +36,8 @@ public static class EnumExtensions
         {
             ChanceType.Fixed => effect.ApplicationChance,
             ChanceType.Base => effect.ApplicationChance +
-                               effect.Source.GetStat(nameof(Stat.EffectHitRate), effect.Target as IHasStats) -
-                               ((effect.Target as IHasStats)?.GetStat(nameof(Stat.EffectRes), effect.Source) ?? 0),
+                               effect.Source.GetStat(nameof(Stat.EffectHitRate), effect.Target as IBattleMember) -
+                               ((effect.Target as IBattleMember)?.GetStat(nameof(Stat.EffectRes), effect.Source) ?? 0),
             _ => throw new InvalidEnumArgumentException($"Invalid chance type: {effect.ChanceType}")
         };
 
