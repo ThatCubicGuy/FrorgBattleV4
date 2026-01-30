@@ -4,7 +4,7 @@ using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.DamageSystem;
 
-public struct DamageCalcContext()
+public struct DamageCalcContext
 {
     public ICharacter? Attacker;
     public ICharacter? Target;
@@ -13,5 +13,4 @@ public struct DamageCalcContext()
     public string? Type;
     public string? Source;
     public Random Rng;
-    public Modifiers Mods = default;
 }

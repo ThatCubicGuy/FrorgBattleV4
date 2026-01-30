@@ -15,8 +15,13 @@ public class SpecialStatComponent : IPoolComponent
     public double? MaxValue { get; init; }
     public double? MinValue { get; init; }
     public PoolFlags Flags { get; init; } = PoolFlags.Dummy;
-    public bool ModifyValue(double value, SpendContext ctx)
+    public SpendResult ProcessSpend(double amount, SpendContext ctx)
     {
-        
+        throw new NotImplementedException();
+    }
+
+    public double ProcessRegen(double amount, ICharacter character)
+    {
+        throw new NotImplementedException();
     }
 }

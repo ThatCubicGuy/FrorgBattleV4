@@ -2,10 +2,8 @@
 using FrogBattleV4.Core.DamageSystem;
 
 namespace FrogBattleV4.Core.EffectSystem.Components;
-public interface IDamageModifier : IModifierComponent
+public interface IDamageModifier : IModifierComponent<DamageCalcContext>
 {
     string? Type { get; }
     string? Source { get; }
-    DamagePhase Phase { get; }
-    DamageCalcContext Apply(DamageCalcContext ctx);
 }

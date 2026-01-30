@@ -1,6 +1,5 @@
 #nullable enable
 using System.Collections.Generic;
-using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.EffectSystem.Components;
 
 namespace FrogBattleV4.Core.EffectSystem;

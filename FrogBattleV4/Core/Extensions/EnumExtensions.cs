@@ -13,9 +13,9 @@ public static class EnumExtensions
     /// <param name="currentValue">The current value of the item to be modified.</param>
     /// <returns>The modified value.</returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public static double Apply(this ModifierOperation op, double amount, double baseValue, double currentValue)
+    public static void Apply(this ModifierOperation op, double amount, double baseValue, ref double currentValue)
     {
-        return op switch
+        currentValue = op switch
         {
             ModifierOperation.AddValue => currentValue + amount,
             ModifierOperation.AddBasePercent => currentValue + amount * baseValue,

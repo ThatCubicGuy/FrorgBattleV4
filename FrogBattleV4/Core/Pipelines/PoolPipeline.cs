@@ -1,7 +1,5 @@
-using System;
-using System.Linq;
 using FrogBattleV4.Core.CharacterSystem;
-using FrogBattleV4.Core.EffectSystem.Components;
+using FrogBattleV4.Core.EffectSystem;
 
 namespace FrogBattleV4.Core.Pipelines;
 
@@ -15,13 +13,13 @@ public static class PoolPipeline
     /// <returns>The final value.</returns>
     public static double ComputePipeline(this PoolCalcContext ctx, double baseAmount)
     {
-        var finalCtx = ctx.Owner.AttachedEffects
-            .SelectMany(x => x.Modifiers)
-            .OfType<IPoolMutationModifier>()
-            .Aggregate(ctx, (current, mod) =>
-                mod.Apply(current));
-        var total = baseAmount;
-        total = finalCtx.Mods.Apply(baseAmount, total);
-        return total;
+        var finalMods = ctx.Owner.AttachedEffects
+            .AggregateMods(ctx, new EffectContext
+            {
+                Holder = ctx.Owner,
+                Target = null,
+            });
+        
+        return finalMods.Apply(baseAmount);
     }
 }

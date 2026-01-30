@@ -49,10 +49,10 @@ public class PoolComponent(ICharacter owner) : IPoolComponent
         switch (ctx.Mode)
         {
             case SpendMode.Preview:
-                return new SpendResult(CalculateFinalAmount(amount, calcCtx), true);
+                return new SpendResult(calcCtx.ComputePipeline(amount), true);
                 break;
             case SpendMode.Validate:
-                return new SpendResult(0, CalculateFinalAmount(amount, calcCtx) <= CurrentValue);
+                return new SpendResult(0, calcCtx.ComputePipeline(amount) <= CurrentValue);
                 break;
             case SpendMode.Commit:
                 break;
@@ -65,18 +65,6 @@ public class PoolComponent(ICharacter owner) : IPoolComponent
     public double ProcessRegen(double amount, ICharacter character)
     {
         throw new NotImplementedException();
-    }
-    [Pure]
-    private double CalculateFinalAmount(double amount, PoolCalcContext ctx)
-    {
-        foreach (var eff in ctx.Owner.AttachedEffects)
-        {
-            foreach (var mod in eff.Modifiers.OfType<IPoolMutationModifier>()
-                         .Where(x => x.Channel == ctx.Channel))
-            {
-                
-            }
-        }
     }
 }
 

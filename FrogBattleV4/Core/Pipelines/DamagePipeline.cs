@@ -1,56 +1,62 @@
 #nullable enable
 using System;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using FrogBattleV4.Core.DamageSystem;
 using FrogBattleV4.Core.CharacterSystem;
+using FrogBattleV4.Core.EffectSystem;
 using FrogBattleV4.Core.EffectSystem.Components;
 
 namespace FrogBattleV4.Core.Pipelines;
 
 public static class DamagePipeline
 {
+    /// <summary>
+    /// Computes the full pipeline for dealing damage.
+    /// </summary>
+    /// <param name="ctx">The context in which to calculate damage.</param>
+    /// <param name="rawDamage">The raw damage being dealt.</param>
+    /// <returns>The final damage to be dealt.</returns>
+    [Pure]
     public static double ComputePipeline(this DamageCalcContext ctx, double rawDamage)
     {
-        var total = rawDamage;
         // Outgoing damage bonuses
         if (ctx.Attacker is { } attacker)
         {
-            var outCtx = attacker.AttachedEffects
-                .SelectMany(x => x.Modifiers)
-                .OfType<IDamageModifier>()
-                .Aggregate(ctx, (current, mod) =>
-                    mod.Apply(current));
-        
+            var outMods = attacker.AttachedEffects
+                .AggregateMods(ctx, new EffectContext
+                {
+                    Holder = attacker,
+                    Target = ctx.Target
+                });
+            
             // Apply outgoing mods
-            total = outCtx.Mods.Apply(rawDamage, total);
-        
+            rawDamage = outMods.Apply(rawDamage);
+            
             // Crit bonus
             if (ctx.Properties.CanCrit && attacker.GetStat(nameof(Stat.CritRate), ctx.Target) < ctx.Rng.NextDouble())
             {
-                total *= attacker.GetStat(nameof(Stat.CritDamage), ctx.Target);
+                rawDamage *= attacker.GetStat(nameof(Stat.CritDamage), ctx.Target);
             }
         }
-        
-        // Reset current damage context cuz yk. Phase switch. Stuff like that.
-        ctx.Mods = default;
-        rawDamage = total;
         
         // Incoming damage resistances
         if (ctx.Target is { } target)
         {
-            var inCtx = target.AttachedEffects
-                .SelectMany(x => x.Modifiers)
-                .OfType<IDamageModifier>()
-                .Aggregate(ctx, (current, mod) =>
-                    mod.Apply(current));
+            var inMods = target.AttachedEffects
+                .AggregateMods(ctx, new EffectContext
+                {
+                    Holder = target,
+                    Target = ctx.Attacker
+                });
 
             // Apply incoming mods
-            total = inCtx.Mods.Apply(rawDamage, total);
+            rawDamage = inMods.Apply(rawDamage);
 
             // DEF Application
-            total -= target.GetStat(nameof(Stat.Def), ctx.Attacker) * Math.Clamp(1 - ctx.Properties.DefPen, 0, 1);
+            rawDamage -= target.GetStat(nameof(Stat.Def), ctx.Attacker) * Math.Clamp(1 - ctx.Properties.DefPen, 0, 1);
         }
         
-        return Math.Max(0, total);
+        return Math.Max(0, rawDamage);
     }
 }
