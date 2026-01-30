@@ -1,10 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.BattleSystem.Decisions;
-using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.BattleSystem;
 
@@ -13,55 +12,50 @@ public class BattleManager
     private readonly IDecisionProvider _playerInputInterface;
     private readonly ActionBarItem[] _actionBar;
     private readonly Random _rng = new();
-    public Team Team1 { get; }
-    public Team Team2 { get; }
+    public List<Team> AllTeams { get; init; }
     [NotNull] public IOrderedEnumerable<ActionBarItem> ActionBar => _actionBar.Order();
 
-    public BattleManager(Team team1, Team team2, IDecisionProvider provider)
+    public BattleManager(IDecisionProvider provider, params Team[] teams)
     {
-        Team1 = team1;
-        Team2 = team2;
+        AllTeams = teams.ToList();
         _playerInputInterface = provider;
-        _actionBar = team1.Members.Concat(team2.Members).SelectMany(x => x.Turns?.Select(y => new ActionBarItem(y))).ToArray();
+        _actionBar = AllTeams
+            .SelectMany(x => x.Members)
+            .SelectMany(x => x.Turns?.Select(y => new ActionBarItem(y)))
+            .ToArray();
     }
+
+    public event EventHandler<IBattleMember> OnMemberAdded;
+    public event EventHandler<IBattleMember> OnMemberRemoved;
+    public event EventHandler<BattleContext> OnTurnStart;
+    public event EventHandler<BattleContext> OnTurnPlay;
+    public event EventHandler<BattleContext> OnTurnEnd;
     
     public async Task RunAsync()
     {
+        var turnNumber = 0U;
         while (TryGetNextTurn(out var next))
         {
+            var member = next.TurnAction.Entity;
+            var team = next.TurnAction.Entity.GetAlliedTeam(AllTeams);
             var ctx = new BattleContext
             {
-                Allies = Team1.Members.AsReadOnly(),
-                Enemies = Team2.Members.AsReadOnly(),
+                ActiveMember = member,
+                Allies = team?.Members,
+                Enemies = AllTeams.SelectMany(x => x.Members).Except(team.Members).ToList(),
+                ActionOrder = ActionBar,
+                TurnNumber = ++turnNumber,
                 Rng = _rng
             };
-            next.TurnEvent.StartAction(ctx);
-            if (next.TurnEvent.CanTakeAction(ctx))
+            OnTurnStart?.Invoke(this, ctx);
+            next.TurnAction.StartAction(ctx);
+            if (next.TurnAction.CanTakeAction(ctx))
             {
-                if (next.TurnEvent.Decisions is { } decisions && next.TurnEvent is CharacterTurn turn)
-                {
-                    var ability = await _playerInputInterface.GetSelectionAsync(turn.AbilityRequester);
-                    var target = await _playerInputInterface.GetSelectionAsync(turn.TargetRequester);
-                    turn.Owner.ExecuteAbility(new AbilityExecContext
-                    {
-                        Definition = ability,
-                        MainTarget = target,
-                        Rng = _rng,
-                        User = turn.Owner,
-                        ValidTargets = ctx.Enemies.SelectMany(x => x.Parts).ToList().AsReadOnly()
-                    });
-                }
+                OnTurnPlay?.Invoke(this, ctx);
+                await next.TurnAction.PlayTurn(_playerInputInterface, ctx);
             }
-            next.TurnEvent.EndAction(ctx);
-        }
-    }
-    
-    protected void AlignActionBar()
-    {
-        var min = _actionBar.MinBy(x => x.ActionValue).ActionValue;
-        foreach (var item in _actionBar)
-        {
-            item.Advance(min);
+            next.TurnAction.EndAction(ctx);
+            OnTurnEnd?.Invoke(this, ctx);
         }
     }
     
@@ -83,6 +77,6 @@ public class BattleManager
 
     public void AdvanceTarget(IBattleMember target, double percentage)
     {
-        
+        ActionBar.First(x => x.TurnAction.Entity == target).AdvancePercentage(percentage);
     }
 }

@@ -10,7 +10,7 @@ public class PassiveEffect : IEffectDefinition, IAttributeModifier
     public required IReadOnlyList<IModifierComponent> Modifiers { get; init; }
     public required IReadOnlyList<IConditionComponent> Conditions { get; init; }
 
-    private uint GetStacks(EffectContext ctx)
+    public uint GetStacks(EffectContext ctx)
     {
         throw new System.NotImplementedException();
     }

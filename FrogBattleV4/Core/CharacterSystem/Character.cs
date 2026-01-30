@@ -6,11 +6,9 @@ using FrogBattleV4.Core.Pipelines;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.CharacterSystem.Components;
-using FrogBattleV4.Core.DamageSystem;
 using FrogBattleV4.Core.EffectSystem;
 using FrogBattleV4.Core.EffectSystem.ActiveEffects;
 using FrogBattleV4.Core.EffectSystem.PassiveEffects;
-using FrogBattleV4.Core.Extensions;
 
 namespace FrogBattleV4.Core.CharacterSystem;
 
@@ -18,8 +16,9 @@ public class Character : ICharacter
 {
     private readonly Dictionary<string, IPoolComponent> _pools;
 
-    public Character()
+    public Character(string name)
     {
+        Name = name;
         // Base stats for any character
         BaseStats = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
         {
@@ -45,18 +44,21 @@ public class Character : ICharacter
         
         _pools = new List<IPoolComponent>(3)
         {
-            new HealthComponent(this)
+            new PoolComponent(this)
             {
+                Id = nameof(Pool.Hp),
                 CurrentValue = BaseStats[nameof(Stat.MaxHp)],
                 Flags = PoolFlags.UsedForLife
             },
-            new ManaComponent(this)
+            new PoolComponent(this)
             {
+                Id = nameof(Pool.Mana),
                 CurrentValue = BaseStats[nameof(Stat.MaxMana)] / 2,
                 Flags = PoolFlags.UsedForCasting
             },
-            new EnergyComponent(this)
+            new PoolComponent(this)
             {
+                Id = nameof(Pool.Energy),
                 CurrentValue = 0,
                 Flags = PoolFlags.UsedForBurst
             }
@@ -66,34 +68,34 @@ public class Character : ICharacter
         Parts[0] = new CharacterBody(this);
     }
 
-    public IAction[] Turns { get; } = [];
-    public ITargetable[] Parts { get; } = [];
+    public string Name { get; }
+    public IAction[] Turns { get; } = new IAction[4];
+    public ITargetable[] Parts { get; } = new ITargetable[1];
+    public ITargetable Body => Parts.Single();
 
     #region Pools
 
     public double Hp
     {
         get => Pools[nameof(Hp)].CurrentValue;
-        set => Pools[nameof(Hp)].CurrentValue = value;
     }
 
     public double Mana
     {
         get => Pools[nameof(Mana)].CurrentValue;
-        set => Pools[nameof(Mana)].CurrentValue = value;
     }
 
     public double Energy
     {
         get => Pools[nameof(Energy)].CurrentValue;
-        set => Pools[nameof(Energy)].CurrentValue = value;
     }
 
     #endregion
     
     public IReadOnlyDictionary<string, double> BaseStats { get; }
     public IReadOnlyDictionary<string, IPoolComponent> Pools => _pools;
-    public TurnContext TurnStatus { get; set; }
+    // Needs a revision
+    private TurnContext TurnStatus { get; set; }
 
     public List<AbilityDefinition> Abilities { get; init; } = [];
     private List<ActiveEffectInstance> ActiveEffects { get; } = [];
@@ -200,13 +202,5 @@ public class Character : ICharacter
     {
         var item = ActiveEffects.First(x => x.Definition == effect);
         return ActiveEffects.Remove(item);
-    }
-
-    public void TakeDamage(DamageCalcContext ctx)
-    {
-        var pool = Pools.Values.LastOrDefault(x => x.Flags.HasFlag(PoolFlags.AbsorbsDamage)) ??
-               Pools.Values.LastOrDefault(x => x.Flags.HasFlag(PoolFlags.UsedForLife)) ?? 
-               Pools["hp"]; // Fallback on HP if I forgot to set its flag or smth lmao
-        pool.CurrentValue -= ctx.ComputePipeline();
     }
 }

@@ -8,7 +8,7 @@ public class AbilityDefinition
 {
     // Metadata
     public required string Id { get; init; }
-    public TargetingTypes TargetingType { get; init; }
+    public TargetingType TargetingType { get; init; }
     // Components
     public ITargetingComponent? Targeting { get; init; }
     public IRequirementComponent[]? Requirements { get; init; }

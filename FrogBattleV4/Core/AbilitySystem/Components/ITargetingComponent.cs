@@ -16,12 +16,12 @@ public interface ITargetFilter
     bool Filter(ITargetable target);
 }
 
-public enum TargetingTypes
+public enum TargetingType
 {
     None,
     Allies,
     Enemies,
-    Both,
     Self,
+    Both,
     Arena
 }

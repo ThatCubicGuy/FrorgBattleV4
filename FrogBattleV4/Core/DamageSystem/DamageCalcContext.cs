@@ -6,13 +6,12 @@ namespace FrogBattleV4.Core.DamageSystem;
 
 public struct DamageCalcContext()
 {
-    public double RawDamage;
     public ICharacter? Attacker;
     public ICharacter? Target;
     public DamageProperties Properties;
     // It might make sense to forgo DamageProperties, honestly.
-    public string Type;
-    public string Source;
+    public string? Type;
+    public string? Source;
     public Random Rng;
     public Modifiers Mods = default;
 }

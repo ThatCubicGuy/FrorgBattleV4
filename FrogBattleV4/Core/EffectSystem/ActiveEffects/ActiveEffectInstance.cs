@@ -7,22 +7,15 @@ using FrogBattleV4.Core.EffectSystem.Components;
 
 namespace FrogBattleV4.Core.EffectSystem.ActiveEffects;
 
-public class ActiveEffectInstance : IAttributeModifier
+public class ActiveEffectInstance(EffectApplicationContext ctx) : IAttributeModifier
 {
-    public ActiveEffectInstance(EffectApplicationContext ctx)
-    {
-        Holder = ctx.Target;
-        Source = ctx.Source;
-        Turns = ctx.InitialTurns;
-        Stacks = ctx.InitialStacks;
-        Definition = ctx.Definition;
-    }
+    public ActiveEffectDefinition Definition { get; init; } = ctx.Definition;
+    public ICharacter? Source { get; init; } = ctx.Source;
+    public ISupportsEffects Holder { get; init; } = ctx.Target;
+    public uint Turns { get; set; } = ctx.InitialTurns;
+    public uint Stacks { get; set; } = ctx.InitialStacks;
+    uint IAttributeModifier.GetStacks(EffectContext ctx) => Stacks;
 
-    public ActiveEffectDefinition Definition { get; init; }
-    public ICharacter? Source { get; init; }
-    public ISupportsEffects Holder { get; init; }
-    public uint Turns { get; set; }
-    public uint Stacks { get; set; }
     internal EffectFlags Props { get; init; } = EffectFlags.None;
 
     IReadOnlyList<IModifierComponent> IAttributeModifier.Modifiers => Definition.Modifiers;

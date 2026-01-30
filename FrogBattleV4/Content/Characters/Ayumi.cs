@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.AbilitySystem.Components;
 using FrogBattleV4.Core.AbilitySystem.Components.Attacks;
@@ -9,7 +10,7 @@ namespace FrogBattleV4.Content.Characters;
 
 public class Ayumi : Character
 {
-    public Ayumi()
+    public Ayumi() : base("Ayumi")
     {
         Abilities =
         [
@@ -20,27 +21,26 @@ public class Ayumi : Character
             
         ];
     }
-}
-
-internal class AyumiAbility1 : AbilityDefinition
-{
-    public AyumiAbility1()
+    private class AyumiAbility1 : AbilityDefinition
     {
-        Targeting = new Single();
-        Attacks =
-        [
-            new AttackComponent
-            {
-                Scalar = nameof(Stat.Atk),
-                Ratio = 1.76,
-                Properties = new DamageProperties
+        public AyumiAbility1()
+        {
+            Targeting = new Single();
+            Attacks =
+            [
+                new AttackComponent
                 {
-                    Type = nameof(DamageType.Pierce),
-                    CanCrit = true,
-                    DefPen = 0.33,
-                },
-                HitRate = 0.9,
-            }
-        ];
+                    Scalar = nameof(Stat.Atk),
+                    Ratio = 1.76,
+                    Properties = new DamageProperties
+                    {
+                        Type = nameof(DamageType.Pierce),
+                        CanCrit = true,
+                        DefPen = 0.33,
+                    },
+                    HitRate = 0.9,
+                }
+            ];
+        }
     }
 }

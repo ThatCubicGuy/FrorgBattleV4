@@ -8,7 +8,7 @@ public class AreaOfEffect : ITargetingComponent
 {
     public IEnumerable<TargetingContext> SelectTargets(AbilityExecContext ctx)
     {
-        return ctx.ValidTargets.Select(x => new TargetingContext()
+        return ctx.ValidTargets.Select(x => new TargetingContext
         {
             Target = x,
             TargetRank = 0

@@ -3,11 +3,8 @@ namespace FrogBattleV4.Core.AbilitySystem.Components.Costs;
 
 public class StaticCost : ICostComponent
 {
-    public required string Stat { get; init; }
-    public required double Amount { get; init; }
+    public required string Pool { get; init; }
+    public required double BaseAmount { get; init; }
 
-    public void Tax(AbilityExecContext ctx)
-    {
-        throw new System.NotImplementedException();
-    }
+    public double GetBaseAmount(AbilityExecContext ctx) => BaseAmount;
 }

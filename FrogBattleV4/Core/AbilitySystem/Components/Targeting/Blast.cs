@@ -1,6 +1,8 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
@@ -15,24 +17,22 @@ public class Blast : ITargetingComponent
             Target = ctx.MainTarget,
             TargetRank = 0
         }];
-        var idx = 0;
-        for (var left = ctx.MainTarget.Left; left is not null; left = left.Left)
+        var idx = ctx.ValidTargets.IndexOf(ctx.MainTarget);
+        if (idx == -1) throw new InvalidOperationException("MainTarget is not among ValidTargets");
+        for (var rank = 1; idx + rank < ctx.ValidTargets.Count && rank <= Radius; rank++)
         {
-            idx += 1;
             result = result.Append(new TargetingContext
             {
-                Target = left,
-                TargetRank = idx
+                Target = ctx.ValidTargets[idx + rank],
+                TargetRank = rank
             });
         }
-        idx = 0;
-        for (var right = ctx.MainTarget.Right; right is not null; right = right.Right)
+        for (var rank = 1; idx - rank >= 0 && rank <= Radius; rank++)
         {
-            idx += 1;
             result = result.Append(new TargetingContext
             {
-                Target = right,
-                TargetRank = idx
+                Target = ctx.ValidTargets[idx - rank],
+                TargetRank = rank
             });
         }
         return result;

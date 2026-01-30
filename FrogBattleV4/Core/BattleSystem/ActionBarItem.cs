@@ -7,7 +7,7 @@ public class ActionBarItem(IAction action) : IComparable<ActionBarItem?>
 {
     private double _actionValue = action.BaseActionValue;
 
-    public IAction TurnEvent { get; } = action;
+    public IAction TurnAction { get; } = action;
     public double ActionValue
     {
         get => _actionValue;
@@ -25,7 +25,7 @@ public class ActionBarItem(IAction action) : IComparable<ActionBarItem?>
 
     public void AdvancePercentage(double value)
     {
-        ActionValue -= TurnEvent.BaseActionValue * value;
+        ActionValue -= TurnAction.BaseActionValue * value;
     }
     
     public int CompareTo(ActionBarItem? other)

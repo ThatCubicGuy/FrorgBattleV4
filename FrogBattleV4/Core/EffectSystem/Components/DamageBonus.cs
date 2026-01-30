@@ -18,13 +18,7 @@ public class DamageBonus : IDamageModifier
         if ((Type ?? ctx.Type) != ctx.Type ||
             (Source ?? ctx.Source) != ctx.Source) return ctx;
         
-        ctx.Mods[Operation] = Operation switch
-        {
-            ModifierOperation.Maximum => Math.Min(Amount, ctx.Mods[Operation]),
-            ModifierOperation.Minimum => Math.Max(Amount, ctx.Mods[Operation]),
-            ModifierOperation.MultiplyTotal => ctx.Mods[Operation] * Amount,
-            _ => ctx.Mods[Operation] + Amount
-        };
+        ctx.Mods = ctx.Mods.Add(Operation, Amount);
         
         return ctx;
     }

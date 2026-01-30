@@ -7,7 +7,7 @@ public struct AbilityExecContext
 {
     public ICharacter User;
     public ITargetable MainTarget;
-    public ReadOnlyCollection<ITargetable> ValidTargets { get; init; }
+    public ReadOnlyCollection<ITargetable> ValidTargets;
     public AbilityDefinition Definition;
     public required System.Random Rng;
 }

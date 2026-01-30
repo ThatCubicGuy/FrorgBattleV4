@@ -22,11 +22,10 @@ public class Damage
         new DamageCalcContext
         {
             Attacker = Source,
-            Target = Target as ICharacter,
+            Target = Target.Owner as ICharacter,
             Properties = Properties,
             Type = Properties.Type,
             Source = "idk lmao",
-            RawDamage = _baseAmount,
             Rng = Random
-        }.ComputePipeline();
+        }.ComputePipeline(_baseAmount);
 }

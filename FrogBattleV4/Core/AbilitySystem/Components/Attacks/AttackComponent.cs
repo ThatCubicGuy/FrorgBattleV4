@@ -22,7 +22,7 @@ public class AttackComponent : IAttackComponent
             var ratio = Ratio * Math.Pow(1 - (Falloff ?? 0), target.TargetRank);
             result.Add(new Damage
             {
-                BaseAmount = ratio * ctx.User.GetStat(Scalar, target.Target.This),
+                BaseAmount = ratio * ctx.User.GetStat(Scalar, target.Target.Owner),
                 Properties = Properties,
                 Source = ctx.User,
                 Target = target.Target,

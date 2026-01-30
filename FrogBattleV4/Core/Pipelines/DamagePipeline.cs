@@ -9,9 +9,9 @@ namespace FrogBattleV4.Core.Pipelines;
 
 public static class DamagePipeline
 {
-    public static double ComputePipeline(this DamageCalcContext ctx)
+    public static double ComputePipeline(this DamageCalcContext ctx, double rawDamage)
     {
-        var total = ctx.RawDamage;
+        var total = rawDamage;
         // Outgoing damage bonuses
         if (ctx.Attacker is { } attacker)
         {
@@ -22,12 +22,7 @@ public static class DamagePipeline
                     mod.Apply(current));
         
             // Apply outgoing mods
-            total += outCtx.Mods[ModifierOperation.AddValue];
-            total += outCtx.Mods[ModifierOperation.AddBasePercent] * ctx.RawDamage;
-            total *= outCtx.Mods[ModifierOperation.MultiplyTotal];
-            total = Math.Clamp(total,
-                outCtx.Mods[ModifierOperation.Minimum],
-                outCtx.Mods[ModifierOperation.Maximum]);
+            total = outCtx.Mods.Apply(rawDamage, total);
         
             // Crit bonus
             if (ctx.Properties.CanCrit && attacker.GetStat(nameof(Stat.CritRate), ctx.Target) < ctx.Rng.NextDouble())
@@ -37,7 +32,8 @@ public static class DamagePipeline
         }
         
         // Reset current damage context cuz yk. Phase switch. Stuff like that.
-        ctx = ctx with { RawDamage = total, Mods = default };
+        ctx.Mods = default;
+        rawDamage = total;
         
         // Incoming damage resistances
         if (ctx.Target is { } target)
@@ -49,12 +45,7 @@ public static class DamagePipeline
                     mod.Apply(current));
 
             // Apply incoming mods
-            total += inCtx.Mods[ModifierOperation.AddValue];
-            total += inCtx.Mods[ModifierOperation.AddBasePercent] * ctx.RawDamage;
-            total *= inCtx.Mods[ModifierOperation.MultiplyTotal];
-            total = Math.Clamp(total,
-                inCtx.Mods[ModifierOperation.Minimum],
-                inCtx.Mods[ModifierOperation.Maximum]);
+            total = inCtx.Mods.Apply(rawDamage, total);
 
             // DEF Application
             total -= target.GetStat(nameof(Stat.Def), ctx.Attacker) * Math.Clamp(1 - ctx.Properties.DefPen, 0, 1);
