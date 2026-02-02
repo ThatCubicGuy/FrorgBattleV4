@@ -19,7 +19,7 @@ internal static class PoolPipeline
         var finalMods = owner.AggregateMods(ctx, ctx.Other);
         return finalMods.ApplyTo(baseAmount);
     }
-    
+
     [Pure]
     public static MutationResult PreviewMutation(this MutationRequest req, MutationExecContext ctx)
     {
@@ -33,7 +33,7 @@ internal static class PoolPipeline
             PoolId = req.Selector(ctx).Id,
             Flags = req.Flags
         }.ComputePipeline(amount);
-        
+
         return new MutationResult(pool, total,
             total <= pool.CurrentValue);
     }

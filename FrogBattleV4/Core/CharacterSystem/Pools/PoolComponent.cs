@@ -22,6 +22,8 @@ public class PoolComponent(BattleMember owner) : IPoolComponent
         set => _currentValue = Math.Clamp(value, 0, Capacity);
     }
 
+    // TODO: Fix! Currently you only allow mutations through PoolPipeline.
+    // TODO: See how u might solve this one.
     public double Capacity => new PoolValueCalcContext
     {
         Channel = PoolPropertyChannel.Max,

@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.DamageSystem;
 using FrogBattleV4.Core.CharacterSystem;
-using Microsoft.VisualBasic;
 
 namespace FrogBattleV4.Core.Pipelines;
 
@@ -19,39 +18,20 @@ internal static class DamagePipeline
     private static double ComputePipeline(this DamageCalcContext ctx, double rawDamage)
     {
         // Outgoing damage bonuses
-        // rawDamage = (ctx.Attacker as Character)?.AggregateMods(ctx, ctx.Target).ApplyTo(rawDamage) ?? rawDamage;
-        if (ctx.Attacker is Character attacker)
-        {
-            var outMods = attacker.AggregateMods(ctx, ctx.Target);
-            
-            // Apply outgoing mods
-            rawDamage = outMods.ApplyTo(rawDamage);
+        rawDamage = (ctx.Attacker as Character)?.AggregateMods(ctx, ctx.Target).ApplyTo(rawDamage) ?? rawDamage;
 
-            // Crit bonus
-            if (ctx.IsCrit)
-            {
-                rawDamage *= 1 + attacker.GetStat(nameof(Stat.CritDamage), ctx.Target);
-            }
-        }
-        
         // Crit bonus
-        if (ctx.IsCrit && ctx.Attacker is not null)
+        if (ctx.IsCrit)
         {
-            rawDamage *= 1 + ctx.Attacker.GetStat(nameof(Stat.CritDamage), ctx.Target);
+            rawDamage *= 1 + (ctx.Attacker?.GetStat(nameof(Stat.CritDamage), ctx.Target) ?? 0);
         }
-        // Incoming damage resistances
-        // rawDamage = (ctx.Target as Character)?.AggregateMods(ctx, ctx.Attacker).ApplyTo(rawDamage) ?? rawDamage;
-        if (ctx.Target is Character target)
-        {
-            var inMods = target.AggregateMods(ctx, ctx.Attacker);
-            
-            // Apply incoming mods
-            rawDamage = inMods.ApplyTo(rawDamage);
 
-            // DEF Application
-            rawDamage -= target.GetStat(nameof(Stat.Def), ctx.Attacker) * Math.Clamp(1 - ctx.DefPen, 0, 1);
-        }
-        
+        // Incoming damage resistances
+        rawDamage = (ctx.Target as Character)?.AggregateMods(ctx, ctx.Attacker).ApplyTo(rawDamage) ?? rawDamage;
+
+        // DEF Application
+        rawDamage -= (ctx.Target?.GetStat(nameof(Stat.Def), ctx.Attacker) ?? 0) * Math.Clamp(1 - ctx.DefPen, 0, 1);
+
         return Math.Max(0, rawDamage);
     }
 
@@ -64,7 +44,7 @@ internal static class DamagePipeline
     /// <param name="ctx">Context in which to execute the request.</param>
     /// <returns>A preview of damage to be dealt.</returns>
     [Pure]
-    public static DamageResult PreviewDamage(this DamageRequest req, DamageExecContext ctx)
+    public static DamagePreview PreviewDamage(this DamageRequest req, DamageExecContext ctx)
     {
         var minDamage = new DamageCalcContext
         {
@@ -74,15 +54,31 @@ internal static class DamagePipeline
             Type = req.Properties.Type,
             Source = "attack"
         }.ComputePipeline(req.BaseAmount);
-        
-        // return new DamageResult(req.Target, damage, req.Properties.Type, isCrit);
+
+        var maxDamage = new DamageCalcContext
+        {
+            Attacker = ctx.Source,
+            Target = ctx.Target,
+            IsCrit = true,
+            Type = req.Properties.Type,
+            Source = "attack"
+        }.ComputePipeline(req.BaseAmount);
+
+        return new DamagePreview(req.Target, minDamage, maxDamage);
     }
 
+    /// <summary>
+    /// Calculates and applies an instance of damage to the target in the given context. 
+    /// </summary>
+    /// <param name="req">Request to process.</param>
+    /// <param name="ctx">Context in which to process.</param>
     public static void ExecuteDamage(this DamageRequest req, DamageExecContext ctx)
     {
+        // Resolve RNG
         var isCrit = req.CanCrit &&
                      ctx.Rng.NextDouble() < ctx.Source?.GetStat(nameof(Stat.CritRate), ctx.Target);
-        
+
+        // Send to the compute mines
         var damage = new DamageCalcContext
         {
             Attacker = ctx.Source,
@@ -91,18 +87,9 @@ internal static class DamagePipeline
             Type = req.Properties.Type,
             Source = "attack"
         }.ComputePipeline(req.BaseAmount);
-        
+
         var result = new DamageResult(req.Target, damage, req.Properties.Type, isCrit);
-        
+
         req.Target.ReceiveDamage(result);
     }
-
-    /// <summary>
-    /// Metadata for computed calculation result.
-    /// Needed to pass some info between Compute and Execute functions.
-    /// Can also be used for display.
-    /// </summary>
-    /// <param name="Amount">Final damage amount.</param>
-    /// <param name="IsCrit">Was it a critical hit?</param>
-    private record DamageSnapshot(double Amount, string Type, bool IsCrit);
 }

@@ -6,6 +6,7 @@ using FrogBattleV4.Core.Pipelines;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.CharacterSystem.Pools;
+using FrogBattleV4.Core.Contexts;
 using FrogBattleV4.Core.DamageSystem;
 using FrogBattleV4.Core.EffectSystem;
 using FrogBattleV4.Core.EffectSystem.ActiveEffects;
@@ -16,6 +17,7 @@ namespace FrogBattleV4.Core.CharacterSystem;
 public class Character : BattleMember, ISupportsEffects, IHasAbilities
 {
     private readonly List<ActiveEffectInstance> _markedForDeathEffects = [];
+
     public Character(string name) : base(name)
     {
         // Base stats for any character
@@ -62,7 +64,7 @@ public class Character : BattleMember, ISupportsEffects, IHasAbilities
                 Flags = PoolFlags.UsedForBurst
             }
         }.ToDictionary(x => x.Id, StringComparer.OrdinalIgnoreCase);
-        
+
         Turns[0] = new CharacterTurn(this);
         Parts[0] = new CharacterBody(this);
     }
@@ -82,14 +84,18 @@ public class Character : BattleMember, ISupportsEffects, IHasAbilities
     public double Energy => Pools[nameof(Energy)].CurrentValue;
 
     #endregion
-    
+
     // Needs a revision
     private TurnContext TurnStatus { get; set; }
 
     public List<AbilityDefinition> Abilities { get; init; } = [];
     private List<ActiveEffectInstance> ActiveEffects { get; } = [];
     private List<PassiveEffect> PassiveEffects { get; } = [];
-    public IEnumerable<AttributeModifier> AttachedEffects => ActiveEffects.Concat<IAttributeModifier>(PassiveEffects);
+
+    public IEnumerable<EffectInstance> GetAttachedEffects(IRelationshipContext ctx)
+    {
+        return ActiveEffects.Concat<EffectInstance>(PassiveEffects);
+    }
 
     /// <summary>
     /// Calculates the final value of a stat, optionally in relation to an enemy.
@@ -133,6 +139,7 @@ public class Character : BattleMember, ISupportsEffects, IHasAbilities
         {
             mutator.OnTurnStart(TurnStatus);
         }
+
         _markedForDeathEffects.AddRange(ActiveEffects.Where(x => x.Expire(TurnStatus)));
     }
 
@@ -146,22 +153,24 @@ public class Character : BattleMember, ISupportsEffects, IHasAbilities
         {
             mutator.OnTurnEnd(TurnStatus);
         }
+
         foreach (var effect in _markedForDeathEffects.Where(effect => effect.TryRemove()))
         {
             ActiveEffects.Remove(effect);
         }
+
         _markedForDeathEffects.Clear();
         TurnStatus = TurnStatus with
         {
             Moment = TurnMoment.None
         };
     }
-    
+
     public bool ApplyEffect(ActiveEffectApplicationContext activeEffect)
     {
         // Raise some events around here ngl
         if (!activeEffect.CanApply()) return false;
-        
+
         var item = ActiveEffects.FirstOrDefault(x => x.Definition == activeEffect.Definition);
         if (item is null)
         {

@@ -25,15 +25,8 @@ internal static class PipelineExtensions
     {
         // Initialize mod "sum"
         var finalMods = new ModifierStack();
-        foreach (var effect in owner.AttachedEffects)
+        foreach (var effect in owner.GetAttachedEffects(ctx))
         {
-            // Build the context for this effect
-            var effectContext = new EffectContext
-            {
-                Holder = owner,
-                Target = target,
-                EffectSource = (effect as ActiveEffectInstance)?.EffectSource
-            };
             var effectMods = new ModifierStack();
             // Skip effects with no modifiers
             if (effect.Modifiers is null) continue;

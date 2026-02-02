@@ -17,9 +17,9 @@ public readonly struct DamageCalcContext() : IRelationshipContext
     // It might make sense to forgo DamageProperties, honestly.
     [NotNull] public string Type { get; init; }
     [NotNull] public string Source { get; init; }
+    public required bool IsCrit { get; init; }
     public double DefPen { get; init; } = 0;
     public double TypeResPen { get; init; } = 0;
-    public required bool IsCrit { get; init; }
     BattleMember? IActorContext.Actor => Attacker;
     BattleMember? IRelationshipContext.Other => Target;
 }

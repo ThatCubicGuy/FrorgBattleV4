@@ -8,7 +8,7 @@ public readonly struct DamageRequest() : IRngContext
 {
     public required double BaseAmount { get; init; }
     [NotNull] public required IDamageable Target { get; init; }
-    [NotNull] public required Random Rng { get; init; }
     [NotNull] public required DamageProperties Properties { get; init; }
+    [NotNull] public required Random Rng { get; init; }
     public bool CanCrit { get; init; } = true;
 }

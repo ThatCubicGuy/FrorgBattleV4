@@ -13,7 +13,7 @@ internal static class AbilityPipeline
     {
         var unmetRequirements = ctx.Definition.Requirements?
             .Where(rc => !rc.IsFulfilled(ctx)).ToArray();
-        
+
         var costs = ctx.Definition.Costs?
             .SelectMany(cc => cc.GetMutationRequests(ctx))
             .Select(mr => mr.PreviewMutation(
@@ -22,7 +22,7 @@ internal static class AbilityPipeline
                     Holder = ctx.User,
                     Other = ctx.MainTarget.Parent
                 })).ToArray();
-        
+
         var damages = ctx.Definition.Attacks?
             .SelectMany(ac => ac.GetDamageRequests(ctx))
             .Select(dr => dr.PreviewDamage(
@@ -41,7 +41,7 @@ internal static class AbilityPipeline
             UnfulfilledRequirements = unmetRequirements
         };
     }
-    
+
     public static bool ExecuteAbility(this AbilityExecContext ctx)
     {
         if (!ctx.CanExecute()) return false;

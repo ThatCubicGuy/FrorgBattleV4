@@ -30,7 +30,7 @@ public class CharacterBody(Character owner) : IDamageable
     public void ReceiveHealing(double healing)
     {
         MutationRequestBuilder
-            .ByAnyFlags([PoolFlags.AbsorbsDamage, PoolFlags.UsedForLife], healing, PoolMutationFlags.Immutable)
+            .ByAnyFlags([PoolFlags.AbsorbsHealing, PoolFlags.UsedForLife], healing, PoolMutationFlags.Immutable)
             .ExecuteMutation(new MutationExecContext
             {
                 Holder = Owner

@@ -7,7 +7,7 @@ using FrogBattleV4.Core.EffectSystem.Components;
 
 namespace FrogBattleV4.Core.EffectSystem.PassiveEffects;
 
-public class PassiveEffect : IEffectDefinition, IAttributeModifier
+public class PassiveEffect : IEffectDefinition
 {
     public required string Id { get; init; }
     public required IReadOnlyList<IModifierComponent> Modifiers { get; init; }
