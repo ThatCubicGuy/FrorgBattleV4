@@ -7,9 +7,10 @@ namespace FrogBattleV4.Core.BattleSystem;
 
 public struct BattleContext
 {
-    public IBattleMember ActiveMember { get; init; }
-    public IReadOnlyCollection<IBattleMember>? Allies { get; init; }
-    public IReadOnlyCollection<IBattleMember>? Enemies { get; init; }
+    public required BattleManager Manager { get; init; }
+    public BattleMember ActiveMember { get; init; }
+    public IReadOnlyCollection<BattleMember>? Allies { get; init; }
+    public IReadOnlyCollection<BattleMember>? Enemies { get; init; }
     public uint TurnNumber { get; init; }
     public IOrderedEnumerable<ActionBarItem> ActionOrder { get; init; }
     public required Random Rng { get; init; }

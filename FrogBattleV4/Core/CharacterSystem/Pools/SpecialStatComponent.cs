@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
+using FrogBattleV4.Core.EffectSystem.ActiveEffects;
 
-namespace FrogBattleV4.Core.CharacterSystem.Components;
+namespace FrogBattleV4.Core.CharacterSystem.Pools;
 
 public class SpecialStatComponent : IPoolComponent
 {
@@ -15,13 +17,6 @@ public class SpecialStatComponent : IPoolComponent
     public double? MaxValue { get; init; }
     public double? MinValue { get; init; }
     public PoolFlags Flags { get; init; } = PoolFlags.Dummy;
-    public SpendResult ProcessSpend(double amount, SpendContext ctx)
-    {
-        throw new NotImplementedException();
-    }
-
-    public double ProcessRegen(double amount, ICharacter character)
-    {
-        throw new NotImplementedException();
-    }
+    
+    public IEnumerable<IMutatorComponent> Mutators { get; set; }
 }

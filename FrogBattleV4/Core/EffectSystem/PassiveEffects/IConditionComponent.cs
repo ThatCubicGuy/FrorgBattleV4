@@ -5,5 +5,5 @@ namespace FrogBattleV4.Core.EffectSystem.PassiveEffects;
 
 public interface IConditionComponent
 {
-    int Check(ICharacter source, ICharacter? target);
+    int GetContribution(EffectContext ctx);
 }

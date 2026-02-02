@@ -1,16 +1,18 @@
 using System;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace FrogBattleV4.Core;
 
 // This doesn't quite make sense, but I had an idea lmao
+// NEVERMIND it's the GREATEST PLAN !!!
 public struct ModifierStack()
 {
     private double _addValue = 0;
     private double _addBasePercent = 0;
     private double _multiplyTotal = 1;
-    private double _minimum = double.NaN;
-    private double _maximum = double.NaN;
+    private double _minimum = double.MinValue;
+    private double _maximum = double.MaxValue;
     
     public double this[ModifierOperation operation]
     {
@@ -42,6 +44,33 @@ public struct ModifierStack()
             }
         }
     }
+    
+    /// <summary>
+    /// Applies these modifiers to a value.
+    /// </summary>
+    /// <param name="baseAmount">The starting amount of the value.</param>
+    /// <returns>The final computed value.</returns>
+    [Pure]
+    public double ApplyTo(double baseAmount)
+    {
+        var total = baseAmount;
+        total += this[ModifierOperation.AddValue];
+        total += this[ModifierOperation.AddBasePercent] * baseAmount;
+        total *= this[ModifierOperation.MultiplyTotal];
+        total = Math.Clamp(total,
+            this[ModifierOperation.Minimum],
+            this[ModifierOperation.Maximum]);
+        return total;
+    }
+
+    public override string ToString()
+    {
+        return $"Additive: {_addValue}," +
+               $" BasePercent: {_addBasePercent}," +
+               $" MultiplyTotal: {_multiplyTotal}," +
+               $" Minimum: {_minimum}," +
+               $" Maximum: {_maximum}";
+    }
 }
 
 public enum ModifierOperation
@@ -55,33 +84,28 @@ public enum ModifierOperation
 
 public static class ModifiersExtensions
 {
-    [Pure]
-    public static ModifierStack NewStack(ModifierOperation operation, double baseAmount)
-    {
-        return default(ModifierStack).AddTo(operation, baseAmount);
-    }
     /// <summary>
     /// Adds the provided amount to the given operation in <paramref name="modifierStack"/>.
     /// </summary>
-    /// <param name="modifierStack">The modifier onto which to add </param>
-    /// <param name="operation"></param>
-    /// <param name="baseAmount"></param>
-    /// <returns></returns>
+    /// <param name="modifierStack">The modifier onto which to add the given value.</param>
+    /// <param name="operation">The operation onto which to add the given value.</param>
+    /// <param name="amount">The value to compound into the modifier stack.</param>
+    /// <returns>A new modifier stack with the applied modification.</returns>
     [Pure]
-    public static ModifierStack AddTo(this ModifierStack modifierStack, ModifierOperation operation, double baseAmount)
+    public static ModifierStack AddTo(this ModifierStack modifierStack, ModifierOperation operation, double amount)
     {
         modifierStack[operation] = operation switch
         {
-            ModifierOperation.Maximum => Math.Min(baseAmount, modifierStack[operation]),
-            ModifierOperation.Minimum => Math.Max(baseAmount, modifierStack[operation]),
-            ModifierOperation.MultiplyTotal => modifierStack[operation] * baseAmount,
-            _ => modifierStack[operation] + baseAmount
+            ModifierOperation.Maximum => Math.Min(amount, modifierStack[operation]),
+            ModifierOperation.Minimum => Math.Max(amount, modifierStack[operation]),
+            ModifierOperation.MultiplyTotal => modifierStack[operation] * amount,
+            _ => modifierStack[operation] + amount
         };
         return modifierStack;
     }
 
     /// <summary>
-    /// Combines the modifiers from two separate structs into one.
+    /// Combines the modifiers from two separate stacks into one.
     /// </summary>
     /// <param name="mod">The first mod to add.</param>
     /// <param name="other">The mod to add to the first.</param>
@@ -89,29 +113,28 @@ public static class ModifiersExtensions
     [Pure]
     public static ModifierStack AddAll(this ModifierStack mod, ModifierStack other)
     {
-        mod[ModifierOperation.AddValue] += other[ModifierOperation.AddValue];
-        mod[ModifierOperation.AddBasePercent] += other[ModifierOperation.AddBasePercent];
-        mod[ModifierOperation.MultiplyTotal] *= other[ModifierOperation.MultiplyTotal];
-        mod[ModifierOperation.Minimum] = Math.Min(mod[ModifierOperation.Minimum], other[ModifierOperation.Minimum]);
-        mod[ModifierOperation.Maximum] = Math.Max(mod[ModifierOperation.Maximum], other[ModifierOperation.Maximum]);
-        return mod;
+        return Enum.GetValuesAsUnderlyingType<ModifierOperation>().Cast<ModifierOperation>()
+            .Aggregate(mod, (current, op) => current.AddTo(op, other[op]));
     }
+    
     /// <summary>
-    /// Applies these modifiers to a value.
+    /// Combines the modifiers from two separate stacks into one, based on a given ratio.
     /// </summary>
-    /// <param name="modifierStack">The modifiers to apply</param>
-    /// <param name="baseAmount">The starting amount of the value.</param>
-    /// <returns></returns>
+    /// <param name="mod">The first mod to add.</param>
+    /// <param name="other">The mod to add to the first.</param>
+    /// <param name="ratio">A number between 0 and 1 indicating the ratio at which to combine them.</param>
+    /// <returns>A new modifier with the combined values.</returns>
     [Pure]
-    public static double Apply(this ModifierStack modifierStack, double baseAmount)
+    public static ModifierStack AddAllWithRatio(this ModifierStack mod, ModifierStack other, double ratio)
     {
-        var total = baseAmount;
-        total += modifierStack[ModifierOperation.AddValue];
-        total += modifierStack[ModifierOperation.AddBasePercent] * baseAmount;
-        total *= modifierStack[ModifierOperation.MultiplyTotal];
-        total = Math.Clamp(total,
-            modifierStack[ModifierOperation.Minimum],
-            modifierStack[ModifierOperation.Maximum]);
-        return total;
+        mod[ModifierOperation.AddValue] += other[ModifierOperation.AddValue] * ratio;
+        mod[ModifierOperation.AddBasePercent] += other[ModifierOperation.AddBasePercent] * ratio;
+        mod[ModifierOperation.MultiplyTotal] *= Math.Pow(other[ModifierOperation.MultiplyTotal], ratio);
+        
+        // Caps can't really be applied partially, so we only apply them if the ratio is 100% or greater.
+        if (ratio < 1) return mod;
+        mod[ModifierOperation.Minimum] = Math.Max(mod[ModifierOperation.Minimum], other[ModifierOperation.Minimum]);
+        mod[ModifierOperation.Maximum] = Math.Min(mod[ModifierOperation.Maximum], other[ModifierOperation.Maximum]);
+        return mod;
     }
 }

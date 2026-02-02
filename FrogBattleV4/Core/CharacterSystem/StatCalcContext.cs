@@ -1,10 +1,12 @@
 #nullable enable
+using FrogBattleV4.Core.BattleSystem;
+using FrogBattleV4.Core.Contexts;
 
 namespace FrogBattleV4.Core.CharacterSystem;
 
-public struct StatCalcContext
+public struct StatCalcContext : IRelationshipContext
 {
-    public string Stat;
-    public IHasStats Owner;
-    public IHasStats? Target;
+    public required string Stat { get; init; }
+    public required BattleMember Actor { get; init; }
+    public BattleMember? Other { get; init; }
 }

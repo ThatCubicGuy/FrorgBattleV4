@@ -5,7 +5,7 @@ namespace FrogBattleV4.Core.EffectSystem.ActiveEffects;
 public struct ActiveEffectContext
 {
     public ISupportsEffects Holder;
-    public ICharacter Source;
+    public Character Source;
     public ActiveEffectDefinition Definition;
     public uint Turns;
     public uint Stacks;

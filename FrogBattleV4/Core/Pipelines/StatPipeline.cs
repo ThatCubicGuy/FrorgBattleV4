@@ -1,22 +1,22 @@
 using System.Collections.Generic;
-using FrogBattleV4.Core.BattleSystem;
+using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.EffectSystem;
 using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.Pipelines;
-public static class StatPipeline
+internal static class StatPipeline
 {
+    /// <summary>
+    /// Calculates the total value of a stat.
+    /// </summary>
+    /// <param name="ctx">The context in which to run the calculations.</param>
+    /// <returns>The final value.</returns>
+    [Pure]
     public static double ComputePipeline(this StatCalcContext ctx)
     {
-        if (ctx.Owner is not ISupportsEffects owner) return ctx.Owner.BaseStats.GetValueOrDefault(ctx.Stat, 0);
-        var finalMods = owner.AttachedEffects
-            .AggregateMods(ctx, new EffectContext
-            {
-                Holder = owner,
-                Target = ctx.Target as IBattleMember,
-            });
-        
-        return ctx.Owner.BaseStats.TryGetValue(ctx.Stat, out var baseStatValue) ?
-            finalMods.Apply(baseStatValue) : 0;
+        if (ctx.Actor is not ISupportsEffects owner) return ctx.Actor.BaseStats.GetValueOrDefault(ctx.Stat, 0);
+        var finalMods = owner.AggregateMods(ctx, ctx.Other);
+
+        return finalMods.ApplyTo(ctx.Actor.BaseStats.GetValueOrDefault(ctx.Stat, 0));
     }
 }

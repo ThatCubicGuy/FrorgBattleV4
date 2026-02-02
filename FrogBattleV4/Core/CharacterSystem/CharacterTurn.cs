@@ -9,6 +9,7 @@ using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.AbilitySystem.Components;
 using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.BattleSystem.Decisions;
+using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.CharacterSystem;
 
@@ -22,7 +23,7 @@ public class CharacterTurn(Character owner) : IAction
 
     public double BaseActionValue => 10000 / Owner.GetStat(nameof(Stat.Spd));
 
-    IBattleMember IAction.Entity => Owner;
+    BattleMember IAction.Entity => Owner;
 
     [Pure] public bool CanTakeAction(BattleContext ctx) => Owner.CanTakeAction(ctx);
 
@@ -44,18 +45,19 @@ public class CharacterTurn(Character owner) : IAction
     public async Task PlayTurn(IDecisionProvider provider, BattleContext ctx)
     {
         var defResult = await provider.GetSelectionAsync(
-            new AbilityDecisionRequest(ctx.ActiveMember, (ctx.ActiveMember as ICharacter)!.Abilities));
-        var def = defResult.Choices.Single();
-        var targets = def.TargetingType switch
+            new AbilityDecisionRequest(ctx.ActiveMember, (ctx.ActiveMember as Character)!.Abilities));
+        var definition = defResult.Choices.Single();
+        var targets = definition.TargetingType switch
         {
             TargetingType.None => null,
-            TargetingType.Allies => ctx.Allies?.SelectMany(x => x.Parts).ToList().AsReadOnly(),
-            TargetingType.Enemies => ctx.Enemies?.SelectMany(x => x.Parts).ToList().AsReadOnly(),
-            // Oh god
-            TargetingType.Both => ((IBattleMember[])[]).Concat(ctx.Allies ?? []).Concat(ctx.Enemies ?? []).SelectMany(x => x.Parts).ToList().AsReadOnly(),
+            TargetingType.Allies => ctx.Allies?.SelectMany(x => x.Parts ?? []).ToList().AsReadOnly(),
+            TargetingType.Enemies => ctx.Enemies?.SelectMany(x => x.Parts ?? []).ToList().AsReadOnly(),
+            // Oh, god...
+            TargetingType.Both => (ctx.Allies ?? []).Concat(ctx.Enemies ?? [])
+                .SelectMany(x => x.Parts ?? []).ToList().AsReadOnly(),
             TargetingType.Self => Array.AsReadOnly([Owner.Body]),
             TargetingType.Arena => throw new NotImplementedException("Arena targeting not implemented."),
-            _ => throw new InvalidEnumArgumentException("TargetingType", (int)def.TargetingType,
+            _ => throw new InvalidEnumArgumentException("TargetingType", (int)definition.TargetingType,
                 typeof(TargetingType))
         };
         var targetResult = await provider.GetSelectionAsync(
@@ -64,12 +66,12 @@ public class CharacterTurn(Character owner) : IAction
         var execCtx = new AbilityExecContext
         {
             User = Owner,
-            Definition = def,
+            Definition = definition,
             MainTarget = mainTarget,
             ValidTargets = targets,
             Rng = ctx.Rng
         };
-        Owner.ExecuteAbility(execCtx);
+        execCtx.ExecuteAbility();
     }
     
     public void EndAction(BattleContext ctx)

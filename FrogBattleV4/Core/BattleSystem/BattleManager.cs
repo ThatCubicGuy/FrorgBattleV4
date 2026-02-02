@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.BattleSystem.Decisions;
+using FrogBattleV4.Core.CharacterSystem;
+using FrogBattleV4.Core.CharacterSystem.Pools;
+using FrogBattleV4.Core.DamageSystem;
+using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.BattleSystem;
 
@@ -25,8 +30,8 @@ public class BattleManager
             .ToArray();
     }
 
-    public event EventHandler<IBattleMember> OnMemberAdded;
-    public event EventHandler<IBattleMember> OnMemberRemoved;
+    public event EventHandler<BattleMember> OnMemberAdded;
+    public event EventHandler<BattleMember> OnMemberRemoved;
     public event EventHandler<BattleContext> OnTurnStart;
     public event EventHandler<BattleContext> OnTurnPlay;
     public event EventHandler<BattleContext> OnTurnEnd;
@@ -40,9 +45,10 @@ public class BattleManager
             var team = next.TurnAction.Entity.GetAlliedTeam(AllTeams);
             var ctx = new BattleContext
             {
+                Manager = this,
                 ActiveMember = member,
                 Allies = team?.Members,
-                Enemies = AllTeams.SelectMany(x => x.Members).Except(team.Members).ToList(),
+                Enemies = AllTeams.SelectMany(x => x.Members).Except(team?.Members ?? []).ToList(),
                 ActionOrder = ActionBar,
                 TurnNumber = ++turnNumber,
                 Rng = _rng
@@ -75,7 +81,7 @@ public class BattleManager
         return true;
     }
 
-    public void AdvanceTarget(IBattleMember target, double percentage)
+    public void AdvanceTarget(BattleMember target, double percentage)
     {
         ActionBar.First(x => x.TurnAction.Entity == target).AdvancePercentage(percentage);
     }

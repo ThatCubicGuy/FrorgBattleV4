@@ -4,7 +4,7 @@ using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
-public class Bounce : ITargetingComponent
+public class BounceTargeting : ITargetingComponent
 {
     public required int Count { get; init; }
 

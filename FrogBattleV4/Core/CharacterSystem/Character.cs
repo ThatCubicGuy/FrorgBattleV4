@@ -5,20 +5,19 @@ using System.Linq;
 using FrogBattleV4.Core.Pipelines;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.BattleSystem;
-using FrogBattleV4.Core.CharacterSystem.Components;
+using FrogBattleV4.Core.CharacterSystem.Pools;
+using FrogBattleV4.Core.DamageSystem;
 using FrogBattleV4.Core.EffectSystem;
 using FrogBattleV4.Core.EffectSystem.ActiveEffects;
 using FrogBattleV4.Core.EffectSystem.PassiveEffects;
 
 namespace FrogBattleV4.Core.CharacterSystem;
 
-public class Character : ICharacter
+public class Character : BattleMember, ISupportsEffects, IHasAbilities
 {
-    private readonly Dictionary<string, IPoolComponent> _pools;
-
-    public Character(string name)
+    private readonly List<ActiveEffectInstance> _markedForDeathEffects = [];
+    public Character(string name) : base(name)
     {
-        Name = name;
         // Base stats for any character
         BaseStats = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
         {
@@ -41,8 +40,8 @@ public class Character : ICharacter
             { nameof(Stat.OutgoingHealing), 1 },
             { nameof(Stat.ShieldToughness), 1 },
         };
-        
-        _pools = new List<IPoolComponent>(3)
+
+        Pools = new List<IPoolComponent>(3)
         {
             new PoolComponent(this)
             {
@@ -63,45 +62,34 @@ public class Character : ICharacter
                 Flags = PoolFlags.UsedForBurst
             }
         }.ToDictionary(x => x.Id, StringComparer.OrdinalIgnoreCase);
-
+        
         Turns[0] = new CharacterTurn(this);
         Parts[0] = new CharacterBody(this);
     }
 
-    public string Name { get; }
-    public IAction[] Turns { get; } = new IAction[4];
-    public ITargetable[] Parts { get; } = new ITargetable[1];
-    public ITargetable Body => Parts.Single();
+    public sealed override IAction[] Turns { get; } = new IAction[4];
+    public sealed override IDamageable[] Parts { get; } = new IDamageable[1];
+    public sealed override IReadOnlyDictionary<string, double> BaseStats { get; }
+    public sealed override IReadOnlyDictionary<string, IPoolComponent> Pools { get; }
+    public IDamageable Body => Parts.Single();
 
     #region Pools
 
-    public double Hp
-    {
-        get => Pools[nameof(Hp)].CurrentValue;
-    }
+    public double Hp => Pools[nameof(Hp)].CurrentValue;
 
-    public double Mana
-    {
-        get => Pools[nameof(Mana)].CurrentValue;
-    }
+    public double Mana => Pools[nameof(Mana)].CurrentValue;
 
-    public double Energy
-    {
-        get => Pools[nameof(Energy)].CurrentValue;
-    }
+    public double Energy => Pools[nameof(Energy)].CurrentValue;
 
     #endregion
     
-    public IReadOnlyDictionary<string, double> BaseStats { get; }
-    public IReadOnlyDictionary<string, IPoolComponent> Pools => _pools;
     // Needs a revision
     private TurnContext TurnStatus { get; set; }
 
     public List<AbilityDefinition> Abilities { get; init; } = [];
     private List<ActiveEffectInstance> ActiveEffects { get; } = [];
     private List<PassiveEffect> PassiveEffects { get; } = [];
-    public IReadOnlyList<IAttributeModifier> AttachedEffects => [..ActiveEffects, ..PassiveEffects];
-    private List<ActiveEffectInstance> MarkedForDeathEffects { get; } = [];
+    public IEnumerable<AttributeModifier> AttachedEffects => ActiveEffects.Concat<IAttributeModifier>(PassiveEffects);
 
     /// <summary>
     /// Calculates the final value of a stat, optionally in relation to an enemy.
@@ -109,13 +97,13 @@ public class Character : ICharacter
     /// <param name="stat">The name of the stat to calculate.</param>
     /// <param name="target">The enemy against which to calculate the stat. Optional.</param>
     /// <returns>The final value of the stat.</returns>
-    public double GetStat(string stat, IBattleMember? target = null)
+    public override double GetStat(string stat, BattleMember? target = null)
     {
         return new StatCalcContext
         {
             Stat = stat,
-            Owner = this,
-            Target = target as ICharacter
+            Actor = this,
+            Other = target
         }.ComputePipeline();
     }
 
@@ -127,7 +115,7 @@ public class Character : ICharacter
     public bool CanTakeAction(BattleContext ctx)
     {
         // There's more, but not for now
-        return !_pools.Values.Any(x => x.Flags.HasFlag(PoolFlags.Stuns));
+        return !Pools.Values.Any(x => x.Flags.HasFlag(PoolFlags.Stuns));
     }
 
     /// <summary>
@@ -145,16 +133,7 @@ public class Character : ICharacter
         {
             mutator.OnTurnStart(TurnStatus);
         }
-        MarkedForDeathEffects.AddRange(ActiveEffects.Where(x => x.Expire(TurnStatus)));
-    }
-
-    public void ExecuteAbility(AbilityExecContext ctx)
-    {
-        TurnStatus = TurnStatus with
-        {
-            Moment = TurnMoment.Animation
-        };
-        throw new NotImplementedException();
+        _markedForDeathEffects.AddRange(ActiveEffects.Where(x => x.Expire(TurnStatus)));
     }
 
     public void FinalizeTurn()
@@ -167,40 +146,38 @@ public class Character : ICharacter
         {
             mutator.OnTurnEnd(TurnStatus);
         }
-        foreach (var effect in MarkedForDeathEffects.Where(effect => effect.TryRemove()))
+        foreach (var effect in _markedForDeathEffects.Where(effect => effect.TryRemove()))
         {
             ActiveEffects.Remove(effect);
         }
-        MarkedForDeathEffects.Clear();
+        _markedForDeathEffects.Clear();
         TurnStatus = TurnStatus with
         {
             Moment = TurnMoment.None
         };
     }
     
-    // Effects
-    public bool ApplyEffect(EffectApplicationContext effect)
+    public bool ApplyEffect(ActiveEffectApplicationContext activeEffect)
     {
         // Raise some events around here ngl
-        if (!effect.CanApply()) return false;
+        if (!activeEffect.CanApply()) return false;
         
-        try
+        var item = ActiveEffects.FirstOrDefault(x => x.Definition == activeEffect.Definition);
+        if (item is null)
         {
-            var item = ActiveEffects.First(x => x.Definition == effect.Definition);
-            item.Stacks += effect.InitialStacks;
-            item.Turns = effect.InitialTurns;
+            ActiveEffects.Add(new ActiveEffectInstance(activeEffect));
+            return true;
         }
-        catch (InvalidOperationException)
-        {
-            ActiveEffects.Add(new ActiveEffectInstance(effect));
-        }
+
+        item.Stacks += activeEffect.InitialStacks;
+        item.Turns = activeEffect.InitialTurns;
 
         return true;
     }
 
-    public bool RemoveEffect(ActiveEffectDefinition effect)
+    public bool RemoveEffect(ActiveEffectRemovalContext ctx)
     {
-        var item = ActiveEffects.First(x => x.Definition == effect);
-        return ActiveEffects.Remove(item);
+        var item = ActiveEffects.First(x => x.Definition == ctx.Definition);
+        return ctx.Rng.NextDouble() < ctx.RemovalChance && ActiveEffects.Remove(item);
     }
 }

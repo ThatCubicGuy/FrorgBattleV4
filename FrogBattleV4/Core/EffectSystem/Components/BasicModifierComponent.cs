@@ -1,9 +1,15 @@
+#nullable enable
+using FrogBattleV4.Core.Contexts;
+
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
-public abstract class BasicModifierComponent<TContext> : IModifierComponent<TContext>, IBasicModifierComponent where TContext : struct
+public abstract class BasicModifierComponent<TContext> : IModifierComponent<TContext>
+    where TContext : struct, IRelationshipContext
 {
     public required ModifierOperation Operation { get; init; }
     public required double Amount { get; init; }
+    public string? Name { get; init; } = null;
+    public string? Description { get; init; } = null;
     /// <summary>
     /// Determines whether this modifier should apply in this context.
     /// </summary>
@@ -13,30 +19,22 @@ public abstract class BasicModifierComponent<TContext> : IModifierComponent<TCon
 
     public ModifierStack GetContribution(TContext ctx)
     {
-        return AppliesInContext(ctx) ? default(ModifierStack).AddTo(Operation, Amount) : default;
+        return AppliesInContext(ctx) ? new ModifierStack().AddTo(Operation, Amount) : new ModifierStack();
     }
 
     public string GetDescription()
     {
-        throw new System.NotImplementedException();
+        return Localization.GetTranslationFormatted(Description, Amount, Operation);
     }
 
-    /// <summary>
-    /// Formats the relevant arguments into a format string.
-    /// Argument order:
-    /// {0}: <see cref="Amount"/>,
-    /// {1}: <see cref="Operation"/>.
-    /// </summary>
-    /// <param name="format">Format string in which to place the arguments.</param>
-    /// <returns>The formatted string.</returns>
-    public string Format(string format)
+    public override string ToString()
     {
-        return string.Format(format, Amount, Operation);
+        return Operation switch
+        {
+            ModifierOperation.AddValue => $"{(Amount > 0 ? '+' : string.Empty)}{Amount:N0} ",
+            ModifierOperation.AddBasePercent => $"{(Amount > 0 ? '+' : string.Empty)}{Amount:P0} ",
+            ModifierOperation.MultiplyTotal => $"{Amount:0.##}x ",
+            _ => $"{Amount:F1}"
+        };
     }
-}
-
-internal interface IBasicModifierComponent
-{
-    double Amount { get; }
-    ModifierOperation Operation { get; }
 }

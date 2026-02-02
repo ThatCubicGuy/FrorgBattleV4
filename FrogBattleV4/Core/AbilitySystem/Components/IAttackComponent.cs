@@ -1,9 +1,13 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.DamageSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components;
 
 public interface IAttackComponent : IAbilityComponent
 {
-    IEnumerable<Damage> GetDamage(AbilityExecContext ctx);
+    [Pure]
+    [return: NotNull]
+    IEnumerable<DamageRequest> GetDamageRequests(AbilityExecContext ctx);
 }

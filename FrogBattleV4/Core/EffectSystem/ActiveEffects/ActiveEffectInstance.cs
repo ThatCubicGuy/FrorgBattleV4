@@ -2,23 +2,22 @@
 using System;
 using System.Collections.Generic;
 using FrogBattleV4.Core.BattleSystem;
-using FrogBattleV4.Core.CharacterSystem;
 using FrogBattleV4.Core.EffectSystem.Components;
 
 namespace FrogBattleV4.Core.EffectSystem.ActiveEffects;
 
-public class ActiveEffectInstance(EffectApplicationContext ctx) : IAttributeModifier
+public class ActiveEffectInstance(ActiveEffectApplicationContext ctx) : IAttributeModifier
 {
     public ActiveEffectDefinition Definition { get; init; } = ctx.Definition;
-    public ICharacter? Source { get; init; } = ctx.Source;
+    public BattleMember? EffectSource { get; init; } = ctx.Source;
     public ISupportsEffects Holder { get; init; } = ctx.Target;
     public uint Turns { get; set; } = ctx.InitialTurns;
     public uint Stacks { get; set; } = ctx.InitialStacks;
     uint IAttributeModifier.GetStacks(EffectContext ctx) => Stacks;
 
-    internal EffectFlags Props { get; init; } = EffectFlags.None;
+    public EffectFlags Props { get; init; } = EffectFlags.None;
 
-    IReadOnlyList<IModifierComponent> IAttributeModifier.Modifiers => Definition.Modifiers;
+    IReadOnlyList<IModifierComponent>? IAttributeModifier.Modifiers => Definition.Modifiers;
     
     /// <summary>
     /// Deducts one of the turns left of the effect.
@@ -44,7 +43,7 @@ public class ActiveEffectInstance(EffectApplicationContext ctx) : IAttributeModi
     }
 }
 
-[Flags] internal enum EffectFlags
+[Flags] public enum EffectFlags
 {
     None = 0,
     Unremovable = 1 << 0,

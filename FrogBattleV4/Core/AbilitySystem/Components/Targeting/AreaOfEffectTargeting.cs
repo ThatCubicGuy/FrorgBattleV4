@@ -4,7 +4,7 @@ using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
-public class AreaOfEffect : ITargetingComponent
+public class AreaOfEffectTargeting : ITargetingComponent
 {
     public IEnumerable<TargetingContext> SelectTargets(AbilityExecContext ctx)
     {

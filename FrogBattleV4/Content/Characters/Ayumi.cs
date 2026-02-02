@@ -25,17 +25,16 @@ public class Ayumi : Character
     {
         public AyumiAbility1()
         {
-            Targeting = new Single();
+            Targeting = new SingleTargeting();
             Attacks =
             [
                 new AttackComponent
                 {
                     Scalar = nameof(Stat.Atk),
                     Ratio = 1.76,
-                    Properties = new DamageProperties
+                    DamageProperties = new DamageProperties
                     {
                         Type = nameof(DamageType.Pierce),
-                        CanCrit = true,
                         DefPen = 0.33,
                     },
                     HitRate = 0.9,

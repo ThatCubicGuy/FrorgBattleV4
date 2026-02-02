@@ -1,9 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using FrogBattleV4.Core.BattleSystem;
+using FrogBattleV4.Core.Contexts;
 using FrogBattleV4.Core.EffectSystem;
+using FrogBattleV4.Core.EffectSystem.ActiveEffects;
 using FrogBattleV4.Core.EffectSystem.Components;
 
 namespace FrogBattleV4.Core.Pipelines;
@@ -11,34 +12,44 @@ namespace FrogBattleV4.Core.Pipelines;
 internal static class PipelineExtensions
 {
     /// <summary>
-    /// Aggregates the full modifier values for a list of effects in the given context. 
+    /// Aggregates the full modifier values for a member's effects in the given context. 
     /// </summary>
-    /// <param name="effects">The list of effects to calculate the modifiers for.</param>
+    /// <param name="owner">The member whose effects to compute.</param>
     /// <param name="ctx">The context in which to calculate the modifiers.</param>
-    /// <param name="effCtx">The effect context in which to calculate the modifiers.</param>
+    /// <param name="target">The target against which to calculate the modifiers.</param>
     /// <typeparam name="TContext">The type of the given context.</typeparam>
     /// <returns>The final <see cref="ModifierStack"/> calculated from every effect in the list.</returns>
     [Pure]
-    public static ModifierStack AggregateMods<TContext>([NotNull] this IReadOnlyList<IAttributeModifier> effects,
-        TContext ctx, EffectContext effCtx) where TContext : struct
-
+    public static ModifierStack AggregateMods<TContext>([NotNull] this ISupportsEffects owner,
+        TContext ctx, BattleMember target) where TContext : struct, IRelationshipContext
     {
-        // Init mod "sum"
+        // Initialize mod "sum"
         var finalMods = new ModifierStack();
-        foreach (var effect in effects)
+        foreach (var effect in owner.AttachedEffects)
         {
-            var effectMods = default(ModifierStack);
+            // Build the context for this effect
+            var effectContext = new EffectContext
+            {
+                Holder = owner,
+                Target = target,
+                EffectSource = (effect as ActiveEffectInstance)?.EffectSource
+            };
+            var effectMods = new ModifierStack();
+            // Skip effects with no modifiers
+            if (effect.Modifiers is null) continue;
             // Get the effect-wide mods
-            var baseMods = effect.Modifiers.Aggregate(default(ModifierStack),
+            var baseMods = effect.Modifiers.OfType<IModifierComponent<TContext>>().Aggregate(new ModifierStack(),
                 (current, mod) => current.AddAll(mod.GetContribution(ctx)));
             // Apply stacks
-            for (var i = 0; i < effect.GetStacks(effCtx); i++)
+            for (var i = 0; i < effect.Stacks; i++)
             {
                 effectMods = effectMods.AddAll(baseMods);
             }
+
             // Add the mods from this effect to the sum
             finalMods = finalMods.AddAll(effectMods);
         }
+
         // Final result is returned
         return finalMods;
     }

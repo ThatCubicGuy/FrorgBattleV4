@@ -1,13 +1,25 @@
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.CharacterSystem;
+using FrogBattleV4.Core.DamageSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem;
 
-public struct AbilityExecContext
+/// <summary>
+/// Enables the full execution of an ability.
+/// TODO: Turn this ^ into this v [keep readonly]
+/// Describes the context in which any ability may be executed.
+/// </summary>
+public readonly struct AbilityExecContext
 {
-    public ICharacter User;
-    public ITargetable MainTarget;
-    public ReadOnlyCollection<ITargetable> ValidTargets;
-    public AbilityDefinition Definition;
-    public required System.Random Rng;
+    [NotNull] public required Character User { get; init; }
+    [NotNull] public required IDamageable MainTarget { get; init; }
+    /// <summary>
+    /// Pool of targets that the ability's targeting components can select from, knowing the main target.
+    /// </summary>
+    /// <remarks>Order sensitive!</remarks>
+    [NotNull] public required IReadOnlyCollection<IDamageable> ValidTargets { get; init; }
+    [NotNull] public required AbilityDefinition Definition { get; init; }
+    [NotNull] public required System.Random Rng { get; init; }
 }

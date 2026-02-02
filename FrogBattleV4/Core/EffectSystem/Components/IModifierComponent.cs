@@ -1,14 +1,15 @@
 using System.Diagnostics;
+using FrogBattleV4.Core.Contexts;
 
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
 public interface IModifierComponent
 {
-    ModifierStack GetContribution(object ctx);
+    ModifierStack GetContribution(IRelationshipContext ctx);
     string GetDescription();
 }
 
-public interface IModifierComponent<in TContext> : IModifierComponent where TContext : struct
+public interface IModifierComponent<in TContext> : IModifierComponent where TContext : struct, IRelationshipContext
 {
     /// <summary>
     /// Gets the contribution of this modifier in the current context.
@@ -17,12 +18,12 @@ public interface IModifierComponent<in TContext> : IModifierComponent where TCon
     /// <returns>The modifier contribution.</returns>
     ModifierStack GetContribution(TContext ctx);
 
-    ModifierStack IModifierComponent.GetContribution(object ctx)
+    ModifierStack IModifierComponent.GetContribution(IRelationshipContext ctx)
     {
         if (ctx is TContext calcContext) return GetContribution(calcContext);
         Debug.WriteLine(
-            $"INFO: Cannot process context of type {ctx.GetType().Name}" +
+            $"WARN: Cannot process context of type {ctx.GetType().Name}" +
             $" from modifier of type {typeof(TContext).Name}.");
-        return default;
+        return new ModifierStack();
     }
 }

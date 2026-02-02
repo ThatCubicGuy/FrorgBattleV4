@@ -11,7 +11,7 @@ public interface IDecisionRequest<out TResult> : IDecisionRequest
 
 public interface IDecisionRequest
 {
-    IBattleMember Requestor { get; }
+    BattleMember Requestor { get; }
     int Count { get; }
 }
 

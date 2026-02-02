@@ -6,7 +6,7 @@ namespace FrogBattleV4.Core.BattleSystem;
 
 public interface IAction
 {
-    IBattleMember Entity { get; }
+    BattleMember Entity { get; }
     double BaseActionValue { get; }
     Task PlayTurn(IDecisionProvider provider, BattleContext ctx);
     bool CanTakeAction(BattleContext ctx);

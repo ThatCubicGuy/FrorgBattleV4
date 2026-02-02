@@ -6,6 +6,6 @@ namespace FrogBattleV4.Core.EffectSystem;
 public struct EffectContext
 {
     public ISupportsEffects Holder;
-    public IBattleMember? Target;
-    public IBattleMember? EffectSource;
+    public BattleMember? Target;
+    public BattleMember? EffectSource;
 }
