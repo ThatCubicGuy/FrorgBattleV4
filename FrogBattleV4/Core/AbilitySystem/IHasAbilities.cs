@@ -4,5 +4,5 @@ namespace FrogBattleV4.Core.AbilitySystem;
 
 public interface IHasAbilities
 {
-    List<AbilityDefinition> Abilities { get; }
+    IEnumerable<AbilityDefinition> Abilities { get; }
 }

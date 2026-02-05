@@ -14,17 +14,18 @@ public class Ayumi : Character
     {
         Abilities =
         [
-            new AyumiAbility1
-            {
-                Id = nameof(AyumiAbility1),
-            },
-            
+            new AyumiAbility1()
         ];
     }
+
     private class AyumiAbility1 : AbilityDefinition
     {
+        [SetsRequiredMembers]
+        // goofy ahh warning lol. it's right there !!!!
+        // ReSharper disable once NotNullOrRequiredMemberIsNotInitialized
         public AyumiAbility1()
         {
+            Id = nameof(AyumiAbility1);
             Targeting = new SingleTargeting();
             Attacks =
             [
@@ -32,12 +33,10 @@ public class Ayumi : Character
                 {
                     Scalar = nameof(Stat.Atk),
                     Ratio = 1.76,
-                    DamageProperties = new DamageProperties
-                    {
-                        Type = nameof(DamageType.Pierce),
-                        DefPen = 0.33,
-                    },
+                    DamageProperties = new DamageProperties(nameof(DamageType.Pierce), 0.33),
                     HitRate = 0.9,
+                    Targeting = new BlastTargeting(2),
+                    AttackProperties = new AttackProperties(true)
                 }
             ];
         }

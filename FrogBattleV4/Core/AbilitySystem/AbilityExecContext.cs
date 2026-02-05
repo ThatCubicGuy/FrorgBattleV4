@@ -15,11 +15,14 @@ public readonly struct AbilityExecContext
 {
     [NotNull] public required Character User { get; init; }
     [NotNull] public required IDamageable MainTarget { get; init; }
+
     /// <summary>
     /// Pool of targets that the ability's targeting components can select from, knowing the main target.
     /// </summary>
     /// <remarks>Order sensitive!</remarks>
-    [NotNull] public required IReadOnlyCollection<IDamageable> ValidTargets { get; init; }
+    [NotNull]
+    public required IReadOnlyCollection<IDamageable> ValidTargets { get; init; }
+
     [NotNull] public required AbilityDefinition Definition { get; init; }
     [NotNull] public required System.Random Rng { get; init; }
 }

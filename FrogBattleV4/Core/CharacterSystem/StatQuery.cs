@@ -1,5 +1,17 @@
 namespace FrogBattleV4.Core.CharacterSystem;
 
+public struct StatQuery()
+{
+    public required string Stat { get; init; }
+    public StatChannel Channel { get; init; } = StatChannel.Owned;
+}
+
+public enum StatChannel
+{
+    Owned,
+    Penalty
+}
+
 public enum Stat
 {
     None,

@@ -6,9 +6,9 @@ using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
-public class BlastTargeting : ITargetingComponent
+public class BlastTargeting(uint radius = 1) : ITargetingComponent
 {
-    public uint Radius { get; init; } = 0;
+    public uint Radius { get; init; } = radius;
 
     public IEnumerable<TargetingContext> SelectTargets(AbilityExecContext ctx)
     {

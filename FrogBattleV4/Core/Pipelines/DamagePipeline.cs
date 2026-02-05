@@ -3,6 +3,8 @@ using System;
 using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.DamageSystem;
 using FrogBattleV4.Core.CharacterSystem;
+using FrogBattleV4.Core.EffectSystem;
+using FrogBattleV4.Core.Modifiers;
 
 namespace FrogBattleV4.Core.Pipelines;
 
@@ -17,20 +19,45 @@ internal static class DamagePipeline
     [Pure]
     private static double ComputePipeline(this DamageCalcContext ctx, double rawDamage)
     {
-        // Outgoing damage bonuses
-        rawDamage = (ctx.Attacker as Character)?.AggregateMods(ctx, ctx.Target).ApplyTo(rawDamage) ?? rawDamage;
+        var query = new DamageQuery
+        {
+            Type = ctx.Type,
+            Source = ctx.Source,
+            Crit = ctx.IsCrit,
+            Direction = ModifierDirection.Outgoing
+        };
+        
+        // Outgoing damage bonuses from the attacker
+        if (ctx.Attacker is ISupportsEffects actor)
+        {
+            var actorMods = query.AggregateMods(new EffectInfoContext
+            {
+                Holder = actor,
+                Other = ctx.Other
+            });
+            rawDamage = actorMods.ApplyTo(rawDamage);
+        }
 
         // Crit bonus
         if (ctx.IsCrit)
         {
-            rawDamage *= 1 + (ctx.Attacker?.GetStat(nameof(Stat.CritDamage), ctx.Target) ?? 0);
+            rawDamage *= 1 + (ctx.Attacker?.GetStat(nameof(Stat.CritDamage), ctx.Other) ?? 0);
         }
 
-        // Incoming damage resistances
-        rawDamage = (ctx.Target as Character)?.AggregateMods(ctx, ctx.Attacker).ApplyTo(rawDamage) ?? rawDamage;
+        // Incoming damage resistances from the target
+        if (ctx.Other is ISupportsEffects other)
+        {
+            query = query with { Direction = ModifierDirection.Incoming };
+            var otherMods = query.AggregateMods(new EffectInfoContext
+            {
+                Holder = other,
+                Other = ctx.Attacker
+            });
+            rawDamage = otherMods.ApplyTo(rawDamage);
+        }
 
         // DEF Application
-        rawDamage -= (ctx.Target?.GetStat(nameof(Stat.Def), ctx.Attacker) ?? 0) * Math.Clamp(1 - ctx.DefPen, 0, 1);
+        rawDamage -= (ctx.Other?.GetStat(nameof(Stat.Def), ctx.Attacker) ?? 0) * Math.Clamp(1 - ctx.DefPen, 0, 1);
 
         return Math.Max(0, rawDamage);
     }
@@ -49,7 +76,7 @@ internal static class DamagePipeline
         var minDamage = new DamageCalcContext
         {
             Attacker = ctx.Source,
-            Target = ctx.Target,
+            Other = ctx.Other,
             IsCrit = false,
             Type = req.Properties.Type,
             Source = "attack"
@@ -58,7 +85,7 @@ internal static class DamagePipeline
         var maxDamage = new DamageCalcContext
         {
             Attacker = ctx.Source,
-            Target = ctx.Target,
+            Other = ctx.Other,
             IsCrit = true,
             Type = req.Properties.Type,
             Source = "attack"
@@ -76,13 +103,13 @@ internal static class DamagePipeline
     {
         // Resolve RNG
         var isCrit = req.CanCrit &&
-                     ctx.Rng.NextDouble() < ctx.Source?.GetStat(nameof(Stat.CritRate), ctx.Target);
+                     ctx.Rng.NextDouble() < ctx.Source?.GetStat(nameof(Stat.CritRate), ctx.Other);
 
         // Send to the compute mines
         var damage = new DamageCalcContext
         {
             Attacker = ctx.Source,
-            Target = ctx.Target,
+            Other = ctx.Other,
             IsCrit = isCrit,
             Type = req.Properties.Type,
             Source = "attack"

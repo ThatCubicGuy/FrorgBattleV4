@@ -1,27 +1,44 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using FrogBattleV4.Core.CharacterSystem;
 using FrogBattleV4.Core.CharacterSystem.Pools;
 using FrogBattleV4.Core.DamageSystem;
+using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.BattleSystem;
 
 public abstract class BattleMember(string name) : IHasStats
 {
     public string Name { get; } = name;
-    public abstract IAction[]? Turns { get; }
+    [NotNull] public abstract IEnumerable<IAction> Turns { get; }
 
     /// <summary>
     /// Every individually selectable part that pertains to this battle member and thus shares its pools and stats.
     /// </summary>
-    public abstract IDamageable[]? Parts { get; }
+    [NotNull] public abstract IEnumerable<IDamageable> Parts { get; }
 
     public abstract IReadOnlyDictionary<string, double> BaseStats { get; }
     public abstract IReadOnlyDictionary<string, IPoolComponent> Pools { get; }
 
-    public abstract double GetStat(string stat, BattleMember? target = null);
+
+    /// <summary>
+    /// Calculates the final value of a stat, optionally in relation to an enemy.
+    /// </summary>
+    /// <param name="stat">The name of the stat to calculate.</param>
+    /// <param name="target">The enemy against which to calculate the stat. Optional.</param>
+    /// <returns>The final value of the stat.</returns>
+    public double GetStat(string stat, BattleMember? target = null)
+    {
+        return new StatCalcContext
+        {
+            Stat = stat,
+            Actor = this,
+            Other = target
+        }.ComputePipeline();
+    }
 }
 
 public static class BattleMemberExtensions

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using FrogBattleV4.Core.BattleSystem;
-using FrogBattleV4.Core.EffectSystem.ActiveEffects;
+using FrogBattleV4.Core.EffectSystem.StatusEffects;
 using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.CharacterSystem.Pools;

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "RFVfaLBuy2A=",
+  "dgSpecHash": "dXqMa+pal0E=",
   "success": true,
   "projectFilePath": "/home/Cubic/repos/FrorgBattleV4/FrogBattleV4/FrogBattleV4.csproj",
   "expectedPackageFiles": [
@@ -11,7 +11,7 @@
     "/home/Cubic/.nuget/packages/nvorbis/0.10.4/nvorbis.0.10.4.nupkg.sha512",
     "/home/Cubic/.nuget/packages/system.memory/4.5.3/system.memory.4.5.3.nupkg.sha512",
     "/home/Cubic/.nuget/packages/system.valuetuple/4.5.0/system.valuetuple.4.5.0.nupkg.sha512",
-    "/home/Cubic/.nuget/packages/microsoft.netcore.app.host.linux-x64/9.0.11/microsoft.netcore.app.host.linux-x64.9.0.11.nupkg.sha512"
+    "/home/Cubic/.nuget/packages/microsoft.netcore.app.host.linux-x64/9.0.12/microsoft.netcore.app.host.linux-x64.9.0.12.nupkg.sha512"
   ],
   "logs": []
 }

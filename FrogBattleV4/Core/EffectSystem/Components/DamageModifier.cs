@@ -1,19 +1,22 @@
 #nullable enable
 using FrogBattleV4.Core.DamageSystem;
+using FrogBattleV4.Core.Modifiers;
 
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
-public class DamageModifier : BasicModifierComponent<DamageCalcContext>
+public class DamageModifier : IModifierRule<DamageQuery>
 {
+    public required ModifierStack ModifierStack { get; init; } = new();
     public string? Type { get; init; }
     public string? Source { get; init; }
     public bool CritOnly { get; init; } = false;
-    public required DamageModificationType ModificationType { get; init; }
+    public required ModifierDirection Direction { get; init; }
 
-    public override bool AppliesInContext(DamageCalcContext ctx)
+    public bool AppliesFor(DamageQuery query)
     {
-        return (!CritOnly || ctx.IsCrit) &&
-               (Type ?? ctx.Type) == ctx.Type &&
-               (Source ?? ctx.Source) == ctx.Source;
+        return Direction == query.Direction &&
+               (!CritOnly || query.Crit) &&
+               (Type ?? query.Type) == query.Type &&
+               (Source ?? query.Source) == query.Source;
     }
 }

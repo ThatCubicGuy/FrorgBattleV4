@@ -29,7 +29,7 @@ internal static class AbilityPipeline
                 new DamageExecContext
                 {
                     Source = ctx.User,
-                    Target = dr.Target.Parent,
+                    Other = dr.Target.Parent,
                     Rng = ctx.Rng
                 })).ToArray();
 
@@ -59,7 +59,7 @@ internal static class AbilityPipeline
             dr.ExecuteDamage(new DamageExecContext
             {
                 Source = ctx.User,
-                Target = dr.Target.Parent,
+                Other = dr.Target.Parent,
                 Rng = ctx.Rng
             });
         }

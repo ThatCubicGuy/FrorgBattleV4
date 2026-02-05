@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using FrogBattleV4.Core.EffectSystem.ActiveEffects;
+using FrogBattleV4.Core.EffectSystem.StatusEffects;
 
 namespace FrogBattleV4.Core.CharacterSystem.Pools;
 

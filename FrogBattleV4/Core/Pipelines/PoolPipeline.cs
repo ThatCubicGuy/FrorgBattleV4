@@ -1,6 +1,7 @@
 using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.CharacterSystem.Pools;
 using FrogBattleV4.Core.EffectSystem;
+using FrogBattleV4.Core.Modifiers;
 
 namespace FrogBattleV4.Core.Pipelines;
 
@@ -13,11 +14,41 @@ internal static class PoolPipeline
     /// <param name="baseAmount">The base value of the cap/cost/regen.</param>
     /// <returns>The final value.</returns>
     [Pure]
-    private static double ComputePipeline(this PoolValueCalcContext ctx, double baseAmount)
+    public static double ComputePipeline(this PoolValueCalcContext ctx, double baseAmount)
     {
-        if (ctx.Actor is not ISupportsEffects owner) return baseAmount;
-        var finalMods = owner.AggregateMods(ctx, ctx.Other);
-        return finalMods.ApplyTo(baseAmount);
+        if (ctx.Actor is ISupportsEffects owner)
+        {
+            var query = new PoolQuery
+            {
+                PoolId = ctx.PoolId,
+                Channel = ctx.Channel,
+                Direction = ModifierDirection.Incoming,
+            };
+            var inMods = query.AggregateMods(new EffectInfoContext
+            {
+                Holder = owner,
+                Other = ctx.Other,
+            });
+            baseAmount = inMods.ApplyTo(baseAmount);
+        }
+
+        if (ctx.Other is ISupportsEffects other)
+        {
+            var query = new PoolQuery
+            {
+                PoolId = ctx.PoolId,
+                Channel = ctx.Channel,
+                Direction = ModifierDirection.Incoming,
+            };
+            var outMods = query.AggregateMods(new EffectInfoContext
+            {
+                Holder = other,
+                Other = ctx.Actor,
+            });
+            baseAmount = outMods.ApplyTo(baseAmount);
+        }
+
+        return baseAmount;
     }
 
     [Pure]
@@ -31,7 +62,7 @@ internal static class PoolPipeline
             Actor = ctx.Holder,
             Other = ctx.Other,
             PoolId = req.Selector(ctx).Id,
-            Flags = req.Flags
+            Flags = req.Flags,
         }.ComputePipeline(amount);
 
         return new MutationResult(pool, total,

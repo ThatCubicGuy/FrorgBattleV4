@@ -12,7 +12,7 @@ namespace FrogBattleV4.Core.DamageSystem;
 public readonly struct DamageCalcContext() : IRelationshipContext
 {
     public BattleMember? Attacker { get; init; }
-    public BattleMember? Target { get; init; }
+    public BattleMember? Other { get; init; }
     // public DamageProperties Properties { get; init; }
     // It might make sense to forgo DamageProperties, honestly.
     [NotNull] public string Type { get; init; }
@@ -21,5 +21,5 @@ public readonly struct DamageCalcContext() : IRelationshipContext
     public double DefPen { get; init; } = 0;
     public double TypeResPen { get; init; } = 0;
     BattleMember? IActorContext.Actor => Attacker;
-    BattleMember? IRelationshipContext.Other => Target;
+    BattleMember? IReferenceContext.Other => Other;
 }

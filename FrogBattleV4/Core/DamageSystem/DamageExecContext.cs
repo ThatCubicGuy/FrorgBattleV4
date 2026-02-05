@@ -12,8 +12,8 @@ namespace FrogBattleV4.Core.DamageSystem;
 public readonly struct DamageExecContext : IRelationshipContext
 {
     public required BattleMember? Source { get; init; }
-    public required BattleMember? Target { get; init; }
+    public required BattleMember? Other { get; init; }
     [NotNull] public required Random Rng { get; init; }
     BattleMember? IActorContext.Actor => Source;
-    BattleMember? IRelationshipContext.Other => Target;
+    BattleMember? IReferenceContext.Other => Other;
 }
