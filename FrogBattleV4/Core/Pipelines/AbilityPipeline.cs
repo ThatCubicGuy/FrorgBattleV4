@@ -15,7 +15,7 @@ internal static class AbilityPipeline
             .Where(rc => !rc.IsFulfilled(ctx)).ToArray();
 
         var costs = ctx.Definition.Costs?
-            .SelectMany(cc => cc.GetMutationRequests(ctx))
+            .SelectMany(cc => cc.GetCostRequests(ctx))
             .Select(mr => mr.PreviewMutation(
                 new MutationExecContext
                 {
@@ -45,7 +45,7 @@ internal static class AbilityPipeline
     public static bool ExecuteAbility(this AbilityExecContext ctx)
     {
         if (!ctx.CanExecute()) return false;
-        foreach (var request in ctx.Definition.Costs?.SelectMany(cc => cc.GetMutationRequests(ctx)) ?? [])
+        foreach (var request in ctx.Definition.Costs?.SelectMany(cc => cc.GetCostRequests(ctx)) ?? [])
         {
             request.ExecuteMutation(new MutationExecContext
             {

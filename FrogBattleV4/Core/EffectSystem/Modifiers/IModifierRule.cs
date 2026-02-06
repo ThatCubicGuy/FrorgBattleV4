@@ -2,7 +2,7 @@
 
 using System.Diagnostics.Contracts;
 
-namespace FrogBattleV4.Core.Modifiers;
+namespace FrogBattleV4.Core.EffectSystem.Modifiers;
 
 public interface IModifierRule
 {

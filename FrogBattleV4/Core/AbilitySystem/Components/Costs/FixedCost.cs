@@ -11,7 +11,7 @@ public record FixedCost(
     PoolMutationFlags CostFlags = PoolMutationFlags.None) : ICostComponent
 {
     [Pure]
-    public IEnumerable<MutationRequest> GetMutationRequests(AbilityExecContext ctx)
+    public IEnumerable<MutationRequest> GetCostRequests(AbilityExecContext ctx)
     {
         return [MutationRequestBuilder.ById(Pool, -BaseAmount, CostFlags)];
     }

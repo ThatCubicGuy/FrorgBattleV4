@@ -1,6 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
-using FrogBattleV4.Core.Modifiers;
+using FrogBattleV4.Core.EffectSystem.Modifiers;
 
 namespace FrogBattleV4.Core.EffectSystem.StatusEffects;
 

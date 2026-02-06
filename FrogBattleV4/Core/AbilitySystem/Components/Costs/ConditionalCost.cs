@@ -12,8 +12,8 @@ public record ConditionalCost(
     ICostComponent CostIfFalse = null) : ICostComponent
 {
     [Pure]
-    public IEnumerable<MutationRequest> GetMutationRequests(AbilityExecContext ctx)
+    public IEnumerable<MutationRequest> GetCostRequests(AbilityExecContext ctx)
     {
-        return Condition(ctx) ? CostIfTrue.GetMutationRequests(ctx) : CostIfFalse?.GetMutationRequests(ctx) ?? [];
+        return Condition(ctx) ? CostIfTrue.GetCostRequests(ctx) : CostIfFalse?.GetCostRequests(ctx) ?? [];
     }
 }

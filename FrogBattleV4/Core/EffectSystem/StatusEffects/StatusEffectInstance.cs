@@ -4,16 +4,17 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.Contexts;
+using FrogBattleV4.Core.EffectSystem.Modifiers;
 
 namespace FrogBattleV4.Core.EffectSystem.StatusEffects;
 
-public class StatusEffectInstance(StatusEffectApplicationContext ctx) : IModifierContributor
+public class StatusEffectInstance(StatusEffectApplicationContext ctx) : IModifierComponent
 {
     public StatusEffectDefinition Definition { get; init; } = ctx.Definition;
     public ISupportsEffects Holder { get; init; } = ctx.Target;
     public BattleMember? EffectSource { get; init; } = ctx.Source;
-    public uint Turns { get; set; } = ctx.InitialTurns;
-    public uint Stacks { get; set; } = ctx.InitialStacks;
+    public int Turns { get; set; } = ctx.InitialTurns;
+    public int Stacks { get; set; } = ctx.InitialStacks;
 
     public EffectFlags Props { get; init; } = EffectFlags.None;
 
@@ -35,7 +36,7 @@ public class StatusEffectInstance(StatusEffectApplicationContext ctx) : IModifie
     {
         if (Props.HasFlag(EffectFlags.Unremovable)) return false;
 
-        if (Props.HasFlag(EffectFlags.RemoveStack)) return --Stacks == 0;
+        if (Props.HasFlag(EffectFlags.RemoveStack)) return --Stacks <= 0;
 
         return true;
     }
@@ -46,9 +47,9 @@ public class StatusEffectInstance(StatusEffectApplicationContext ctx) : IModifie
     /// <param name="ctx"></param>
     /// <returns>An effect context about this active effect instance.</returns>
     [Pure]
-    public EffectInstanceContext GetInstance(EffectInfoContext ctx)
+    public StatusEffectInstanceContext GetInstance(EffectInfoContext ctx)
     {
-        return new EffectInstanceContext
+        return new StatusEffectInstanceContext
         {
             EffectId = Definition.Id,
             EffectSource = EffectSource,

@@ -1,11 +1,14 @@
 using System.Diagnostics.Contracts;
 
-namespace FrogBattleV4.Core.EffectSystem;
+namespace FrogBattleV4.Core.EffectSystem.Modifiers;
 
-public interface IModifierContributor
+/// <summary>
+/// Represents a full AttributeModifier wrapper that returns a total ModifierStack for a query in a context.
+/// </summary>
+public interface IModifierComponent
 {
     /// <summary>
-    /// Gets the contribution of this IModifierContributor to the given query, in the given context.
+    /// Gets the contribution of this IModifierComponent to the given query, in the given context.
     /// This method applies stacks if necessary.
     /// </summary>
     /// <param name="ctx">Context in which to get contributions</param>

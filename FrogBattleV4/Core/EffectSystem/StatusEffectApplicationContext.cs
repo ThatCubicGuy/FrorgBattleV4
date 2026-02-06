@@ -11,8 +11,8 @@ public struct StatusEffectApplicationContext()
     public ISupportsEffects Target { get; init; }
     public double ApplicationChance { get; init; } = 1;
     public ChanceType ChanceType { get; init; } = ChanceType.Fixed;
-    public uint InitialStacks { get; init; } = 1;
-    public required uint InitialTurns { get; init; }
+    public int InitialStacks { get; init; } = 1;
+    public required int InitialTurns { get; init; }
     public required System.Random Rng { get; init; }
 }
 

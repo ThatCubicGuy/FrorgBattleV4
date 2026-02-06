@@ -1,8 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using FrogBattleV4.Core.AbilitySystem.Components;
-using FrogBattleV4.Core.EffectSystem.Components;
-using FrogBattleV4.Core.Modifiers;
+using FrogBattleV4.Core.EffectSystem.Modifiers;
 
 namespace FrogBattleV4.Core.AbilitySystem;
 
@@ -32,9 +31,9 @@ public class AbilityDefinition
     /// </summary>
     public IEnumerable<IRequirementComponent> Requirements { get; init; } = [];
     /// <summary>
-    /// Ability wide modifiers to be temporarily applied during execution.
+    /// Ability wide modifiers to be included in calculations.
     /// </summary>
-    public IEnumerable<IModifierRule> Modifiers { get; init; } = [];
+    public IEnumerable<IModifierComponent> Modifiers { get; init; } = [];
     /// <summary>
     /// The costs of the ability, taxed after successful casting.
     /// </summary>

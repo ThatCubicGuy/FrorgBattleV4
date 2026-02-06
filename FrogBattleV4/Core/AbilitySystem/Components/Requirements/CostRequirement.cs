@@ -13,7 +13,7 @@ public record CostRequirement(
     [Pure]
     public bool IsFulfilled(AbilityExecContext ctx)
     {
-        return Cost.GetMutationRequests(ctx).All(r => r.PreviewMutation(
+        return Cost.GetCostRequests(ctx).All(r => r.PreviewMutation(
             new MutationExecContext
             {
                 Holder = ctx.User,

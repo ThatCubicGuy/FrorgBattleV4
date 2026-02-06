@@ -1,10 +1,10 @@
 #nullable enable
 using FrogBattleV4.Core.CharacterSystem;
-using FrogBattleV4.Core.Modifiers;
+using FrogBattleV4.Core.EffectSystem.Modifiers;
 
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
-public class SimpleStatModifier : IModifierRule<StatQuery>
+public class StatModifier : IModifierRule<StatQuery>
 {
     public required ModifierStack ModifierStack { get; init; } = new();
     public required string Stat { get; init; }

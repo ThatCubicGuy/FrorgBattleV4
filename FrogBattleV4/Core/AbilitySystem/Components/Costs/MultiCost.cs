@@ -10,8 +10,8 @@ public record MultiCost(
     [NotNull] params ICostComponent[] Costs) : ICostComponent
 {
     [Pure]
-    public IEnumerable<MutationRequest> GetMutationRequests(AbilityExecContext ctx)
+    public IEnumerable<MutationRequest> GetCostRequests(AbilityExecContext ctx)
     {
-        return Costs.SelectMany(x => x.GetMutationRequests(ctx));
+        return Costs.SelectMany(x => x.GetCostRequests(ctx));
     }
 }

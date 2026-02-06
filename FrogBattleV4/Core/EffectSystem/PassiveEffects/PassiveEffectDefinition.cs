@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using FrogBattleV4.Core.Modifiers;
+using FrogBattleV4.Core.EffectSystem.Modifiers;
+using FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
 
 namespace FrogBattleV4.Core.EffectSystem.PassiveEffects;
 
 /// <summary>
 /// Defines a passive effect that is to be processed 
 /// </summary>
-public class PassiveEffectDefinition : IEffectDefinition, IModifierContributor
+public class PassiveEffectDefinition : IEffectDefinition, IModifierComponent
 {
     public required string Id { get; init; }
     public required IEnumerable<IModifierRule> Modifiers { get; init; }
@@ -24,9 +25,9 @@ public class PassiveEffectDefinition : IEffectDefinition, IModifierContributor
     public AccumulationType ConditionAccumulationType { get; set; }
 
     [Pure]
-    private uint GetStacks(EffectInfoContext ctx)
+    private int GetStacks(EffectInfoContext ctx)
     {
-        return (uint)Math.Max(0, ConditionAccumulationType switch
+        return Math.Max(0, ConditionAccumulationType switch
         {
             AccumulationType.And => Conditions.Select(cc => cc.GetContribution(ctx)).Min(),
             AccumulationType.Or => Conditions.Select(cc => cc.GetContribution(ctx)).Max(),
@@ -34,21 +35,6 @@ public class PassiveEffectDefinition : IEffectDefinition, IModifierContributor
             _ => throw new InvalidEnumArgumentException(nameof(ConditionAccumulationType),
                 (int)ConditionAccumulationType, typeof(AccumulationType))
         });
-    }
-
-    [Pure]
-    public EffectInstanceContext GetInstance(EffectInfoContext ctx)
-    {
-        return new EffectInstanceContext
-        {
-            EffectId = Id,
-            Holder = ctx.Holder,
-            Target = ctx.Other,
-            EffectSource = null,
-            Stacks = GetStacks(ctx),
-            Modifiers = Modifiers,
-            Mutators = null,
-        };
     }
 
     [Pure]

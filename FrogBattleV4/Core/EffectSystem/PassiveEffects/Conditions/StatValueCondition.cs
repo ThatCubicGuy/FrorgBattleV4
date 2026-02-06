@@ -1,0 +1,49 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
+using FrogBattleV4.Core.BattleSystem;
+
+namespace FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
+
+public class StatValueCondition : IConditionComponent
+{
+    private readonly double _step;
+
+    /// <summary>
+    /// Stat to query for.
+    /// </summary>
+    [NotNull] public required string Stat { get; set; }
+
+    /// <summary>
+    /// The starting value that the interval starts being calculated from.
+    /// </summary>
+    public required double MinValue { get; init; }
+
+    /// <summary>
+    /// The final value at which the interval stops being calculated.
+    /// </summary>
+    public required double MaxValue { get; init; }
+
+    /// <summary>
+    /// The step by which the contribution is calculated.
+    /// Every Step amount that the value has over MinValue it increases by one, up to (MaxValue - MinValue) / Step.
+    /// Cannot be zero.
+    /// </summary>
+    /// <exception cref="ArgumentException">Step is zero.</exception>
+    public required double Step
+    {
+        get => _step;
+        init
+        {
+            if (value == 0) throw new ArgumentException("Step cannot be zero");
+            _step = value;
+        }
+    }
+
+    [Pure]
+    public int GetContribution(EffectInfoContext ctx)
+    {
+        if (ctx.Holder is not BattleMember holder) return 0;
+        return (int)Math.Floor((Math.Clamp(holder.GetStat(Stat, ctx.Other), MinValue, MaxValue) - MinValue) / Step);
+    }
+}

@@ -115,7 +115,7 @@ public static class ModifiersExtensions
     /// <param name="scalar">Real value to scale by.</param>
     /// <returns>A scaled modifier result.</returns>
     [Pure]
-    public static ModifierStack MultiplyBy(this ModifierStack mod, double scalar)
+    public static ModifierStack MultiplyBy(this ModifierStack mod, int scalar)
     {
         mod.AddValue *= scalar;
         mod.AddBasePercent *= scalar;

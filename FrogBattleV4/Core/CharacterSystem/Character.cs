@@ -9,6 +9,7 @@ using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.CharacterSystem.Pools;
 using FrogBattleV4.Core.DamageSystem;
 using FrogBattleV4.Core.EffectSystem;
+using FrogBattleV4.Core.EffectSystem.Modifiers;
 using FrogBattleV4.Core.EffectSystem.StatusEffects;
 using FrogBattleV4.Core.EffectSystem.PassiveEffects;
 
@@ -101,8 +102,8 @@ public class Character : BattleMember, ISupportsEffects, IHasAbilities
     private List<StatusEffectInstance> ActiveEffects { get; } = [];
     private List<PassiveEffectDefinition> PassiveEffects { get; } = [];
 
-    public IEnumerable<IModifierContributor> AttachedEffects =>
-        ActiveEffects.Concat<IModifierContributor>(PassiveEffects);
+    public IEnumerable<IModifierComponent> AttachedEffects =>
+        ActiveEffects.Concat<IModifierComponent>(PassiveEffects);
 
     /// <summary>
     /// Decides whether the character can actually execute an ability and isn't stunned.
@@ -188,7 +189,7 @@ public class Character : BattleMember, ISupportsEffects, IHasAbilities
 
     public bool RemoveEffect(StatusEffectRemovalContext ctx)
     {
-        var item = ActiveEffects.First(x => x.Definition.Id == ctx.EffectId);
+        var item = ActiveEffects.First(ctx.Query.Invoke);
         if (ctx.Rng.NextDouble() < ctx.RemovalChance && ActiveEffects.Remove(item))
         {
             EffectRemoveSuccess?.Invoke(this, ctx);

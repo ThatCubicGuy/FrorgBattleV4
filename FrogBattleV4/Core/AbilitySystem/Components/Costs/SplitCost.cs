@@ -11,8 +11,8 @@ public record SplitCost(
     [NotNull] params ICostComponent[] CostList) : ICostComponent
 {
     [Pure]
-    public IEnumerable<MutationRequest> GetMutationRequests(AbilityExecContext ctx)
+    public IEnumerable<MutationRequest> GetCostRequests(AbilityExecContext ctx)
     {
-        return CostList[Selector(ctx)].GetMutationRequests(ctx);
+        return CostList[Selector(ctx)].GetCostRequests(ctx);
     }
 }
