@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using FrogBattleV4.Core.AbilitySystem;
-using FrogBattleV4.Core.BattleSystem.Decisions;
+using FrogBattleV4.Core.BattleSystem.Selections;
 using FrogBattleV4.Core.CharacterSystem;
 using FrogBattleV4.Core.CharacterSystem.Pools;
 using FrogBattleV4.Core.DamageSystem;
@@ -14,13 +14,13 @@ namespace FrogBattleV4.Core.BattleSystem;
 
 public class BattleManager
 {
-    private readonly IDecisionProvider _playerInputInterface;
+    private readonly ISelectionProvider _playerInputInterface;
     private readonly ActionBarItem[] _actionBar;
     private readonly Random _rng = new();
     public List<Team> AllTeams { get; init; }
     [NotNull] public IOrderedEnumerable<ActionBarItem> ActionBar => _actionBar.Order();
 
-    public BattleManager(IDecisionProvider provider, params Team[] teams)
+    public BattleManager(ISelectionProvider provider, params Team[] teams)
     {
         AllTeams = teams.ToList();
         _playerInputInterface = provider;

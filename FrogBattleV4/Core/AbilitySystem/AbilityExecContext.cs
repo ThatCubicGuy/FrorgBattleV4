@@ -21,7 +21,7 @@ public readonly struct AbilityExecContext
     /// </summary>
     /// <remarks>Order sensitive!</remarks>
     [NotNull]
-    public required IReadOnlyCollection<IDamageable> ValidTargets { get; init; }
+    public required IEnumerable<IDamageable> ValidTargets { get; init; }
 
     [NotNull] public required AbilityDefinition Definition { get; init; }
     [NotNull] public required System.Random Rng { get; init; }

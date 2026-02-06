@@ -1,22 +1,23 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
-using FrogBattleV4.Core.BattleSystem.Decisions;
+using FrogBattleV4.Core.BattleSystem.Selections;
 
 namespace FrogBattleV4.ConsoleBattle;
 
-public class ConsoleSelectionProvider : IDecisionProvider
+public class ConsoleSelectionProvider : ISelectionProvider
 {
-    public async Task<DecisionResult<TResult>> GetSelectionAsync<TResult>(IDecisionRequest<TResult> request)
+    public async Task<ISelectionResult<TResult>> GetSelectionAsync<TResult>(ISelectionRequest<TResult> request)
     {
-        return (DecisionResult<TResult>)(request switch
+        return (ISelectionResult<TResult>)(request switch
         {
-            AbilityDecisionRequest ab => await GetAbilitySelectionAsync(ab),
-            TargetDecisionRequest tg => await GetTargetSelectionAsync(tg),
+            AbilitySelectionRequest ab => await GetAbilitySelectionAsync(ab),
+            TargetSelectionRequest tg => await GetTargetSelectionAsync(tg),
             _ => throw new NotSupportedException($"Decision type {typeof(TResult).Name} not supported")
         });
     }
 
-    private static async Task<IDecisionResult> GetAbilitySelectionAsync(AbilityDecisionRequest request)
+    private static async Task<ISelectionResult> GetAbilitySelectionAsync(AbilitySelectionRequest request)
     {
         while (true)
         {
@@ -33,7 +34,7 @@ public class ConsoleSelectionProvider : IDecisionProvider
                     await Console.Out.WriteLineAsync(ex.Message);
                 }
 
-                return selection < 0 || selection >= request.ValidOptions.Count
+                return selection < 0 || selection >= request.ValidOptions.Count()
                     ? throw new IndexOutOfRangeException(nameof(selection))
                     : request.Select(selection);
             }
@@ -48,7 +49,7 @@ public class ConsoleSelectionProvider : IDecisionProvider
         }
     }
 
-    private static async Task<IDecisionResult> GetTargetSelectionAsync(TargetDecisionRequest request)
+    private static async Task<ISelectionResult> GetTargetSelectionAsync(TargetSelectionRequest request)
     {
         while (true)
         {
@@ -56,10 +57,11 @@ public class ConsoleSelectionProvider : IDecisionProvider
             {
                 await Console.Out.WriteLineAsync($"Select target for {request.Requestor.Name}: ");
                 if (int.TryParse(await Task.Run(Console.ReadLine), out var selection) &&
-                    selection >= 0 && selection < request.ValidOptions.Count)
+                    selection >= 0 && selection < request.ValidOptions.Count())
                 {
                     return request.Select(selection);
                 }
+
                 await Console.Out.WriteLineAsync("Invalid target number!");
             }
             catch (Exception ex)
