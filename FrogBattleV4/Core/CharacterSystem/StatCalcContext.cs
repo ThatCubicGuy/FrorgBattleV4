@@ -8,6 +8,6 @@ namespace FrogBattleV4.Core.CharacterSystem;
 public struct StatCalcContext : IRelationshipContext
 {
     [NotNull] public required string Stat { get; init; }
-    [NotNull] public required BattleMember Actor { get; init; }
-    public BattleMember? Other { get; init; }
+    [NotNull] public required IBattleMember Actor { get; init; }
+    public IBattleMember? Other { get; init; }
 }

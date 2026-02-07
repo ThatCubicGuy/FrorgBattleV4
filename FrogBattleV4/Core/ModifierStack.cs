@@ -76,36 +76,24 @@ public struct ModifierStack()
                $" Minimum: {Minimum}," +
                $" Maximum: {Maximum}";
     }
-}
 
-public enum ModifierOperation
-{
-    AddValue = 0,
-    AddBasePercent = 1,
-    MultiplyTotal = 2,
-    Minimum = 3,
-    Maximum = 4,
-}
-
-public static class ModifiersExtensions
-{
     /// <summary>
     /// Combines the modifiers from two separate stacks into one.
     /// </summary>
-    /// <param name="mod">The first mod to add.</param>
-    /// <param name="other">The mod to add to the first.</param>
+    /// <param name="left">The first mod to add.</param>
+    /// <param name="right">The second mod to add to the first.</param>
     /// <returns>A new modifier with the combined values.</returns>
     [Pure]
-    public static ModifierStack Add(this ModifierStack mod, ModifierStack other)
+    public static ModifierStack operator +(ModifierStack left, ModifierStack right)
     {
-        mod.AddValue += other.AddValue;
-        mod.AddBasePercent += other.AddBasePercent;
-        mod.MultiplyTotal *= other.MultiplyTotal;
+        left.AddValue += right.AddValue;
+        left.AddBasePercent += right.AddBasePercent;
+        left.MultiplyTotal *= right.MultiplyTotal;
 
-        mod.Minimum = Math.Max(mod.Minimum, other.Minimum);
-        mod.Maximum = Math.Min(mod.Maximum, other.Maximum);
+        left.Minimum = Math.Max(left.Minimum, right.Minimum);
+        left.Maximum = Math.Min(left.Maximum, right.Maximum);
 
-        return mod;
+        return left;
     }
 
     /// <summary>
@@ -115,7 +103,7 @@ public static class ModifiersExtensions
     /// <param name="scalar">Real value to scale by.</param>
     /// <returns>A scaled modifier result.</returns>
     [Pure]
-    public static ModifierStack MultiplyBy(this ModifierStack mod, int scalar)
+    public static ModifierStack operator *(ModifierStack mod, int scalar)
     {
         mod.AddValue *= scalar;
         mod.AddBasePercent *= scalar;
@@ -124,4 +112,22 @@ public static class ModifiersExtensions
         // Completely clueless as to how I'd modify min/max by a scalar... 
         return mod;
     }
+
+    /// <summary>
+    /// Multiplies a modifier stack by a scalar.
+    /// </summary>
+    /// <param name="scalar">Real value to scale by.</param>
+    /// <param name="mod">Modifier to scale.</param>
+    /// <returns>A scaled modifier result.</returns>
+    [Pure]
+    public static ModifierStack operator *(int scalar, ModifierStack mod) => mod * scalar;
+}
+
+public enum ModifierOperation
+{
+    AddValue = 0,
+    AddBasePercent = 1,
+    MultiplyTotal = 2,
+    Minimum = 3,
+    Maximum = 4,
 }

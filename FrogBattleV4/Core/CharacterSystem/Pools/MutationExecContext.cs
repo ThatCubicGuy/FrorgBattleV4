@@ -8,9 +8,9 @@ namespace FrogBattleV4.Core.CharacterSystem.Pools;
 /// <summary>
 /// Stores the context in which any pool mutation will happen.
 /// </summary>
-public readonly struct MutationExecContext(BattleMember holder) : IRelationshipContext
+public readonly struct MutationExecContext(IHasPools holder) : IRelationshipContext
 {
-    [NotNull] public required BattleMember Holder { get; init; } = holder;
-    public BattleMember? Other { get; init; }
-    BattleMember? IActorContext.Actor => Holder;
+    [NotNull] public required IHasPools Holder { get; init; } = holder;
+    public IBattleMember? Other { get; init; }
+    IBattleMember? IActorContext.Actor => Holder;
 }

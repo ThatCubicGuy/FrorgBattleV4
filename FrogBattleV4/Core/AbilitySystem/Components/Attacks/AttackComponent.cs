@@ -27,8 +27,7 @@ public class AttackComponent : IAttackComponent
                 BaseAmount = Ratio * Math.Pow(1 - Falloff, target.TargetRank) *
                              ctx.User.GetStat(Scalar, target.Target.Parent),
                 Properties = DamageProperties,
-                Target = target.Target,
-                Rng = ctx.Rng
+                Target = target.Target
             });
     }
 }

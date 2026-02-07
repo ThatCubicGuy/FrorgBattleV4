@@ -24,7 +24,7 @@ public class CharacterTurn(Character owner) : IAction
 
     public double BaseActionValue => 10000 / Owner.GetStat(nameof(Stat.Spd));
 
-    BattleMember IAction.Entity => Owner;
+    IBattleMember IAction.Entity => Owner;
 
     [Pure]
     public bool CanTakeAction(BattleContext ctx) => Owner.CanTakeAction(ctx);

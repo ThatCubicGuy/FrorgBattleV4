@@ -41,7 +41,7 @@ public static class MutationRequestBuilder
 
         IPoolComponent Selector(MutationExecContext ctx)
         {
-            return ctx.Holder.GetPoolByFlag(poolFlags) ??
+            return ctx.Holder.GetPoolsByFlag(poolFlags).LastOrDefault() ??
                    throw new System.InvalidOperationException("Pool not found for flags " + poolFlags);
         }
     }
@@ -59,10 +59,11 @@ public static class MutationRequestBuilder
     {
         var poolFlagsArray = poolFlagsList.ToArray();
         return new MutationRequest(Selector, baseAmount, flags);
+
         IPoolComponent Selector(MutationExecContext ctx)
         {
-            var pool = poolFlagsArray.Aggregate((IPoolComponent)null,
-                (accumulate, flag) => accumulate ?? ctx.Holder.GetPoolByFlag(flag));
+            var pool = poolFlagsArray.Aggregate((IPoolComponent)null, (accumulate, flag) =>
+                accumulate ?? ctx.Holder.GetPoolsByFlag(flag).LastOrDefault());
             return pool ?? throw new System.InvalidOperationException("Cannot find a pool for any of the flags given.");
         }
     }

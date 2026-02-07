@@ -10,5 +10,5 @@ public interface IDamageable
     /// <summary>
     /// The actual battle member whom this targetable entity refers to.
     /// </summary>
-    BattleMember Parent { get; }
+    IBattleMember Parent { get; }
 }

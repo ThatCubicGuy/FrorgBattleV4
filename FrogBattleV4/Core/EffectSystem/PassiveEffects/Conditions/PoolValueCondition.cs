@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.BattleSystem;
+using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
 
@@ -49,7 +50,7 @@ public class PoolValueCondition : IConditionComponent
     public int GetContribution(EffectInfoContext ctx)
     {
         // Funny ahh type check
-        if ((Direction == ConditionDirection.Self ? ctx.Holder as BattleMember : ctx.Other)?.Pools
+        if ((Direction == ConditionDirection.Self ? ctx.Holder as IHasPools : ctx.Other as IHasPools)?.Pools
             .GetValueOrDefault(PoolId) is not { } pool) return 0;
         if (Percent)
         {

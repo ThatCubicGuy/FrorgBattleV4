@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using FrogBattleV4.Core.BattleSystem;
-using FrogBattleV4.Core.Contexts;
 using FrogBattleV4.Core.EffectSystem.Modifiers;
 
 namespace FrogBattleV4.Core.EffectSystem.StatusEffects;
@@ -12,7 +11,7 @@ public class StatusEffectInstance(StatusEffectApplicationContext ctx) : IModifie
 {
     public StatusEffectDefinition Definition { get; init; } = ctx.Definition;
     public ISupportsEffects Holder { get; init; } = ctx.Target;
-    public BattleMember? EffectSource { get; init; } = ctx.Source;
+    public IBattleMember? EffectSource { get; init; } = ctx.Source;
     public int Turns { get; set; } = ctx.InitialTurns;
     public int Stacks { get; set; } = ctx.InitialStacks;
 
@@ -65,9 +64,9 @@ public class StatusEffectInstance(StatusEffectApplicationContext ctx) : IModifie
     public ModifierStack GetContributions<TQuery>(EffectInfoContext ctx, TQuery query)
         where TQuery : struct
     {
-        return Definition.Modifiers
+        return Definition.Modifiers.Where(mr => mr.AppliesFor(query))
             .Aggregate(new ModifierStack(), (stack, rule) =>
-                stack.Add(rule.ModifierStack.MultiplyBy(Stacks)));
+                stack + rule.ModifierStack * Stacks);
     }
 }
 

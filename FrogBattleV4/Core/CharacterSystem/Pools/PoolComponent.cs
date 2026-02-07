@@ -11,7 +11,7 @@ namespace FrogBattleV4.Core.CharacterSystem.Pools;
 /// Standard positive pool component for a character.
 /// </summary>
 /// <param name="owner">The character who possesses this pool.</param>
-public class PoolComponent(BattleMember owner) : IPoolComponent
+public class PoolComponent(IBattleMember owner) : IPoolComponent
 {
     private double _currentValue;
 

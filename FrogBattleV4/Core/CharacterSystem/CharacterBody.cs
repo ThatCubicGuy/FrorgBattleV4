@@ -13,7 +13,7 @@ namespace FrogBattleV4.Core.CharacterSystem;
 /// <param name="owner">The character this instance belongs to.</param>
 public class CharacterBody(Character owner) : IDamageable
 {
-    BattleMember IDamageable.Parent => Owner;
+    IBattleMember IDamageable.Parent => Owner;
 
     public Character Owner { get; } = owner;
 

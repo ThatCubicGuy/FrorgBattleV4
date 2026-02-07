@@ -13,8 +13,8 @@ namespace FrogBattleV4.Core.CharacterSystem.Pools;
 public readonly struct PoolValueCalcContext : IRelationshipContext
 {
     [NotNull] public required string PoolId { get; init; }
-    [NotNull] public required BattleMember Actor { get; init; }
-    public BattleMember? Other { get; init; }
+    [NotNull] public required IBattleMember Actor { get; init; }
+    public IBattleMember? Other { get; init; }
     public PoolPropertyChannel Channel { get; init; }
     public PoolMutationFlags Flags { get; init; }
 }

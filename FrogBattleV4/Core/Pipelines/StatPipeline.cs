@@ -11,14 +11,13 @@ internal static class StatPipeline
     /// Calculates the total value of a stat.
     /// </summary>
     /// <param name="ctx">The context in which to run the calculations.</param>
+    /// <param name="baseStatValue">Base stat value to consider.</param>
     /// <returns>The final value.</returns>
     [Pure]
-    public static double ComputePipeline(this StatCalcContext ctx)
+    public static double ComputePipeline(this StatCalcContext ctx, double baseStatValue)
     {
-        var result = ctx.Actor.BaseStats.GetValueOrDefault(ctx.Stat, 0);
-
         if (ctx.Actor is not ISupportsEffects owner)
-            return result;
+            return baseStatValue;
 
         // Mods on the holder
         var query = new StatQuery { Stat = ctx.Stat };
@@ -27,10 +26,10 @@ internal static class StatPipeline
             Holder = owner,
             Other = ctx.Other
         });
-        result = inMods.ApplyTo(result);
+        baseStatValue = inMods.ApplyTo(baseStatValue);
 
         if (ctx.Other is not ISupportsEffects other)
-            return result;
+            return baseStatValue;
 
         // Mods on the other
         query = query with { Channel = StatChannel.Penalty };
@@ -39,8 +38,8 @@ internal static class StatPipeline
             Holder = other,
             Other = ctx.Actor
         });
-        result = outMods.ApplyTo(result);
+        baseStatValue = outMods.ApplyTo(baseStatValue);
 
-        return result;
+        return baseStatValue;
     }
 }

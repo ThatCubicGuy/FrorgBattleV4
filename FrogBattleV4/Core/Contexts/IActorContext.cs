@@ -5,5 +5,5 @@ namespace FrogBattleV4.Core.Contexts;
 
 public interface IActorContext
 {
-    BattleMember? Actor { get; }
+    IBattleMember? Actor { get; }
 }

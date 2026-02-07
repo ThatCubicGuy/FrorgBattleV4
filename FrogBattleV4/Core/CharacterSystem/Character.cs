@@ -15,40 +15,40 @@ using FrogBattleV4.Core.EffectSystem.PassiveEffects;
 
 namespace FrogBattleV4.Core.CharacterSystem;
 
-public class Character : BattleMember, ISupportsEffects, IHasAbilities
+public class Character : BattleMember, IHasAbilities
 {
     private readonly List<StatusEffectInstance> _markedForDeathEffects = [];
+
+    private readonly Dictionary<string, double> _baseStats = new(StringComparer.OrdinalIgnoreCase)
+    {
+        { nameof(Stat.MaxHp), 400000 },
+        { nameof(Stat.MaxMana), 100 },
+        { nameof(Stat.MaxEnergy), 120 },
+        { nameof(Stat.Atk), 1000 },
+        { nameof(Stat.Def), 500 },
+        { nameof(Stat.Spd), 100 },
+        { nameof(Stat.Dex), 0 },
+        { nameof(Stat.CritRate), 0.1 },
+        { nameof(Stat.CritDamage), 0.5 },
+        { nameof(Stat.HitRateBonus), 0 },
+        { nameof(Stat.EffectHitRate), 1 },
+        { nameof(Stat.EffectRes), 0 },
+        { nameof(Stat.ManaCost), 1 },
+        { nameof(Stat.ManaRegen), 1 },
+        { nameof(Stat.EnergyRecharge), 1 },
+        { nameof(Stat.IncomingHealing), 1 },
+        { nameof(Stat.OutgoingHealing), 1 },
+        { nameof(Stat.ShieldToughness), 1 },
+    };
 
     public event EventHandler<StatusEffectApplicationContext>? EffectApplySuccess;
     public event EventHandler<StatusEffectApplicationContext>? EffectApplyFailure;
     public event EventHandler<StatusEffectRemovalContext>? EffectRemoveSuccess;
     public event EventHandler<StatusEffectRemovalContext>? EffectRemoveFailure;
 
-    public Character(string name) : base(name)
+    public Character(string name)
     {
-        // Base stats for any character
-        BaseStats = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
-        {
-            { nameof(Stat.MaxHp), 400000 },
-            { nameof(Stat.MaxMana), 100 },
-            { nameof(Stat.MaxEnergy), 120 },
-            { nameof(Stat.Atk), 1000 },
-            { nameof(Stat.Def), 500 },
-            { nameof(Stat.Spd), 100 },
-            { nameof(Stat.Dex), 0 },
-            { nameof(Stat.CritRate), 0.1 },
-            { nameof(Stat.CritDamage), 0.5 },
-            { nameof(Stat.HitRateBonus), 0 },
-            { nameof(Stat.EffectHitRate), 1 },
-            { nameof(Stat.EffectRes), 0 },
-            { nameof(Stat.ManaCost), 1 },
-            { nameof(Stat.ManaRegen), 1 },
-            { nameof(Stat.EnergyRecharge), 1 },
-            { nameof(Stat.IncomingHealing), 1 },
-            { nameof(Stat.OutgoingHealing), 1 },
-            { nameof(Stat.ShieldToughness), 1 },
-        };
-
+        Name = name;
         Pools = new List<IPoolComponent>(3)
         {
             new PoolComponent(this)
@@ -75,13 +75,15 @@ public class Character : BattleMember, ISupportsEffects, IHasAbilities
         Parts = [new CharacterBody(this)];
     }
 
-    [NotNull] public sealed override IEnumerable<IAction> Turns { get; }
+    [NotNull] public string Name { get; }
 
-    [NotNull] public sealed override IEnumerable<IDamageable> Parts { get; }
+    [NotNull] public IEnumerable<IAction> Turns { get; }
 
-    public sealed override IReadOnlyDictionary<string, double> BaseStats { get; }
-    public sealed override IReadOnlyDictionary<string, IPoolComponent> Pools { get; }
-    public IDamageable Body => Parts.Single();
+    [NotNull] public IEnumerable<IDamageable> Parts { get; }
+    [NotNull] public IDamageable Body => Parts.Single();
+
+    [NotNull] public IReadOnlyDictionary<string, double> BaseStats => _baseStats;
+    [NotNull] public IReadOnlyDictionary<string, IPoolComponent> Pools { get; }
 
     #region Pools
 
@@ -100,10 +102,21 @@ public class Character : BattleMember, ISupportsEffects, IHasAbilities
     IEnumerable<AbilityDefinition> IHasAbilities.Abilities => Abilities;
 
     private List<StatusEffectInstance> ActiveEffects { get; } = [];
-    private List<PassiveEffectDefinition> PassiveEffects { get; } = [];
+    public List<PassiveEffectDefinition> PassiveEffects { private get; init; } = [];
 
     public IEnumerable<IModifierComponent> AttachedEffects =>
         ActiveEffects.Concat<IModifierComponent>(PassiveEffects);
+
+    public double GetStat(string stat, IBattleMember? target = null)
+    {
+        
+        return new StatCalcContext
+        {
+            Stat = stat,
+            Actor = this,
+            Other = target
+        }.ComputePipeline(BaseStats.GetValueOrDefault(stat));
+    }
 
     /// <summary>
     /// Decides whether the character can actually execute an ability and isn't stunned.
@@ -166,9 +179,9 @@ public class Character : BattleMember, ISupportsEffects, IHasAbilities
             return false;
         }
 
-        var item = ActiveEffects.FirstOrDefault(se => se.Definition == ctx.Definition);
-
         EffectApplySuccess?.Invoke(this, ctx);
+
+        var item = ActiveEffects.FirstOrDefault(se => se.Definition == ctx.Definition);
 
         if (item is null)
         {

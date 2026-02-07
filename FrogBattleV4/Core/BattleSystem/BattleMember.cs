@@ -1,61 +1,41 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using FrogBattleV4.Core.CharacterSystem;
 using FrogBattleV4.Core.CharacterSystem.Pools;
 using FrogBattleV4.Core.DamageSystem;
-using FrogBattleV4.Core.Pipelines;
+using FrogBattleV4.Core.EffectSystem;
+using FrogBattleV4.Core.EffectSystem.Modifiers;
 
 namespace FrogBattleV4.Core.BattleSystem;
 
-public abstract class BattleMember(string name) : IHasStats
+public abstract class BattleMember : ITakesTurns, IHasPools, ISupportsEffects
 {
-    public string Name { get; } = name;
-    [NotNull] public abstract IEnumerable<IAction> Turns { get; }
+    protected readonly Dictionary<string, IPoolComponent> _pools = new();
 
-    /// <summary>
-    /// Every individually selectable part that pertains to this battle member and thus shares its pools and stats.
-    /// </summary>
-    [NotNull] public abstract IEnumerable<IDamageable> Parts { get; }
+    public event EventHandler<StatusEffectApplicationContext> EffectApplySuccess;
+    public event EventHandler<StatusEffectApplicationContext> EffectApplyFailure;
+    public event EventHandler<StatusEffectRemovalContext> EffectRemoveSuccess;
+    public event EventHandler<StatusEffectRemovalContext> EffectRemoveFailure;
 
-    public abstract IReadOnlyDictionary<string, double> BaseStats { get; }
-    public abstract IReadOnlyDictionary<string, IPoolComponent> Pools { get; }
+    [NotNull] public string Name { get; protected set; }
+    [NotNull] public IEnumerable<IAction> Turns { get; protected set; }
+    [NotNull] public IEnumerable<IDamageable> Parts { get; protected set; } = [];
+    [NotNull] public IReadOnlyDictionary<string, IPoolComponent> Pools => _pools;
+    [NotNull] public IEnumerable<IModifierComponent> AttachedEffects { get; } = [];
 
-
-    /// <summary>
-    /// Calculates the final value of a stat, optionally in relation to an enemy.
-    /// </summary>
-    /// <param name="stat">The name of the stat to calculate.</param>
-    /// <param name="target">The enemy against which to calculate the stat. Optional.</param>
-    /// <returns>The final value of the stat.</returns>
-    public double GetStat(string stat, BattleMember? target = null)
+    public double GetStat(string stat, IBattleMember target = null)
     {
-        return new StatCalcContext
-        {
-            Stat = stat,
-            Actor = this,
-            Other = target
-        }.ComputePipeline();
+        throw new NotImplementedException();
     }
-}
 
-public static class BattleMemberExtensions
-{
-    /// <summary>
-    /// Gets the team of which this BattleMember is a part of, or null if it is not part of them.
-    /// </summary>
-    /// <param name="member">The member whose team to find.</param>
-    /// <param name="teams">A list of teams to look through for the allied team.</param>
-    /// <returns>The team which contains the given member.</returns>
-    /// <exception cref="ArgumentNullException">member or list of teams is null.</exception>
-    /// <exception cref="System.InvalidOperationException">The battle member is part of
-    /// more than one of the given teams.</exception>
-    public static Team? GetAlliedTeam(this BattleMember member, IEnumerable<Team> teams)
+    public bool ApplyEffect(StatusEffectApplicationContext ctx)
     {
-        ArgumentNullException.ThrowIfNull(member);
-        ArgumentNullException.ThrowIfNull(teams);
-        return teams.SingleOrDefault(x => x.Members.Contains(member));
+        throw new NotImplementedException();
+    }
+
+    public bool RemoveEffect(StatusEffectRemovalContext ctx)
+    {
+        throw new NotImplementedException();
     }
 }

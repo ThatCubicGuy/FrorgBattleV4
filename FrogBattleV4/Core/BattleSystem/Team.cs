@@ -10,13 +10,13 @@ public class Team
     // Interesting suggestion by predictive tests
     public readonly static List<Team> AllTeams = [];
 
-    public Team(params BattleMember[] battleMembers)
+    public Team(params IBattleMember[] battleMembers)
     {
         Members = battleMembers.ToList();
         AllTeams.Add(this);
     }
 
-    public IReadOnlyCollection<BattleMember> Members { get; }
+    public IReadOnlyCollection<IBattleMember> Members { get; }
 
     public IReadOnlyCollection<IDamageable> Parts => Members.SelectMany(m => m.Parts ?? []).ToList();
 }

@@ -9,5 +9,5 @@ namespace FrogBattleV4.Core.Contexts;
 /// </summary>
 public interface IReferenceContext
 {
-    BattleMember? Other { get; }
+    IBattleMember? Other { get; }
 }

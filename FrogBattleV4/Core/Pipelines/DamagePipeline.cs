@@ -8,7 +8,7 @@ using FrogBattleV4.Core.EffectSystem.Modifiers;
 
 namespace FrogBattleV4.Core.Pipelines;
 
-internal static class DamagePipeline
+public static class DamagePipeline
 {
     /// <summary>
     /// Computes the full pipeline for dealing damage.
@@ -26,7 +26,7 @@ internal static class DamagePipeline
             Crit = ctx.IsCrit,
             Direction = ModifierDirection.Outgoing
         };
-        
+
         // Outgoing damage bonuses from the attacker
         if (ctx.Attacker is ISupportsEffects actor)
         {
@@ -73,23 +73,24 @@ internal static class DamagePipeline
     [Pure]
     public static DamagePreview PreviewDamage(this DamageRequest req, DamageExecContext ctx)
     {
-        var minDamage = new DamageCalcContext
+        req.Properties.Deconstruct(out var type, out var defPen, out var typeResPen);
+        var baseCtx = new DamageCalcContext
         {
-            Attacker = ctx.Source,
-            Other = ctx.Other,
             IsCrit = false,
-            Type = req.Properties.Type,
-            Source = "attack"
-        }.ComputePipeline(req.BaseAmount);
-
-        var maxDamage = new DamageCalcContext
-        {
             Attacker = ctx.Source,
             Other = ctx.Other,
-            IsCrit = true,
-            Type = req.Properties.Type,
-            Source = "attack"
-        }.ComputePipeline(req.BaseAmount);
+            Type = type,
+            Source = "attack",
+            DefPen = defPen,
+            TypeResPen = typeResPen,
+        };
+
+        var minDamage = baseCtx.ComputePipeline(req.BaseAmount);
+
+        var maxDamage = req.CanCrit ? (baseCtx with
+        {
+            IsCrit = true
+        }).ComputePipeline(req.BaseAmount) : minDamage;
 
         return new DamagePreview(req.Target, minDamage, maxDamage);
     }

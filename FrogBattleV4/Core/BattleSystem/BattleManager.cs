@@ -25,13 +25,14 @@ public class BattleManager
         AllTeams = teams.ToList();
         _playerInputInterface = provider;
         _actionBar = AllTeams
-            .SelectMany(x => x.Members)
-            .SelectMany(x => x.Turns?.Select(y => new ActionBarItem(y)))
+            .SelectMany(team => team.Members)
+            .OfType<ITakesTurns>()
+            .SelectMany(tt => tt.Turns.Select(action => new ActionBarItem(action)))
             .ToArray();
     }
 
-    public event EventHandler<BattleMember> OnMemberAdded;
-    public event EventHandler<BattleMember> OnMemberRemoved;
+    // public event EventHandler<BattleMember> OnMemberAdded;
+    // public event EventHandler<BattleMember> OnMemberRemoved;
     public event EventHandler<BattleContext> OnTurnStart;
     public event EventHandler<BattleContext> OnTurnPlay;
     public event EventHandler<BattleContext> OnTurnEnd;
@@ -81,8 +82,8 @@ public class BattleManager
         return true;
     }
 
-    public void AdvanceTarget(BattleMember target, double percentage)
+    public void AdvanceTarget(IBattleMember target, double percentage)
     {
-        ActionBar.First(x => x.TurnAction.Entity == target).AdvancePercentage(percentage);
+        ActionBar.First(action => action.TurnAction.Entity == target).AdvancePercentage(percentage);
     }
 }

@@ -17,6 +17,6 @@ internal static class PipelineExtensions
     public static ModifierStack AggregateMods<TQuery>(this TQuery query, EffectInfoContext ctx) where TQuery : struct
     {
         return ctx.Holder.AttachedEffects.Aggregate(new ModifierStack(),
-            (stack, effect) => stack.Add(effect.GetContributions(ctx, query)));
+            (stack, effect) => stack + effect.GetContributions(ctx, query));
     }
 }

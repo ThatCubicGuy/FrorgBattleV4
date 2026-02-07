@@ -43,7 +43,7 @@ public class PassiveEffectDefinition : IEffectDefinition, IModifierComponent
     {
         return Modifiers.Where(mr => mr.AppliesFor(query))
             .Aggregate(new ModifierStack(), (stack, rule) =>
-                stack.Add(rule.ModifierStack.MultiplyBy(GetStacks(ctx))));
+                stack + rule.ModifierStack * GetStacks(ctx));
     }
 }
 
