@@ -3,4 +3,4 @@ using FrogBattleV4.Core.BattleSystem;
 
 namespace FrogBattleV4.Core.Contexts;
 
-public record RelationshipWrapper(IBattleMember? Actor, IBattleMember? Other) : IRelationshipContext;
+public record RelationshipWrapper(BattleMember? Actor, BattleMember? Other) : IRelationshipContext;

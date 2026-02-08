@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.CharacterSystem;
 using FrogBattleV4.Core.DamageSystem;
 
@@ -24,5 +24,5 @@ public readonly struct AbilityExecContext
     public required IEnumerable<IDamageable> ValidTargets { get; init; }
 
     [NotNull] public required AbilityDefinition Definition { get; init; }
-    [NotNull] public required System.Random Rng { get; init; }
+    [NotNull] public required Random Rng { get; init; }
 }

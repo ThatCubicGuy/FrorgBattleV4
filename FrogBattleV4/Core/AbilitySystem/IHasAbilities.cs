@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using FrogBattleV4.Core.BattleSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem;
 
-public interface IHasAbilities : IBattleMember
+public interface IHasAbilities
 {
     IEnumerable<AbilityDefinition> Abilities { get; }
 }

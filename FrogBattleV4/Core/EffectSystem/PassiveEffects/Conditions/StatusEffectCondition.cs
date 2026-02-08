@@ -17,7 +17,7 @@ public class StatusEffectCondition : IConditionComponent
         return (Direction switch
         {
             ConditionDirection.Self => ctx.Holder,
-            ConditionDirection.Other => ctx.Other as ISupportsEffects,
+            ConditionDirection.Other => ctx.Other,
             _ => null
         })?.AttachedEffects.OfType<StatusEffectInstance>().Where(Query.Invoke).Sum(sei => sei.Stacks) ?? 0;
     }

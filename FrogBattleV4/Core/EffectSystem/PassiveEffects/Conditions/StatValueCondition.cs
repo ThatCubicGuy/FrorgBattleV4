@@ -43,7 +43,7 @@ public class StatValueCondition : IConditionComponent
     [Pure]
     public int GetContribution(EffectInfoContext ctx)
     {
-        if (ctx.Holder is not IBattleMember holder) return 0;
+        if (ctx.Holder is not BattleMember holder) return 0;
         return (int)Math.Floor((Math.Clamp(holder.GetStat(Stat, ctx.Other), MinValue, MaxValue) - MinValue) / Step);
     }
 }

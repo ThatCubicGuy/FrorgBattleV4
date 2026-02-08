@@ -1,5 +1,4 @@
 #nullable enable
-using System.Linq;
 using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.CharacterSystem.Pools;
 using FrogBattleV4.Core.DamageSystem;
@@ -13,14 +12,14 @@ namespace FrogBattleV4.Core.CharacterSystem;
 /// <param name="owner">The character this instance belongs to.</param>
 public class CharacterBody(Character owner) : IDamageable
 {
-    IBattleMember IDamageable.Parent => Owner;
+    BattleMember IDamageable.Parent => Owner;
 
     public Character Owner { get; } = owner;
 
     public void ReceiveDamage(DamageResult dmg)
     {
         MutationRequestBuilder
-            .ByAnyFlags([PoolFlags.AbsorbsDamage, PoolFlags.UsedForLife], dmg.Amount, PoolMutationFlags.Immutable)
+            .ByAnyFlags(["absorbs_damage", "used_for_life"], dmg.Amount, PoolMutationFlags.Immutable)
             .ExecuteMutation(new MutationExecContext
             {
                 Holder = Owner
@@ -30,7 +29,7 @@ public class CharacterBody(Character owner) : IDamageable
     public void ReceiveHealing(double healing)
     {
         MutationRequestBuilder
-            .ByAnyFlags([PoolFlags.AbsorbsHealing, PoolFlags.UsedForLife], healing, PoolMutationFlags.Immutable)
+            .ByAnyFlags(["absorbs_healing", "used_for_life"], healing, PoolMutationFlags.Immutable)
             .ExecuteMutation(new MutationExecContext
             {
                 Holder = Owner

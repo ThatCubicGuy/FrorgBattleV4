@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -8,6 +7,7 @@ using System.Threading.Tasks;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.AbilitySystem.Components;
 using FrogBattleV4.Core.BattleSystem;
+using FrogBattleV4.Core.BattleSystem.Actions;
 using FrogBattleV4.Core.BattleSystem.Selections;
 using FrogBattleV4.Core.Pipelines;
 
@@ -24,7 +24,7 @@ public class CharacterTurn(Character owner) : IAction
 
     public double BaseActionValue => 10000 / Owner.GetStat(nameof(Stat.Spd));
 
-    IBattleMember IAction.Entity => Owner;
+    BattleMember IAction.Entity => Owner;
 
     [Pure]
     public bool CanTakeAction(BattleContext ctx) => Owner.CanTakeAction(ctx);

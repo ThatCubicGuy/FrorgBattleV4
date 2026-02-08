@@ -11,7 +11,7 @@ public class StatusEffectInstance(StatusEffectApplicationContext ctx) : IModifie
 {
     public StatusEffectDefinition Definition { get; init; } = ctx.Definition;
     public ISupportsEffects Holder { get; init; } = ctx.Target;
-    public IBattleMember? EffectSource { get; init; } = ctx.Source;
+    public BattleMember? EffectSource { get; init; } = ctx.Source;
     public int Turns { get; set; } = ctx.InitialTurns;
     public int Stacks { get; set; } = ctx.InitialStacks;
 

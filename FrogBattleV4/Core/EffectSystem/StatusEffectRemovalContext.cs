@@ -8,7 +8,7 @@ namespace FrogBattleV4.Core.EffectSystem;
 public struct StatusEffectRemovalContext()
 {
     public required StatusEffectQuery Query { get; init; }
-    public IBattleMember? Source { get; init; }
+    public BattleMember? Source { get; init; }
     [NotNull] public required ISupportsEffects Target { get; init; }
     public double RemovalChance { get; init; } = 1;
     public int RemovedStacks { get; init; } = 1;

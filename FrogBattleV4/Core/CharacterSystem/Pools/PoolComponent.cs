@@ -1,50 +1,56 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using FrogBattleV4.Core.BattleSystem;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using FrogBattleV4.Core.EffectSystem.StatusEffects;
-using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.CharacterSystem.Pools;
 
-/// <summary>
-/// Standard positive pool component for a character.
-/// </summary>
-/// <param name="owner">The character who possesses this pool.</param>
-public class PoolComponent(IBattleMember owner) : IPoolComponent
+public class PoolComponent
 {
     private double _currentValue;
+    private readonly HashSet<PoolTag> _tags = [];
+    public event Action<PoolComponent, double, double>? ValueChanged;
+    public required PoolId Id { get; init; }
 
-    public required string Id { get; init; }
     public double CurrentValue
     {
         get => _currentValue;
-        set => _currentValue = Math.Clamp(value, 0, Capacity);
+        set
+        {
+            var old = _currentValue;
+            _currentValue = Math.Clamp(value, MinValue ?? double.MinValue, MaxValue ?? double.MaxValue);
+            if (!old.Equals(_currentValue)) ValueChanged?.Invoke(this, _currentValue, value);
+        }
     }
 
-    // TODO: Fix! Currently you only allow mutations through PoolPipeline.
-    // TODO: See how u might solve this one.
-    public double Capacity => new PoolValueCalcContext
-    {
-        Channel = PoolPropertyChannel.Max,
-        Actor = owner,
-        Other = null,
-        PoolId = Id
-    }.ComputePipeline(owner.GetStat("Max" + Id));
-    public required PoolFlags Flags { get; init; }
+    public virtual double? MaxValue { get; init; }
+    public virtual double? MinValue { get; init; }
 
-    double? IPoolComponent.MaxValue => Capacity;
-    double? IPoolComponent.MinValue => 0;
-    
-    public IEnumerable<IMutatorComponent>? Mutators { get; set; }
+    [NotNull] public IEnumerable<PoolTag> Tags
+    {
+        get => _tags;
+        init => _tags = [..value];
+    }
+
+    [NotNull] public List<IMutatorComponent> Mutators { get; } = [];
 }
 
-internal enum Pool
+public static class PoolComponentExtensions
 {
-    Hp,
-    Mana,
-    Energy,
-    Shield,
-    Barrier,
-    Special
+    public static bool HasTag([NotNull] this PoolComponent pc, PoolTag tag)
+    {
+        return pc.Tags.Contains(tag);
+    }
+
+    public static bool HasAllTags([NotNull] this PoolComponent pc, [NotNull] params PoolTag[] tags)
+    {
+        return tags.Aggregate(true, (b, tag) => b && pc.Tags.Contains(tag));
+    }
+    
+    public static bool HasAnyTags([NotNull] this PoolComponent pc, [NotNull] params PoolTag[] tags)
+    {
+        return tags.Aggregate(false, (b, tag) => b || pc.Tags.Contains(tag));
+    }
 }

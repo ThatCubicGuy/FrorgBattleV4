@@ -50,7 +50,7 @@ public class PoolValueCondition : IConditionComponent
     public int GetContribution(EffectInfoContext ctx)
     {
         // Funny ahh type check
-        if ((Direction == ConditionDirection.Self ? ctx.Holder as IHasPools : ctx.Other as IHasPools)?.Pools
+        if ((Direction == ConditionDirection.Self ? ctx.Holder as IHasPools : ctx.Other)?.Pools
             .GetValueOrDefault(PoolId) is not { } pool) return 0;
         if (Percent)
         {
@@ -70,7 +70,7 @@ public class PoolValueCondition : IConditionComponent
     /// <param name="pool">Pool to calculate percentage for.</param>
     /// <param name="poolMaxValue">Non-nullable max value of the pool.</param>
     /// <returns>Contribution value for a percentage cost.</returns>
-    private int GetPercentageValue(CharacterSystem.Pools.IPoolComponent pool, double poolMaxValue)
+    private int GetPercentageValue(CharacterSystem.Pools.PoolComponent pool, double poolMaxValue)
     {
         if (!Percent)
             throw new InvalidOperationException(

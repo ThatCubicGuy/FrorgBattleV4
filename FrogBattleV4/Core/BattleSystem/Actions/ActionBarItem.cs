@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 
-namespace FrogBattleV4.Core.BattleSystem;
+namespace FrogBattleV4.Core.BattleSystem.Actions;
 
 public class ActionBarItem(IAction action) : IComparable<ActionBarItem?>
 {

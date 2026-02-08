@@ -11,6 +11,6 @@ namespace FrogBattleV4.Core.CharacterSystem.Pools;
 public readonly struct MutationExecContext(IHasPools holder) : IRelationshipContext
 {
     [NotNull] public required IHasPools Holder { get; init; } = holder;
-    public IBattleMember? Other { get; init; }
-    IBattleMember? IActorContext.Actor => Holder;
+    public BattleMember? Other { get; init; }
+    BattleMember? IActorContext.Actor => Holder as BattleMember;
 }

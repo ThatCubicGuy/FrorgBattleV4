@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using FrogBattleV4.Core.BattleSystem.Selections;
 
-namespace FrogBattleV4.Core.BattleSystem;
+namespace FrogBattleV4.Core.BattleSystem.Actions;
 
 public interface IAction
 {
-    IBattleMember Entity { get; }
+    BattleMember Entity { get; }
     double BaseActionValue { get; }
     Task PlayTurn(ISelectionProvider provider, BattleContext ctx);
     bool CanTakeAction(BattleContext ctx);

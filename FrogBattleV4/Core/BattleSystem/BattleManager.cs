@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using FrogBattleV4.Core.AbilitySystem;
+using FrogBattleV4.Core.BattleSystem.Actions;
 using FrogBattleV4.Core.BattleSystem.Selections;
-using FrogBattleV4.Core.CharacterSystem;
-using FrogBattleV4.Core.CharacterSystem.Pools;
-using FrogBattleV4.Core.DamageSystem;
-using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.BattleSystem;
 
@@ -82,7 +78,7 @@ public class BattleManager
         return true;
     }
 
-    public void AdvanceTarget(IBattleMember target, double percentage)
+    public void AdvanceTarget(BattleMember target, double percentage)
     {
         ActionBar.First(action => action.TurnAction.Entity == target).AdvancePercentage(percentage);
     }

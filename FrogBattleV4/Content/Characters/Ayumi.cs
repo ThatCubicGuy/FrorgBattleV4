@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using FrogBattleV4.Core.AbilitySystem;
-using FrogBattleV4.Core.AbilitySystem.Components;
 using FrogBattleV4.Core.AbilitySystem.Components.Attacks;
 using FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 using FrogBattleV4.Core.CharacterSystem;

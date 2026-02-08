@@ -9,7 +9,7 @@ public struct StatusEffectApplicationContext()
 {
     [NotNull] public required StatusEffectDefinition Definition { get; init; }
     [NotNull] public ISupportsEffects Target { get; init; }
-    public IBattleMember? Source { get; init; }
+    public BattleMember? Source { get; init; }
     public double ApplicationChance { get; init; } = 1;
     public ChanceType ChanceType { get; init; } = ChanceType.Fixed;
     public int InitialStacks { get; init; } = 1;

@@ -12,7 +12,7 @@ public interface ISelectionRequest<out TResult> : ISelectionRequest
 
 public interface ISelectionRequest
 {
-    IBattleMember Requestor { get; }
+    BattleMember Requestor { get; }
     int Count { get; }
 }
 

@@ -1,4 +1,5 @@
 using System.Diagnostics.Contracts;
+using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.CharacterSystem.Pools;
 using FrogBattleV4.Core.EffectSystem;
 using FrogBattleV4.Core.EffectSystem.Modifiers;
@@ -16,36 +17,32 @@ internal static class PoolPipeline
     [Pure]
     public static double ComputePipeline(this PoolValueCalcContext ctx, double baseAmount)
     {
-        if (ctx.Actor is ISupportsEffects owner)
+        if (ctx.Holder is ISupportsEffects owner)
         {
-            var query = new PoolQuery
+            baseAmount = new PoolQuery
             {
                 PoolId = ctx.PoolId,
                 Channel = ctx.Channel,
                 Direction = ModifierDirection.Incoming,
-            };
-            var inMods = query.AggregateMods(new EffectInfoContext
+            }.AggregateMods(new EffectInfoContext
             {
                 Holder = owner,
                 Other = ctx.Other,
-            });
-            baseAmount = inMods.ApplyTo(baseAmount);
+            }).ApplyTo(baseAmount);
         }
 
         if (ctx.Other is ISupportsEffects other)
         {
-            var query = new PoolQuery
+            baseAmount = new PoolQuery
             {
                 PoolId = ctx.PoolId,
                 Channel = ctx.Channel,
                 Direction = ModifierDirection.Incoming,
-            };
-            var outMods = query.AggregateMods(new EffectInfoContext
+            }.AggregateMods(new EffectInfoContext
             {
                 Holder = other,
-                Other = ctx.Actor,
-            });
-            baseAmount = outMods.ApplyTo(baseAmount);
+                Other = ctx.Holder as BattleMember,
+            }).ApplyTo(baseAmount);
         }
 
         return baseAmount;
@@ -59,7 +56,7 @@ internal static class PoolPipeline
         var total = new PoolValueCalcContext
         {
             Channel = req.BaseAmount > 0 ? PoolPropertyChannel.Regen : PoolPropertyChannel.Cost,
-            Actor = ctx.Holder,
+            Holder = ctx.Holder,
             Other = ctx.Other,
             PoolId = req.Selector(ctx).Id,
             Flags = req.Flags,

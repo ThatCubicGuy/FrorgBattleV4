@@ -8,6 +8,6 @@ namespace FrogBattleV4.Core.EffectSystem;
 public readonly struct EffectInfoContext : IRelationshipContext
 {
     [NotNull] public required ISupportsEffects Holder { get; init; }
-    public IBattleMember? Other { get; init; }
-    IBattleMember? IActorContext.Actor => Holder as IBattleMember;
+    public BattleMember? Other { get; init; }
+    BattleMember? IActorContext.Actor => Holder as BattleMember;
 }

@@ -12,9 +12,10 @@ namespace FrogBattleV4.Core.CharacterSystem.Pools;
 /// </summary>
 public readonly struct PoolValueCalcContext : IRelationshipContext
 {
-    [NotNull] public required string PoolId { get; init; }
-    [NotNull] public required IBattleMember Actor { get; init; }
-    public IBattleMember? Other { get; init; }
+    [NotNull] public required PoolId PoolId { get; init; }
+    [NotNull] public required IHasPools Holder { get; init; }
+    BattleMember? IActorContext.Actor => Holder as BattleMember;
+    public BattleMember? Other { get; init; }
     public PoolPropertyChannel Channel { get; init; }
     public PoolMutationFlags Flags { get; init; }
 }

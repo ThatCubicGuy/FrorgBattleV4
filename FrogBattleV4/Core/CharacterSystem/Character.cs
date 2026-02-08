@@ -3,15 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using FrogBattleV4.Core.Pipelines;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.CharacterSystem.Pools;
 using FrogBattleV4.Core.DamageSystem;
 using FrogBattleV4.Core.EffectSystem;
 using FrogBattleV4.Core.EffectSystem.Modifiers;
-using FrogBattleV4.Core.EffectSystem.StatusEffects;
 using FrogBattleV4.Core.EffectSystem.PassiveEffects;
+using FrogBattleV4.Core.EffectSystem.StatusEffects;
+using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.CharacterSystem;
 
@@ -49,41 +49,35 @@ public class Character : BattleMember, IHasAbilities
     public Character(string name)
     {
         Name = name;
-        Pools = new List<IPoolComponent>(3)
+        Pools = new List<PoolComponent>(3)
         {
-            new PoolComponent(this)
+            new CharacterPoolComponent(this)
             {
                 Id = nameof(Pool.Hp),
                 CurrentValue = BaseStats[nameof(Stat.MaxHp)],
-                Flags = PoolFlags.UsedForLife
+                Tags = ["used_for_health"]
             },
-            new PoolComponent(this)
+            new CharacterPoolComponent(this)
             {
                 Id = nameof(Pool.Mana),
                 CurrentValue = BaseStats[nameof(Stat.MaxMana)] / 2,
-                Flags = PoolFlags.UsedForCasting
+                Tags = ["used_for_abilities"]
             },
-            new PoolComponent(this)
+            new CharacterPoolComponent(this)
             {
                 Id = nameof(Pool.Energy),
                 CurrentValue = 0,
-                Flags = PoolFlags.UsedForBurst
+                Tags = ["used_for_burst"]
             }
-        }.ToDictionary(pc => pc.Id, StringComparer.OrdinalIgnoreCase);
+        }.ToDictionary(pc => pc.Id);
 
         Turns = [new CharacterTurn(this)];
         Parts = [new CharacterBody(this)];
     }
 
-    [NotNull] public string Name { get; }
-
-    [NotNull] public IEnumerable<IAction> Turns { get; }
-
-    [NotNull] public IEnumerable<IDamageable> Parts { get; }
     [NotNull] public IDamageable Body => Parts.Single();
 
     [NotNull] public IReadOnlyDictionary<string, double> BaseStats => _baseStats;
-    [NotNull] public IReadOnlyDictionary<string, IPoolComponent> Pools { get; }
 
     #region Pools
 
@@ -107,7 +101,7 @@ public class Character : BattleMember, IHasAbilities
     public IEnumerable<IModifierComponent> AttachedEffects =>
         ActiveEffects.Concat<IModifierComponent>(PassiveEffects);
 
-    public double GetStat(string stat, IBattleMember? target = null)
+    public double GetStat(string stat, BattleMember? target = null)
     {
         
         return new StatCalcContext
@@ -126,7 +120,7 @@ public class Character : BattleMember, IHasAbilities
     public bool CanTakeAction(BattleContext ctx)
     {
         // There's more, but not for now
-        return !Pools.Values.Any(pc => pc.Flags.HasFlag(PoolFlags.Stuns));
+        return !Pools.Values.Any(pc => pc.HasTag("stuns"));
     }
 
     /// <summary>
@@ -140,7 +134,7 @@ public class Character : BattleMember, IHasAbilities
             TurnNumber = ctx.TurnNumber,
             Moment = TurnMoment.Start
         };
-        foreach (var mutator in ActiveEffects.SelectMany(se => se.Definition.Mutators ?? []))
+        foreach (var mutator in ActiveEffects.SelectMany(se => se.Definition.Mutators))
         {
             mutator.OnTurnStart(TurnStatus);
         }
@@ -154,7 +148,7 @@ public class Character : BattleMember, IHasAbilities
         {
             Moment = TurnMoment.End
         };
-        foreach (var mutator in ActiveEffects.SelectMany(se => se.Definition.Mutators ?? []))
+        foreach (var mutator in ActiveEffects.SelectMany(se => se.Definition.Mutators))
         {
             mutator.OnTurnEnd(TurnStatus);
         }
