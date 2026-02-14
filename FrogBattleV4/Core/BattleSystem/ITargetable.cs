@@ -10,26 +10,27 @@ namespace FrogBattleV4.Core.BattleSystem;
 public interface ITargetable
 {
     BattleMember Parent { get; }
-    IEnumerable<TargetTag> Tags { get; }
+    TargetIdentifier Identifier { get; }
+
     /// <summary>
     /// Modifiers for incoming damage.
     /// </summary>
     IEnumerable<DamageModifier> DamageModifiers { get; }
 }
 
-public class PartEqualityComparer : IEqualityComparer<ITargetable>
+public class PartComparer : IEqualityComparer<ITargetable?>
 {
     private readonly Func<ITargetable?, ITargetable?, bool> _equator;
     private readonly Func<ITargetable, int> _hasher;
 
-    private PartEqualityComparer(Func<ITargetable?, ITargetable?, bool> equatorFunc, Func<ITargetable, int> hasherFunc)
+    private PartComparer(Func<ITargetable?, ITargetable?, bool> equatorFunc, Func<ITargetable, int> hasherFunc)
     {
         _equator = equatorFunc;
         _hasher = hasherFunc;
     }
 
-    bool IEqualityComparer<ITargetable>.Equals(ITargetable? x, ITargetable? y) => _equator(x, y);
-    int IEqualityComparer<ITargetable>.GetHashCode(ITargetable obj) => _hasher(obj);
+    bool IEqualityComparer<ITargetable?>.Equals(ITargetable? x, ITargetable? y) => _equator(x, y);
+    int IEqualityComparer<ITargetable?>.GetHashCode(ITargetable obj) => _hasher(obj);
 
     // int IComparer<ITargetable>.Compare(ITargetable? x, ITargetable? y) => _equator(x, y) ? 0 : _comparer(x, y);
     // private static int CompareByHeightAndDepth(ITargetable? x, ITargetable? y)
@@ -42,19 +43,19 @@ public class PartEqualityComparer : IEqualityComparer<ITargetable>
     //         : x.Position.Height.CompareTo(y.Position.Height);
     // }
 
-    private static bool EqualsByParentAndTags(ITargetable? x, ITargetable? y)
+    private static bool EqualsByParentAndRole(ITargetable? x, ITargetable? y)
     {
         if (ReferenceEquals(x, y)) return true;
         if (x is null) return false;
         if (y is null) return false;
-        return x.Parent.Equals(y.Parent) && x.Tags.SequenceEqual(y.Tags);
+        return x.Parent.Equals(y.Parent) && x.Identifier.Equals(y.Identifier);
     }
 
-    private static int GetHashCodeByParentAndTags(ITargetable obj)
+    private static int GetHashCodeByParent(ITargetable obj)
     {
-        return HashCode.Combine(obj.Parent, obj.Tags);
+        return HashCode.Combine(obj.Parent);
     }
 
-    public static readonly PartEqualityComparer DefaultEqualityComparer =
-        new(EqualsByParentAndTags, GetHashCodeByParentAndTags);
+    public static readonly PartComparer DefaultComparer =
+        new(EqualsByParentAndRole, GetHashCodeByParent);
 }

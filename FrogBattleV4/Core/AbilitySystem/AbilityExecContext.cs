@@ -20,7 +20,7 @@ public readonly struct AbilityExecContext
     /// Pool of targets that the ability's targeting components can select from, knowing the main target.
     /// </summary>
     /// <remarks>Order sensitive!</remarks>
-    [NotNull] public required IEnumerable<ITargetable> ValidTargets { get; init; }
+    [NotNull] public required IEnumerable<BattleMember> ValidTargets { get; init; }
 
     [NotNull] public required AbilityDefinition Definition { get; init; }
     [NotNull] public required Random Rng { get; init; }

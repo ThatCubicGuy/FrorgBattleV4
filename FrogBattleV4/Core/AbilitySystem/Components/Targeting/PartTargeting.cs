@@ -8,59 +8,77 @@ namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
 internal static class PartTargeting
 {
-    public static IEnumerable<TargetingContext> Slam(
+    public static IEnumerable<TargetingContext> Vertical(
         BattleMember target,
         int startingRank,
-        bool reversed = false)
+        bool fromTop = false)
     {
-        var result = target.Parts.Cast<ITargetable?>();
-        if (reversed) result = result.Reverse();
-        return result.Where(part => part is not null).Select((part, index) => new TargetingContext
+        var result = target.Parts.OfType<ITargetable>();
+        if (fromTop) result = result.Reverse();
+        return result.Select((part, index) => new TargetingContext
         {
             Target = part,
             TargetRank = index + startingRank,
         });
     }
 
-    public static TargetingContext ByTag(
+    public static IEnumerable<TargetingContext> ByTag(
         BattleMember target,
         int startingRank,
-        TargetTag tag)
+        TargetIdentifier id,
+        bool rankDecay = false)
     {
-        return new TargetingContext
+        var i = 0;
+        return target.Parts
+            .Where(part => id.Equals(part?.Identifier))
+            .Select(part =>
+                new TargetingContext
+                {
+                    Target = part,
+                    TargetRank = startingRank + (rankDecay ? i++ : i),
+                });
+    }
+
+    public static IEnumerable<TargetingContext> ByHeight(
+        BattleMember target,
+        int startingRank,
+        int height)
+    {
+        yield return new TargetingContext
         {
-            Target = target.Parts.Cast<ITargetable?>().SingleOrDefault(part => part?.Tags.Contains(tag) ?? false),
+            Target = target.Parts[height],
             TargetRank = startingRank,
         };
     }
-    
-    
-    public static IEnumerable<TargetingContext> FullyCustom(
+
+    public static IEnumerable<TargetingContext> AllParts(
+        BattleMember target,
+        int startingRank) =>
+        CustomBlast(target, startingRank, 0, 100, false);
+
+    private static List<TargetingContext> CustomBlast(
         BattleMember target,
         int startingRank,
-        int mainTargetHeight,
+        int mainTargetIndex,
         int radius,
-        int pierce,
-        bool heightLosesRank,
-        bool pierceLosesRank)
+        bool heightRankDecay)
     {
         var result = new List<TargetingContext>();
-        for (var i = Math.Max(0, mainTargetHeight - radius); i < Math.Min(target.Parts.Depth, mainTargetHeight + radius); i++)
+        // Inclusive lower bound
+        var lowerBound = Math.Max(0, mainTargetIndex - radius);
+        // Exclusive upper bound
+        var upperBound = Math.Min(target.Parts.Height, mainTargetIndex + radius + 1);
+        for (var i = lowerBound;
+             i < upperBound;
+             i++)
         {
-            
-        }
-    }
-
-    private static ITargetable? NthAtHeight(
-        BattleMember target,
-        int height,
-        int n = 0)
-    {
-        for (var i = new TargetPosition(height); i.Depth < target.Parts.Depth; i = new TargetPosition(height, i.Depth + 1))
-        {
-            if (target.Parts[i] is not null && --n < 0) return target.Parts[i];
+            result.Add(new TargetingContext
+            {
+                Target = target.Parts[i],
+                TargetRank = startingRank + (heightRankDecay ? Math.Abs(i - mainTargetIndex) : 0),
+            });
         }
 
-        return null;
+        return result;
     }
 }

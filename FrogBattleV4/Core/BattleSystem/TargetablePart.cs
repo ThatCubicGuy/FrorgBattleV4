@@ -6,6 +6,6 @@ namespace FrogBattleV4.Core.BattleSystem;
 public class TargetablePart : ITargetable
 {
     public required BattleMember Parent { get; init; }
-    public required IEnumerable<TargetTag> Tags { get; init; }
+    public required TargetIdentifier Identifier { get; init; }
     public IEnumerable<DamageModifier> DamageModifiers { get; init; } = [];
 }

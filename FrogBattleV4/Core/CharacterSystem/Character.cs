@@ -61,46 +61,38 @@ public class Character : BattleMember, IDamageable, IHasAbilities
             Tags = [PoolTag.UsedForBurst]
         });
 
-        Parts = new BattleMemberParts
+        Parts = new HitboxProfile(new TargetablePart
         {
-            [2] = new TargetablePart
-            {
-                Parent = this,
-                Tags = [TargetTag.WeakPoint],
-                DamageModifiers =
-                [
-                    new DamageModifier
+            Parent = this,
+            DamageModifiers =
+            [
+                new DamageModifier
+                {
+                    Direction = ModifierDirection.Incoming,
+                    ModifierStack = new ModifierStack
                     {
-                        Direction = ModifierDirection.Incoming,
-                        ModifierStack = new ModifierStack
-                        {
-                            MultiplyTotal = 1.3
-                        }
+                        MultiplyTotal = 0.9
                     }
-                ],
-            },
-            [1] = new TargetablePart
-            {
-                Parent = this,
-                Tags = [TargetTag.MainBody],
-            },
-            [0] = new TargetablePart
-            {
-                Parent = this,
-                Tags = [TargetTag.Limb],
-                DamageModifiers =
-                [
-                    new DamageModifier
+                }
+            ],
+        }, new TargetablePart
+        {
+            Parent = this,
+        }, new TargetablePart
+        {
+            Parent = this,
+            DamageModifiers =
+            [
+                new DamageModifier
+                {
+                    Direction = ModifierDirection.Incoming,
+                    ModifierStack = new ModifierStack
                     {
-                        Direction = ModifierDirection.Incoming,
-                        ModifierStack = new ModifierStack
-                        {
-                            MultiplyTotal = 0.7
-                        }
+                        MultiplyTotal = 1.1
                     }
-                ],
-            }
-        };
+                }
+            ],
+        });
         Turns = [new CharacterTurn(this)];
     }
 

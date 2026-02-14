@@ -70,7 +70,7 @@ public class CharacterTurn(Character owner) : IAction
             User = Owner,
             Definition = definition,
             MainTarget = mainTarget,
-            ValidTargets = targets?.SelectMany(bm => bm.Parts),
+            ValidTargets = targets,
             Rng = ctx.Rng,
         }.ExecuteAbility();
     }
