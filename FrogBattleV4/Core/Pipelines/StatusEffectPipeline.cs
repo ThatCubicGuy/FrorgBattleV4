@@ -21,8 +21,8 @@ internal static class StatusEffectPipeline
         {
             ChanceType.Fixed => statusEffect.ApplicationChance,
             ChanceType.Base => statusEffect.ApplicationChance +
-                               (statusEffect.Source.GetStat(nameof(Stat.EffectHitRate), statusEffect.Target as BattleMember)) -
-                               ((statusEffect.Target as BattleMember)?.GetStat(nameof(Stat.EffectRes), statusEffect.Source) ?? 0),
+                               (statusEffect.Source.GetStat(StatId.EffectHitRate, statusEffect.Target as BattleMember)) -
+                               ((statusEffect.Target as BattleMember)?.GetStat(StatId.EffectRes, statusEffect.Source) ?? 0),
             _ => throw new InvalidEnumArgumentException($"Invalid chance type: {statusEffect.ChanceType}")
         };
     }

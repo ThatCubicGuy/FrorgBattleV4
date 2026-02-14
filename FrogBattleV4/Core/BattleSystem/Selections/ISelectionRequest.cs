@@ -16,7 +16,7 @@ public interface ISelectionRequest
     int Count { get; }
 }
 
-public static class DecisionRequestExtensions
+public static class SelectionRequestExtensions
 {
     [Pure]
     public static SelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, int selection)

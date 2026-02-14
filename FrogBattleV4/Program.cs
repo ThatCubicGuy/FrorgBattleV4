@@ -12,5 +12,6 @@ var game = new BattleManager(provider, new Team(c1), new Team(c2));
 var runningTask = game.RunAsync();
 while (true)
 {
-    
+    // Avoid public execution with this one simple truck:
+    // TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }

@@ -22,7 +22,7 @@ public class CharacterTurn(Character owner) : IAction
         Moment = TurnMoment.None
     };
 
-    public double BaseActionValue => 10000 / Owner.GetStat(nameof(Stat.Spd));
+    public double BaseActionValue => 10000 / Owner.GetStat(StatId.Spd);
 
     BattleMember IAction.Entity => Owner;
 
@@ -49,31 +49,30 @@ public class CharacterTurn(Character owner) : IAction
         var defResult = await provider.GetSelectionAsync(
             new AbilitySelectionRequest(ctx.ActiveMember, (ctx.ActiveMember as Character)!.Abilities));
         var definition = defResult.Choices.Single();
-        var targets = definition.TargetingType switch
+        var targets = (definition.TargetingType switch
         {
             TargetingType.None => null,
-            TargetingType.Allies => ctx.Allies?.SelectMany(bm => bm.Parts),
-            TargetingType.Enemies => ctx.Enemies?.SelectMany(bm => bm.Parts),
+            TargetingType.Allies => ctx.Allies,
+            TargetingType.Enemies => ctx.Enemies,
             // Oh, god...
-            TargetingType.Both => (ctx.Allies ?? []).Concat(ctx.Enemies ?? [])
-                .SelectMany(bm => bm.Parts),
-            TargetingType.Self => [Owner.Body],
+            TargetingType.Both => (ctx.Allies ?? []).Concat(ctx.Enemies ?? []),
+            TargetingType.Self => [Owner],
             TargetingType.Arena => throw new NotImplementedException("Arena targeting not implemented."),
             _ => throw new InvalidEnumArgumentException("TargetingType", (int)definition.TargetingType,
                 typeof(TargetingType))
-        };
+        })?.ToArray();
         var targetResult = await provider.GetSelectionAsync(
             new TargetSelectionRequest(ctx.ActiveMember, targets));
         var mainTarget = targetResult.Choices.Single();
-        var execCtx = new AbilityExecContext
+
+        new AbilityExecContext
         {
             User = Owner,
             Definition = definition,
             MainTarget = mainTarget,
-            ValidTargets = targets,
-            Rng = ctx.Rng
-        };
-        execCtx.ExecuteAbility();
+            ValidTargets = targets?.SelectMany(bm => bm.Parts),
+            Rng = ctx.Rng,
+        }.ExecuteAbility();
     }
 
     public void EndAction(BattleContext ctx)

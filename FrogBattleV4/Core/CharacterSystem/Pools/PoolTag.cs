@@ -13,11 +13,12 @@ public readonly record struct PoolTag(string Name)
 
     #region Common Tags
 
-    public static readonly PoolTag UsedForLife = new PoolTag(nameof(UsedForLife));
-    public static readonly PoolTag UsedForSpells = new PoolTag(nameof(UsedForSpells));
-    public static readonly PoolTag UsedForBurst = new PoolTag(nameof(UsedForBurst));
-    public static readonly PoolTag AbsorbsDamage = new PoolTag(nameof(AbsorbsDamage));
-    public static readonly PoolTag AbsorbsHealing = new PoolTag(nameof(AbsorbsHealing));
+    public static readonly PoolTag UsedForLife = nameof(UsedForLife);
+    public static readonly PoolTag UsedForSpells = nameof(UsedForSpells);
+    public static readonly PoolTag UsedForBurst = nameof(UsedForBurst);
+    public static readonly PoolTag AbsorbsDamage = nameof(AbsorbsDamage);
+    public static readonly PoolTag AbsorbsHealing = nameof(AbsorbsHealing);
+    public static readonly PoolTag Stuns = nameof(Stuns);
 
     #endregion
 }

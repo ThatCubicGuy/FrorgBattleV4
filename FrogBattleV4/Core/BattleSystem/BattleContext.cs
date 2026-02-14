@@ -10,8 +10,8 @@ public struct BattleContext
 {
     public required BattleManager Manager { get; init; }
     public BattleMember ActiveMember { get; init; }
-    public IReadOnlyCollection<BattleMember>? Allies { get; init; }
-    public IReadOnlyCollection<BattleMember>? Enemies { get; init; }
+    public IEnumerable<BattleMember>? Allies { get; init; }
+    public IEnumerable<BattleMember>? Enemies { get; init; }
     public uint TurnNumber { get; init; }
     public IOrderedEnumerable<ActionBarItem> ActionOrder { get; init; }
     public required Random Rng { get; init; }

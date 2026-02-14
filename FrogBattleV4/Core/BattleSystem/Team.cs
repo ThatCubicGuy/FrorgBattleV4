@@ -1,7 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Linq;
-using FrogBattleV4.Core.DamageSystem;
 
 namespace FrogBattleV4.Core.BattleSystem;
 
@@ -17,6 +16,4 @@ public class Team
     }
 
     public IReadOnlyCollection<BattleMember> Members { get; }
-
-    public IReadOnlyCollection<IDamageable> Parts => Members.SelectMany(m => m.Parts ?? []).ToList();
 }

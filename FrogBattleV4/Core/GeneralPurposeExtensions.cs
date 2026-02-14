@@ -15,6 +15,11 @@ public static class GeneralPurposeExtensions
         return string.Concat(input.Words().Select(s => char.ToUpper(s[0]) + s[1..].ToLower()));
     }
 
+    public static string ToScreamingSnakeCase(this string input)
+    {
+        return string.Join('_', input.Words().Select(s => s.ToUpper()));
+    }
+
     private static List<string> Words(this string input)
     {
         var result = new List<string>();

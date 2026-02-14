@@ -41,7 +41,7 @@ public static class DamagePipeline
         // Crit bonus
         if (ctx.IsCrit)
         {
-            rawDamage *= 1 + (ctx.Attacker?.GetStat(nameof(Stat.CritDamage), ctx.Other) ?? 0);
+            rawDamage *= 1 + (ctx.Attacker?.GetStat(StatId.CritDamage, ctx.Other) ?? 0);
         }
 
         // Incoming damage resistances from the target
@@ -57,7 +57,7 @@ public static class DamagePipeline
         }
 
         // DEF Application
-        rawDamage -= (ctx.Other?.GetStat(nameof(Stat.Def), ctx.Attacker) ?? 0) * Math.Clamp(1 - ctx.DefPen, 0, 1);
+        rawDamage -= (ctx.Other?.GetStat(StatId.Def, ctx.Attacker) ?? 0) * Math.Clamp(1 - ctx.DefPen, 0, 1);
 
         return Math.Max(0, rawDamage);
     }
@@ -104,7 +104,7 @@ public static class DamagePipeline
     {
         // Resolve RNG
         var isCrit = req.CanCrit &&
-                     ctx.Rng.NextDouble() < ctx.Source?.GetStat(nameof(Stat.CritRate), ctx.Other);
+                     ctx.Rng.NextDouble() < ctx.Source?.GetStat(StatId.CritRate, ctx.Other);
 
         // Send to the compute mines
         var damage = new DamageCalcContext
@@ -118,6 +118,8 @@ public static class DamagePipeline
 
         var result = new DamageResult(req.Target, damage, req.Properties.Type, isCrit);
 
-        req.Target.ReceiveDamage(result);
+        // TODO
+
+        
     }
 }

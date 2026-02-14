@@ -1,10 +1,10 @@
-using FrogBattleV4.Core.DamageSystem;
+using FrogBattleV4.Core.BattleSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components;
 
 public struct TargetingContext
 {
-    public required IDamageable Target { get; init; }
+    public required ITargetable Target { get; init; }
     /// <summary>
     /// The rank of the target signifies whether it
     /// is the primary target (rank 0), secondary, or further.

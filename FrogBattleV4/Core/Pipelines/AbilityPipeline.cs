@@ -1,6 +1,7 @@
 using System.Diagnostics.Contracts;
 using System.Linq;
 using FrogBattleV4.Core.AbilitySystem;
+using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.CharacterSystem.Pools;
 using FrogBattleV4.Core.DamageSystem;
 
@@ -11,7 +12,7 @@ internal static class AbilityPipeline
     [Pure]
     public static AbilityPreview PreviewAbility(this AbilityExecContext ctx)
     {
-        var unmetRequirements = ctx.Definition.Requirements?
+        var unmetRequirements = ctx.Definition.Requirements
             .Where(rc => !rc.IsFulfilled(ctx)).ToArray();
 
         var costs = ctx.Definition.Costs?
@@ -20,16 +21,16 @@ internal static class AbilityPipeline
                 new MutationExecContext
                 {
                     Holder = ctx.User,
-                    Other = ctx.MainTarget.Parent
+                    Other = ctx.MainTarget
                 })).ToArray();
 
-        var damages = ctx.Definition.Attacks?
+        var damages = ctx.Definition.Attacks
             .SelectMany(ac => ac.GetDamageRequests(ctx))
             .Select(dr => dr.PreviewDamage(
                 new DamageExecContext
                 {
                     Source = ctx.User,
-                    Other = dr.Target.Parent,
+                    Other = dr.Target as BattleMember,
                     Rng = ctx.Rng
                 })).ToArray();
 
@@ -45,21 +46,21 @@ internal static class AbilityPipeline
     public static bool ExecuteAbility(this AbilityExecContext ctx)
     {
         if (!ctx.CanExecute()) return false;
-        foreach (var request in ctx.Definition.Costs?.SelectMany(cc => cc.GetCostRequests(ctx)) ?? [])
+        foreach (var request in ctx.Definition.Costs.SelectMany(cc => cc.GetCostRequests(ctx)))
         {
             request.ExecuteMutation(new MutationExecContext
             {
                 Holder = ctx.User,
-                Other = ctx.MainTarget.Parent
+                Other = ctx.MainTarget
             });
         }
 
-        foreach (var dr in ctx.Definition.Attacks?.SelectMany(ac => ac.GetDamageRequests(ctx)) ?? [])
+        foreach (var dr in ctx.Definition.Attacks.SelectMany(ac => ac.GetDamageRequests(ctx)))
         {
             dr.ExecuteDamage(new DamageExecContext
             {
                 Source = ctx.User,
-                Other = dr.Target.Parent,
+                Other = dr.Target as BattleMember,
                 Rng = ctx.Rng
             });
         }
@@ -70,6 +71,6 @@ internal static class AbilityPipeline
     [Pure]
     private static bool CanExecute(this AbilityExecContext ctx)
     {
-        return ctx.Definition.Requirements?.All(item => item.IsFulfilled(ctx)) ?? true;
+        return ctx.Definition.Requirements.All(item => item.IsFulfilled(ctx));
     }
 }

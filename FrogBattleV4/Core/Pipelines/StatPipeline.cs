@@ -16,29 +16,30 @@ internal static class StatPipeline
     [Pure]
     public static double ComputePipeline(this StatCalcContext ctx, double baseStatValue)
     {
-        if (ctx.Actor is not ISupportsEffects owner)
-            return baseStatValue;
-
         // Mods on the holder
-        var query = new StatQuery { Stat = ctx.Stat };
-        var inMods = query.AggregateMods(new EffectInfoContext
+        baseStatValue = new StatQuery
         {
-            Holder = owner,
+            Stat = ctx.Stat,
+            Channel = StatChannel.Owned,
+        }.AggregateMods(new EffectInfoContext
+        {
+            Holder = ctx.Actor,
             Other = ctx.Other
-        });
-        baseStatValue = inMods.ApplyTo(baseStatValue);
+        }).ApplyTo(baseStatValue);
 
         if (ctx.Other is not ISupportsEffects other)
             return baseStatValue;
 
-        // Mods on the other
-        query = query with { Channel = StatChannel.Penalty };
-        var outMods = query.AggregateMods(new EffectInfoContext
+        // Penalty mods on the other
+        baseStatValue = new StatQuery
+        {
+            Stat = ctx.Stat,
+            Channel = StatChannel.Penalty,
+        }.AggregateMods(new EffectInfoContext
         {
             Holder = other,
             Other = ctx.Actor
-        });
-        baseStatValue = outMods.ApplyTo(baseStatValue);
+        }).ApplyTo(baseStatValue);
 
         return baseStatValue;
     }

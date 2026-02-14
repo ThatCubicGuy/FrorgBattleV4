@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.CharacterSystem;
-using FrogBattleV4.Core.DamageSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem;
 
@@ -14,14 +14,13 @@ namespace FrogBattleV4.Core.AbilitySystem;
 public readonly struct AbilityExecContext
 {
     [NotNull] public required Character User { get; init; }
-    [NotNull] public required IDamageable MainTarget { get; init; }
+    [NotNull] public required BattleMember MainTarget { get; init; }
 
     /// <summary>
     /// Pool of targets that the ability's targeting components can select from, knowing the main target.
     /// </summary>
     /// <remarks>Order sensitive!</remarks>
-    [NotNull]
-    public required IEnumerable<IDamageable> ValidTargets { get; init; }
+    [NotNull] public required IEnumerable<ITargetable> ValidTargets { get; init; }
 
     [NotNull] public required AbilityDefinition Definition { get; init; }
     [NotNull] public required Random Rng { get; init; }

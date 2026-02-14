@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using FrogBattleV4.Core.DamageSystem;
+using FrogBattleV4.Core.BattleSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components;
 
@@ -13,7 +13,7 @@ public interface ITargetingComponent
 /// </summary>
 public interface ITargetFilter
 {
-    bool Filter(IDamageable target);
+    bool Filter(ITargetable target);
 }
 
 public enum TargetingType

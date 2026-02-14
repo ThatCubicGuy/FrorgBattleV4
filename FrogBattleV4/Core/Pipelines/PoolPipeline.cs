@@ -37,7 +37,7 @@ internal static class PoolPipeline
             {
                 PoolId = ctx.PoolId,
                 Channel = ctx.Channel,
-                Direction = ModifierDirection.Incoming,
+                Direction = ModifierDirection.Outgoing,
             }.AggregateMods(new EffectInfoContext
             {
                 Holder = other,

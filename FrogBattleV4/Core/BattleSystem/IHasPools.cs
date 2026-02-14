@@ -12,7 +12,7 @@ public interface IHasPools
     IReadOnlyDictionary<PoolId, PoolComponent> Pools { get; }
     
     bool AddPool(PoolComponent pool);
-    bool RemovePool(string id);
+    bool RemovePool(PoolId id);
 }
 
 public static class IHasPoolsExtensions

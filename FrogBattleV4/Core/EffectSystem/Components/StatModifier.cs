@@ -7,7 +7,7 @@ namespace FrogBattleV4.Core.EffectSystem.Components;
 public class StatModifier : IModifierRule<StatQuery>
 {
     public required ModifierStack ModifierStack { get; init; } = new();
-    public required string Stat { get; init; }
+    public required StatId Stat { get; init; }
     public StatChannel Channel { get; init; } = StatChannel.Owned;
 
     public bool AppliesFor(StatQuery query)

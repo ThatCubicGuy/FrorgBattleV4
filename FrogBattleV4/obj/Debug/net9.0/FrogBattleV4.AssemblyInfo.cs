@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FrogBattleV4")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+628e76ca16a97f79dc5413508f55949dc89ea3b2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f62cbb55c633b23c2392dcce41310dfc7b74390a")]
 [assembly: System.Reflection.AssemblyProductAttribute("FrogBattleV4")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FrogBattleV4")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

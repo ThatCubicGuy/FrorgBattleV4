@@ -1,5 +1,4 @@
-#nullable enable
-using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -7,85 +6,113 @@ using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.CharacterSystem.Pools;
 using FrogBattleV4.Core.DamageSystem;
-using FrogBattleV4.Core.EffectSystem;
+using FrogBattleV4.Core.EffectSystem.Components;
 using FrogBattleV4.Core.EffectSystem.Modifiers;
-using FrogBattleV4.Core.EffectSystem.PassiveEffects;
 using FrogBattleV4.Core.EffectSystem.StatusEffects;
 using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.CharacterSystem;
 
-public class Character : BattleMember, IHasAbilities
+public class Character : BattleMember, IDamageable, IHasAbilities
 {
     private readonly List<StatusEffectInstance> _markedForDeathEffects = [];
 
-    private readonly Dictionary<string, double> _baseStats = new(StringComparer.OrdinalIgnoreCase)
+    private readonly Dictionary<StatId, double> _baseStats = new()
     {
-        { nameof(Stat.MaxHp), 400000 },
-        { nameof(Stat.MaxMana), 100 },
-        { nameof(Stat.MaxEnergy), 120 },
-        { nameof(Stat.Atk), 1000 },
-        { nameof(Stat.Def), 500 },
-        { nameof(Stat.Spd), 100 },
-        { nameof(Stat.Dex), 0 },
-        { nameof(Stat.CritRate), 0.1 },
-        { nameof(Stat.CritDamage), 0.5 },
-        { nameof(Stat.HitRateBonus), 0 },
-        { nameof(Stat.EffectHitRate), 1 },
-        { nameof(Stat.EffectRes), 0 },
-        { nameof(Stat.ManaCost), 1 },
-        { nameof(Stat.ManaRegen), 1 },
-        { nameof(Stat.EnergyRecharge), 1 },
-        { nameof(Stat.IncomingHealing), 1 },
-        { nameof(Stat.OutgoingHealing), 1 },
-        { nameof(Stat.ShieldToughness), 1 },
+        { StatId.MaxHp, 400000 },
+        { StatId.MaxMana, 100 },
+        { StatId.MaxEnergy, 120 },
+        { StatId.Atk, 1000 },
+        { StatId.Def, 500 },
+        { StatId.Spd, 100 },
+        { StatId.Dex, 0 },
+        { StatId.CritRate, 0.1 },
+        { StatId.CritDamage, 0.5 },
+        { StatId.HitRateBonus, 0 },
+        { StatId.EffectHitRate, 1 },
+        { StatId.EffectRes, 0 },
+        { StatId.ManaCost, 1 },
+        { StatId.ManaRegen, 1 },
+        { StatId.EnergyRecharge, 1 },
+        { StatId.IncomingHealing, 1 },
+        { StatId.OutgoingHealing, 1 },
+        { StatId.ShieldToughness, 1 },
     };
-
-    public event EventHandler<StatusEffectApplicationContext>? EffectApplySuccess;
-    public event EventHandler<StatusEffectApplicationContext>? EffectApplyFailure;
-    public event EventHandler<StatusEffectRemovalContext>? EffectRemoveSuccess;
-    public event EventHandler<StatusEffectRemovalContext>? EffectRemoveFailure;
 
     public Character(string name)
     {
         Name = name;
-        Pools = new List<PoolComponent>(3)
+        AddPool(new CharacterPoolComponent(this)
         {
-            new CharacterPoolComponent(this)
-            {
-                Id = nameof(Pool.Hp),
-                CurrentValue = BaseStats[nameof(Stat.MaxHp)],
-                Tags = ["used_for_health"]
-            },
-            new CharacterPoolComponent(this)
-            {
-                Id = nameof(Pool.Mana),
-                CurrentValue = BaseStats[nameof(Stat.MaxMana)] / 2,
-                Tags = ["used_for_abilities"]
-            },
-            new CharacterPoolComponent(this)
-            {
-                Id = nameof(Pool.Energy),
-                CurrentValue = 0,
-                Tags = ["used_for_burst"]
-            }
-        }.ToDictionary(pc => pc.Id);
+            Id = PoolId.Hp,
+            CurrentValue = BaseStats[StatId.MaxHp],
+            Tags = [PoolTag.UsedForLife]
+        });
+        AddPool(new CharacterPoolComponent(this)
+        {
+            Id = PoolId.Mana,
+            CurrentValue = BaseStats[StatId.MaxMana] / 2,
+            Tags = [PoolTag.UsedForSpells]
+        });
+        AddPool(new CharacterPoolComponent(this)
+        {
+            Id = PoolId.Energy,
+            CurrentValue = 0,
+            Tags = [PoolTag.UsedForBurst]
+        });
 
+        Parts = new BattleMemberParts
+        {
+            [2] = new TargetablePart
+            {
+                Parent = this,
+                Tags = [TargetTag.WeakPoint],
+                DamageModifiers =
+                [
+                    new DamageModifier
+                    {
+                        Direction = ModifierDirection.Incoming,
+                        ModifierStack = new ModifierStack
+                        {
+                            MultiplyTotal = 1.3
+                        }
+                    }
+                ],
+            },
+            [1] = new TargetablePart
+            {
+                Parent = this,
+                Tags = [TargetTag.MainBody],
+            },
+            [0] = new TargetablePart
+            {
+                Parent = this,
+                Tags = [TargetTag.Limb],
+                DamageModifiers =
+                [
+                    new DamageModifier
+                    {
+                        Direction = ModifierDirection.Incoming,
+                        ModifierStack = new ModifierStack
+                        {
+                            MultiplyTotal = 0.7
+                        }
+                    }
+                ],
+            }
+        };
         Turns = [new CharacterTurn(this)];
-        Parts = [new CharacterBody(this)];
     }
 
-    [NotNull] public IDamageable Body => Parts.Single();
-
-    [NotNull] public IReadOnlyDictionary<string, double> BaseStats => _baseStats;
+    [NotNull] public IReadOnlyDictionary<StatId, double> BaseStats => _baseStats;
 
     #region Pools
 
-    public double Hp => Pools[nameof(Hp)].CurrentValue;
+    public PoolComponent Hp => Pools[PoolId.Hp];
 
-    public double Mana => Pools[nameof(Mana)].CurrentValue;
+    public PoolComponent Mana => Pools[PoolId.Mana];
 
-    public double Energy => Pools[nameof(Energy)].CurrentValue;
+    public PoolComponent Energy => Pools[PoolId.Energy];
 
     #endregion
 
@@ -95,15 +122,8 @@ public class Character : BattleMember, IHasAbilities
     public List<AbilityDefinition> Abilities { get; init; } = [];
     IEnumerable<AbilityDefinition> IHasAbilities.Abilities => Abilities;
 
-    private List<StatusEffectInstance> ActiveEffects { get; } = [];
-    public List<PassiveEffectDefinition> PassiveEffects { private get; init; } = [];
-
-    public IEnumerable<IModifierComponent> AttachedEffects =>
-        ActiveEffects.Concat<IModifierComponent>(PassiveEffects);
-
-    public double GetStat(string stat, BattleMember? target = null)
+    public override double GetStat(StatId stat, BattleMember target = null)
     {
-        
         return new StatCalcContext
         {
             Stat = stat,
@@ -120,7 +140,7 @@ public class Character : BattleMember, IHasAbilities
     public bool CanTakeAction(BattleContext ctx)
     {
         // There's more, but not for now
-        return !Pools.Values.Any(pc => pc.HasTag("stuns"));
+        return !Pools.Values.Any(pc => pc.HasTag(PoolTag.Stuns));
     }
 
     /// <summary>
@@ -155,7 +175,7 @@ public class Character : BattleMember, IHasAbilities
 
         foreach (var effect in _markedForDeathEffects.Where(effect => effect.TryRemove()))
         {
-            ActiveEffects.Remove(effect);
+            ForceRemoveActive(effect);
         }
 
         _markedForDeathEffects.Clear();
@@ -163,46 +183,5 @@ public class Character : BattleMember, IHasAbilities
         {
             Moment = TurnMoment.None
         };
-    }
-
-    public bool ApplyEffect(StatusEffectApplicationContext ctx)
-    {
-        if (ctx.ComputeTotalChance() < ctx.Rng.NextDouble())
-        {
-            EffectApplyFailure?.Invoke(this, ctx);
-            return false;
-        }
-
-        EffectApplySuccess?.Invoke(this, ctx);
-
-        var item = ActiveEffects.FirstOrDefault(se => se.Definition == ctx.Definition);
-
-        if (item is null)
-        {
-            ActiveEffects.Add(new StatusEffectInstance(ctx));
-            foreach (var mutator in ctx.Definition.Mutators)
-            {
-                mutator.OnApply(ctx);
-            }
-
-            return true;
-        }
-
-        item.Stacks += ctx.InitialStacks;
-        item.Turns = ctx.InitialTurns;
-
-        return true;
-    }
-
-    public bool RemoveEffect(StatusEffectRemovalContext ctx)
-    {
-        var item = ActiveEffects.First(ctx.Query.Invoke);
-        if (ctx.Rng.NextDouble() < ctx.RemovalChance && ActiveEffects.Remove(item))
-        {
-            EffectRemoveSuccess?.Invoke(this, ctx);
-        }
-
-        EffectRemoveFailure?.Invoke(this, ctx);
-        return false;
     }
 }

@@ -30,7 +30,7 @@ public class Ayumi : Character
             [
                 new AttackComponent
                 {
-                    Scalar = nameof(Stat.Atk),
+                    Scalar = StatId.Atk,
                     Ratio = 1.76,
                     DamageProperties = new DamageProperties(nameof(DamageType.Pierce), 0.33),
                     HitRate = 0.9,

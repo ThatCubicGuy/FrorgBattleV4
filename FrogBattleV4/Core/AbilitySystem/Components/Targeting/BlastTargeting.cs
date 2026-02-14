@@ -9,6 +9,7 @@ public class BlastTargeting(uint radius = 1) : ITargetingComponent
 {
     public uint Radius { get; init; } = radius;
 
+    // waaaaaaaa TODO absolutely EVERYTHINGGGGGG RAHHHHH
     public IEnumerable<TargetingContext> SelectTargets(AbilityExecContext ctx)
     {
         IEnumerable<TargetingContext> result = [new()

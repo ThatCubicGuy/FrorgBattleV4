@@ -8,7 +8,7 @@ namespace FrogBattleV4.Core.CharacterSystem.Pools;
 /// Standard positive pool component for a character.
 /// </summary>
 /// <param name="owner">The character who possesses this pool.</param>
-public class CharacterPoolComponent(BattleMember owner) : PoolComponent
+public class CharacterPoolComponent(Character owner) : PoolComponent
 {
     // TODO: Fix! Currently you only allow mutations through PoolPipeline.
     // TODO: See how u might solve this one.
@@ -22,14 +22,4 @@ public class CharacterPoolComponent(BattleMember owner) : PoolComponent
 
     public override double? MaxValue => Capacity;
     public override double? MinValue => 0;
-}
-
-internal enum Pool
-{
-    Hp,
-    Mana,
-    Energy,
-    Shield,
-    Barrier,
-    Special
 }
