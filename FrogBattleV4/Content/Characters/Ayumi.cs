@@ -25,7 +25,7 @@ public class Ayumi : Character
         public AyumiAbility1()
         {
             Id = nameof(AyumiAbility1);
-            Targeting = new SingleTargeting();
+            Targeting = new SingleTargeting(TargetingType.Body);
             Attacks =
             [
                 new AttackComponent
@@ -34,7 +34,7 @@ public class Ayumi : Character
                     Ratio = 1.76,
                     DamageProperties = new DamageProperties(nameof(DamageType.Pierce), 0.33),
                     HitRate = 0.9,
-                    Targeting = new BlastTargeting(2),
+                    Targeting = new BlastTargeting(TargetingType.Body) { Radius = 2 },
                     AttackProperties = new AttackProperties(true)
                 }
             ];

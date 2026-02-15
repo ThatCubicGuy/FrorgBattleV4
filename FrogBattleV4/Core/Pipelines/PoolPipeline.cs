@@ -17,9 +17,10 @@ internal static class PoolPipeline
     [Pure]
     public static double ComputePipeline(this PoolValueCalcContext ctx, double baseAmount)
     {
+        var mods = new ModifierStack();
         if (ctx.Holder is ISupportsEffects owner)
         {
-            baseAmount = new PoolQuery
+            mods += new PoolQuery
             {
                 PoolId = ctx.PoolId,
                 Channel = ctx.Channel,
@@ -28,12 +29,12 @@ internal static class PoolPipeline
             {
                 Holder = owner,
                 Other = ctx.Other,
-            }).ApplyTo(baseAmount);
+            });
         }
 
         if (ctx.Other is ISupportsEffects other)
         {
-            baseAmount = new PoolQuery
+            mods += new PoolQuery
             {
                 PoolId = ctx.PoolId,
                 Channel = ctx.Channel,
@@ -42,10 +43,10 @@ internal static class PoolPipeline
             {
                 Holder = other,
                 Other = ctx.Holder as BattleMember,
-            }).ApplyTo(baseAmount);
+            });
         }
 
-        return baseAmount;
+        return mods.ApplyTo(baseAmount);
     }
 
     [Pure]

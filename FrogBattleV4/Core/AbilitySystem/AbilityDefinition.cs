@@ -16,7 +16,7 @@ public class AbilityDefinition
     /// <summary>
     /// The type of targets that the attacker is allowed to select for executing this ability on.
     /// </summary>
-    public TargetingType TargetingType { get; init; }
+    public TargetingPool TargetingPool { get; init; }
 
     #endregion
 

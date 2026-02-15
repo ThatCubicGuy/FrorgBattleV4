@@ -49,17 +49,17 @@ public class CharacterTurn(Character owner) : IAction
         var defResult = await provider.GetSelectionAsync(
             new AbilitySelectionRequest(ctx.ActiveMember, (ctx.ActiveMember as Character)!.Abilities));
         var definition = defResult.Choices.Single();
-        var targets = (definition.TargetingType switch
+        var targets = (definition.TargetingPool switch
         {
-            TargetingType.None => null,
-            TargetingType.Allies => ctx.Allies,
-            TargetingType.Enemies => ctx.Enemies,
+            TargetingPool.None => null,
+            TargetingPool.Allies => ctx.Allies,
+            TargetingPool.Enemies => ctx.Enemies,
             // Oh, god...
-            TargetingType.Both => (ctx.Allies ?? []).Concat(ctx.Enemies ?? []),
-            TargetingType.Self => [Owner],
-            TargetingType.Arena => throw new NotImplementedException("Arena targeting not implemented."),
-            _ => throw new InvalidEnumArgumentException("TargetingType", (int)definition.TargetingType,
-                typeof(TargetingType))
+            TargetingPool.Both => (ctx.Allies ?? []).Concat(ctx.Enemies ?? []),
+            TargetingPool.Self => [Owner],
+            TargetingPool.Arena => throw new NotImplementedException("Arena targeting not implemented."),
+            _ => throw new InvalidEnumArgumentException("TargetingType", (int)definition.TargetingPool,
+                typeof(TargetingPool))
         })?.ToArray();
         var targetResult = await provider.GetSelectionAsync(
             new TargetSelectionRequest(ctx.ActiveMember, targets));

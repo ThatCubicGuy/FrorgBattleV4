@@ -29,10 +29,10 @@ public class AttackComponent : IAttackComponent
             .Select(tc => new DamageRequest
             {
                 BaseAmount = Ratio * Math.Pow(1 - Falloff, tc.TargetRank) *
-                             ctx.User.GetStat(Scalar, tc.Target.Parent),
+                             ctx.User.GetStat(Scalar, tc.Target),
                 Properties = DamageProperties,
-                Target = tc.Target.Parent as IDamageable,
-                ExtraModifiers = tc.Target.DamageModifiers
+                Target = tc.Target as IDamageable,
+                ExtraModifiers = tc.Modifiers
             });
     }
 }

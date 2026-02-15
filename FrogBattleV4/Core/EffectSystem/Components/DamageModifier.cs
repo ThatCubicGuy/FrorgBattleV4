@@ -9,7 +9,7 @@ public class DamageModifier : IModifierRule<DamageQuery>
     public required ModifierStack ModifierStack { get; init; } = new();
     public string? Type { get; init; }
     public string? Source { get; init; }
-    public bool CritOnly { get; init; } = false;
+    public bool CritOnly { get; init; }
     public required ModifierDirection Direction { get; init; }
 
     public bool AppliesFor(DamageQuery query)

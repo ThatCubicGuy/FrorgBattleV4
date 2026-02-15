@@ -5,7 +5,7 @@ namespace FrogBattleV4.Core.AbilitySystem.Components;
 
 public interface ITargetingComponent
 {
-    IEnumerable<TargetingContext> SelectTargets(AbilityExecContext ctx);
+    IEnumerable<AbilityTargetingContext> SelectTargets(AbilityExecContext ctx);
 }
 /// <summary>
 /// Applied by the ability at the start to actually generate the list of possible targets,
@@ -16,7 +16,7 @@ public interface ITargetFilter
     bool Filter(ITargetable target);
 }
 
-public enum TargetingType
+public enum TargetingPool
 {
     None,
     Allies,

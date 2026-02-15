@@ -17,7 +17,7 @@ internal static class StatPipeline
     public static double ComputePipeline(this StatCalcContext ctx, double baseStatValue)
     {
         // Mods on the holder
-        baseStatValue = new StatQuery
+        var mods = new StatQuery
         {
             Stat = ctx.Stat,
             Channel = StatChannel.Owned,
@@ -25,13 +25,13 @@ internal static class StatPipeline
         {
             Holder = ctx.Actor,
             Other = ctx.Other
-        }).ApplyTo(baseStatValue);
+        });
 
         if (ctx.Other is not ISupportsEffects other)
-            return baseStatValue;
+            return mods.ApplyTo(baseStatValue);
 
         // Penalty mods on the other
-        baseStatValue = new StatQuery
+        mods += new StatQuery
         {
             Stat = ctx.Stat,
             Channel = StatChannel.Penalty,
@@ -39,8 +39,8 @@ internal static class StatPipeline
         {
             Holder = other,
             Other = ctx.Actor
-        }).ApplyTo(baseStatValue);
+        });
 
-        return baseStatValue;
+        return mods.ApplyTo(baseStatValue);
     }
 }

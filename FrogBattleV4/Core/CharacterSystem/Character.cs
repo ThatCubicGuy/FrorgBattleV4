@@ -61,38 +61,20 @@ public class Character : BattleMember, IDamageable, IHasAbilities
             Tags = [PoolTag.UsedForBurst]
         });
 
-        Parts = new HitboxProfile(new TargetablePart
+        Hitbox = new HumanoidHitbox
         {
-            Parent = this,
-            DamageModifiers =
+            HeadshotModifiers =
             [
                 new DamageModifier
                 {
                     Direction = ModifierDirection.Incoming,
                     ModifierStack = new ModifierStack
                     {
-                        MultiplyTotal = 0.9
+                        MultiplyTotal = 1.2
                     }
                 }
-            ],
-        }, new TargetablePart
-        {
-            Parent = this,
-        }, new TargetablePart
-        {
-            Parent = this,
-            DamageModifiers =
-            [
-                new DamageModifier
-                {
-                    Direction = ModifierDirection.Incoming,
-                    ModifierStack = new ModifierStack
-                    {
-                        MultiplyTotal = 1.1
-                    }
-                }
-            ],
-        });
+            ]
+        };
         Turns = [new CharacterTurn(this)];
     }
 

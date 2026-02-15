@@ -32,14 +32,12 @@ public abstract class BattleMember : ITakesTurns, IHasStats, IHasPools, ISupport
     {
         _pools = new Dictionary<PoolId, PoolComponent>();
         Pools = new ReadOnlyDictionary<PoolId, PoolComponent>(_pools);
-
-        Parts = new HitboxProfile();
     }
 
     [NotNull] public string? Name { get; protected init; }
     [NotNull] public IEnumerable<IAction> Turns { get; protected init; } = [];
 
-    [NotNull] public HitboxProfile Parts { get; protected init; }
+    [NotNull] public ITargetable Hitbox { get; protected init; }
     [NotNull] public IReadOnlyDictionary<PoolId, PoolComponent> Pools { get; }
     public bool AddPool(PoolComponent pool) => _pools.TryAdd(pool.Id, pool);
     public bool RemovePool(PoolId poolId) => _pools.Remove(poolId);
