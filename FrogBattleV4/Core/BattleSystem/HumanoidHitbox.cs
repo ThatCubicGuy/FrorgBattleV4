@@ -29,7 +29,7 @@ public class HumanoidHitbox : ITargetable
     };
 
     [Pure]
-    private IEnumerable<IModifierRule> GetModifiers(HitboxRegion region) => region switch
+    private IEnumerable<ModifierRule> GetModifiers(HitboxRegion region) => region switch
     {
         HitboxRegion.Body => NormalModifiers,
         HitboxRegion.WeakPoint => HeadshotModifiers,

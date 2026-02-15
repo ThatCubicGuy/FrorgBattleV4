@@ -14,6 +14,6 @@ public struct StatusEffectInstanceContext
     public BattleMember? Target { get; init; }
     public BattleMember? EffectSource { get; init; }
     public required int Stacks { get; init; }
-    public required IEnumerable<IModifierRule> Modifiers { get; init; }
+    public required IEnumerable<ModifierRule> Modifiers { get; init; }
     public required IEnumerable<IMutatorComponent>? Mutators { get; init; }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using FrogBattleV4.Core.BattleSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 
@@ -16,6 +17,16 @@ public class BounceTargeting(TargetingType type) : ITargetingComponent
             targets = targets.Append(ctx.ValidTargets.MinBy(_ => ctx.Rng.NextDouble()));
         }
 
-        return HitboxTargeting.SelectAll(type, targets, idx => idx == 0 ? 0 : 1);
+        return targets.Select(bm => new AbilityTargetingContext
+        {
+            Target = bm,
+            Aiming = type,
+            Rank = 1,
+        }).Prepend(new AbilityTargetingContext
+        {
+            Target = ctx.MainTarget,
+            Aiming = type,
+            Rank = 0,
+        });
     }
 }

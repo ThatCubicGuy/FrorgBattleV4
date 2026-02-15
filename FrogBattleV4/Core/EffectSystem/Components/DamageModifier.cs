@@ -4,19 +4,16 @@ using FrogBattleV4.Core.EffectSystem.Modifiers;
 
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
-public class DamageModifier : IModifierRule<DamageQuery>
+public class DamageModifier : ModifierRule<DamageRequest>
 {
-    public required ModifierStack ModifierStack { get; init; } = new();
     public string? Type { get; init; }
     public string? Source { get; init; }
     public bool CritOnly { get; init; }
-    public required ModifierDirection Direction { get; init; }
 
-    public bool AppliesFor(DamageQuery query)
+    protected override bool AppliesToRequest(DamageRequest request)
     {
-        return Direction == query.Direction &&
-               (!CritOnly || query.Crit) &&
-               (Type ?? query.Type) == query.Type &&
-               (Source ?? query.Source) == query.Source;
+        return (!CritOnly || request.Crit) &&
+               (Type ?? request.Type) == request.Type &&
+               (Source ?? request.Source) == request.Source;
     }
 }

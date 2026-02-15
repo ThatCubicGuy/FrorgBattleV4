@@ -4,14 +4,12 @@ using FrogBattleV4.Core.EffectSystem.Modifiers;
 
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
-public class StatModifier : IModifierRule<StatQuery>
+public class StatModifier : ModifierRule<StatQuery>
 {
-    public required ModifierStack ModifierStack { get; init; } = new();
     public required StatId Stat { get; init; }
-    public StatChannel Channel { get; init; } = StatChannel.Owned;
 
-    public bool AppliesFor(StatQuery query)
+    protected override bool AppliesToRequest(StatQuery query)
     {
-        return query.Stat == Stat && query.Channel == Channel;
+        return query.Stat == Stat;
     }
 }

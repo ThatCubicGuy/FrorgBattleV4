@@ -50,7 +50,7 @@ public class PoolValueCondition : IConditionComponent
     public int GetContribution(EffectInfoContext ctx)
     {
         // Funny ahh type check
-        if ((Direction == ConditionDirection.Self ? ctx.Holder as IHasPools : ctx.Other)?.Pools
+        if ((Direction == ConditionDirection.Self ? ctx.Actor as IHasPools : ctx.Other)?.Pools
             .GetValueOrDefault(PoolId) is not { } pool) return 0;
         if (Percent)
         {

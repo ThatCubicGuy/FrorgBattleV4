@@ -12,11 +12,17 @@ public class AbilityDefinition
     /// <summary>
     /// A preferably unique string-based identifier for this ability.
     /// </summary>
-    public required string Id { get; init; }
+    public required string Name { get; init; }
+
+    /// <summary>
+    /// Description of what this ability does.
+    /// </summary>
+    public required string Description { get; init; }
+
     /// <summary>
     /// The type of targets that the attacker is allowed to select for executing this ability on.
     /// </summary>
-    public TargetingPool TargetingPool { get; init; }
+    public required TargetingPool TargetingPool { get; init; }
 
     #endregion
 
@@ -26,22 +32,27 @@ public class AbilityDefinition
     /// This ability's base targeting. Underlying components fall back to this if they don't have their own targeting.
     /// </summary>
     public ITargetingComponent? Targeting { get; init; }
+
     /// <summary>
     /// Prerequisites for casting the ability.
     /// </summary>
     public IEnumerable<IRequirementComponent> Requirements { get; init; } = [];
+
     /// <summary>
     /// Ability wide modifiers to be included in calculations.
     /// </summary>
-    public IEnumerable<IModifierComponent> Modifiers { get; init; } = [];
+    public IEnumerable<IModifierProvider> Passives { get; init; } = [];
+
     /// <summary>
     /// The costs of the ability, taxed after successful casting.
     /// </summary>
     public IEnumerable<ICostComponent> Costs { get; init; } = [];
+
     /// <summary>
     /// Every attack that this ability causes in order to damage others.
     /// </summary>
     public IEnumerable<IAttackComponent> Attacks { get; init; } = [];
+
     /// <summary>
     /// An array of effects that this ability might apply to the targets.
     /// </summary>

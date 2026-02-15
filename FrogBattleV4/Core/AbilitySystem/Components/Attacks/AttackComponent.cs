@@ -22,17 +22,18 @@ public class AttackComponent : IAttackComponent
     public ITargetingComponent? Targeting { get; init; }
 
     [Pure]
-    public IEnumerable<DamageRequest> GetDamageRequests(AbilityExecContext ctx)
+    public IEnumerable<DamageIntent> GetDamageRequests(AbilityExecContext ctx)
     {
         return (Targeting ?? ctx.Definition.Targeting)!
             .SelectTargets(ctx)
-            .Select(tc => new DamageRequest
+            .Select(tc => new DamageIntent
             {
-                BaseAmount = Ratio * Math.Pow(1 - Falloff, tc.TargetRank) *
+                BaseAmount = Ratio * Math.Pow(1 - Falloff, tc.Rank) *
                              ctx.User.GetStat(Scalar, tc.Target),
                 Properties = DamageProperties,
                 Target = tc.Target as IDamageable,
-                ExtraModifiers = tc.Modifiers
+                Targeting = tc.Aiming,
+                CanCrit = AttackProperties.CanCrit,
             });
     }
 }

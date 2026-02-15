@@ -8,8 +8,7 @@ public interface ITargetingComponent
     IEnumerable<AbilityTargetingContext> SelectTargets(AbilityExecContext ctx);
 }
 /// <summary>
-/// Applied by the ability at the start to actually generate the list of possible targets,
-/// alongside TargetingType (which is for cleaner UI display).
+/// Applied by the ability at the start to actually generate the list of possible targets.
 /// </summary>
 public interface ITargetFilter
 {

@@ -1,7 +1,6 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.BattleSystem;
+using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
 
@@ -12,7 +11,7 @@ public class StatValueCondition : IConditionComponent
     /// <summary>
     /// Stat to query for.
     /// </summary>
-    [NotNull] public required string Stat { get; set; }
+    public required StatId Stat { get; set; }
 
     /// <summary>
     /// The starting value that the interval starts being calculated from.
@@ -43,7 +42,7 @@ public class StatValueCondition : IConditionComponent
     [Pure]
     public int GetContribution(EffectInfoContext ctx)
     {
-        if (ctx.Holder is not BattleMember holder) return 0;
-        return (int)Math.Floor((Math.Clamp(holder.GetStat(Stat, ctx.Other), MinValue, MaxValue) - MinValue) / Step);
+        if (ctx.Actor is not { } actor) return 0;
+        return (int)Math.Floor((Math.Clamp(actor.GetStat(Stat, ctx.Other), MinValue, MaxValue) - MinValue) / Step);
     }
 }

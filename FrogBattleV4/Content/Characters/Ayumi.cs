@@ -24,7 +24,7 @@ public class Ayumi : Character
         // ReSharper disable once NotNullOrRequiredMemberIsNotInitialized
         public AyumiAbility1()
         {
-            Id = nameof(AyumiAbility1);
+            Name = nameof(AyumiAbility1);
             Targeting = new SingleTargeting(TargetingType.Body);
             Attacks =
             [

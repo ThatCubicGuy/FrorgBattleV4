@@ -67,7 +67,7 @@ public class Character : BattleMember, IDamageable, IHasAbilities
             [
                 new DamageModifier
                 {
-                    Direction = ModifierDirection.Incoming,
+                    Direction = ModifierDirection.Self,
                     ModifierStack = new ModifierStack
                     {
                         MultiplyTotal = 1.2

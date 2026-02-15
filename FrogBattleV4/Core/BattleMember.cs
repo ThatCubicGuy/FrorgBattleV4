@@ -42,8 +42,8 @@ public abstract class BattleMember : ITakesTurns, IHasStats, IHasPools, ISupport
     public bool AddPool(PoolComponent pool) => _pools.TryAdd(pool.Id, pool);
     public bool RemovePool(PoolId poolId) => _pools.Remove(poolId);
 
-    [NotNull] public IEnumerable<IModifierComponent> AttachedEffects =>
-        _passiveEffects.Concat<IModifierComponent>(_activeEffects);
+    [NotNull] public IEnumerable<IModifierProvider> AttachedEffects =>
+        _passiveEffects.Concat<IModifierProvider>(_activeEffects);
     [NotNull] protected IEnumerable<StatusEffectInstance> ActiveEffects => _activeEffects;
 
     [NotNull] public IEnumerable<PassiveEffectDefinition> PassiveEffects

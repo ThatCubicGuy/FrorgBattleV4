@@ -7,7 +7,7 @@ using FrogBattleV4.Core.EffectSystem.Modifiers;
 
 namespace FrogBattleV4.Core.EffectSystem.StatusEffects;
 
-public class StatusEffectInstance(StatusEffectApplicationContext ctx) : IModifierComponent
+public class StatusEffectInstance(StatusEffectApplicationContext ctx) : IModifierProvider
 {
     public StatusEffectDefinition Definition { get; init; } = ctx.Definition;
     public ISupportsEffects Holder { get; init; } = ctx.Target;
@@ -61,7 +61,7 @@ public class StatusEffectInstance(StatusEffectApplicationContext ctx) : IModifie
     }
 
     [Pure]
-    public ModifierStack GetContributions<TQuery>(EffectInfoContext ctx, TQuery query)
+    public ModifierStack GetContributingModifiers<TQuery>(TQuery query, EffectInfoContext ctx)
         where TQuery : struct
     {
         return Definition.Modifiers.Where(mr => mr.AppliesFor(query))

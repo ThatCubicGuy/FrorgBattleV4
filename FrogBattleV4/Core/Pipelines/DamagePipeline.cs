@@ -19,20 +19,20 @@ public static class DamagePipeline
     [Pure]
     private static double ComputePipeline(this DamageCalcContext ctx, double rawDamage)
     {
-        var query = new DamageQuery
+        var query = new DamageRequest
         {
             Type = ctx.Type,
             Source = ctx.Source,
             Crit = ctx.IsCrit,
-            Direction = ModifierDirection.Outgoing
+            Direction = ModifierDirection.Reference
         };
 
         // Outgoing damage bonuses from the attacker
         if (ctx.Attacker is ISupportsEffects actor)
         {
-            var actorMods = query.AggregateMods(new EffectInfoContext
+            var actorMods = query.AggregateEffectMods(new EffectInfoContext
             {
-                Holder = actor,
+                Actor = actor,
                 Other = ctx.Other
             });
             rawDamage = actorMods.ApplyTo(rawDamage);
@@ -47,10 +47,10 @@ public static class DamagePipeline
         // Incoming damage resistances from the target
         if (ctx.Other is ISupportsEffects other)
         {
-            query = query with { Direction = ModifierDirection.Incoming };
-            var otherMods = query.AggregateMods(new EffectInfoContext
+            query = query with { Direction = ModifierDirection.Self };
+            var otherMods = query.AggregateEffectMods(new EffectInfoContext
             {
-                Holder = other,
+                Actor = other,
                 Other = ctx.Attacker
             });
             rawDamage = otherMods.ApplyTo(rawDamage);
@@ -71,7 +71,7 @@ public static class DamagePipeline
     /// <param name="ctx">Context in which to execute the request.</param>
     /// <returns>A preview of damage to be dealt.</returns>
     [Pure]
-    public static DamagePreview PreviewDamage(this DamageRequest req, DamageExecContext ctx)
+    public static DamagePreview PreviewDamage(this DamageIntent req, DamageExecContext ctx)
     {
         req.Properties.Deconstruct(out var type, out var defPen, out var typeResPen);
         var baseCtx = new DamageCalcContext
@@ -100,7 +100,7 @@ public static class DamagePipeline
     /// </summary>
     /// <param name="req">Request to process.</param>
     /// <param name="ctx">Context in which to process.</param>
-    public static void ExecuteDamage(this DamageRequest req, DamageExecContext ctx)
+    public static void ExecuteDamage(this DamageIntent req, DamageExecContext ctx)
     {
         // Resolve RNG
         var isCrit = req.CanCrit &&

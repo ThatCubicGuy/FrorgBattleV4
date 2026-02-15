@@ -24,10 +24,10 @@ internal static class PoolPipeline
             {
                 PoolId = ctx.PoolId,
                 Channel = ctx.Channel,
-                Direction = ModifierDirection.Incoming,
-            }.AggregateMods(new EffectInfoContext
+                Direction = ModifierDirection.Self,
+            }.AggregateEffectMods(new EffectInfoContext
             {
-                Holder = owner,
+                Actor = owner,
                 Other = ctx.Other,
             });
         }
@@ -38,10 +38,10 @@ internal static class PoolPipeline
             {
                 PoolId = ctx.PoolId,
                 Channel = ctx.Channel,
-                Direction = ModifierDirection.Outgoing,
-            }.AggregateMods(new EffectInfoContext
+                Direction = ModifierDirection.Reference,
+            }.AggregateEffectMods(new EffectInfoContext
             {
-                Holder = other,
+                Actor = other,
                 Other = ctx.Holder as BattleMember,
             });
         }

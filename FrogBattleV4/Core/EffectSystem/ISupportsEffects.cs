@@ -6,7 +6,7 @@ namespace FrogBattleV4.Core.EffectSystem;
 
 public interface ISupportsEffects
 {
-    IEnumerable<IModifierComponent> AttachedEffects { get; }
+    IEnumerable<IModifierProvider> AttachedEffects { get; }
     bool ApplyEffect(StatusEffectApplicationContext ctx);
     bool RemoveEffect(StatusEffectRemovalContext ctx);
     event EventHandler<StatusEffectApplicationContext> EffectApplySuccess;

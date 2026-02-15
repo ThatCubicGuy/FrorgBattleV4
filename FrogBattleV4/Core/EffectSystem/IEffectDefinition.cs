@@ -7,5 +7,5 @@ namespace FrogBattleV4.Core.EffectSystem;
 public interface IEffectDefinition
 {
     string Id { get; }
-    IEnumerable<IModifierRule> Modifiers { get; }
+    IEnumerable<ModifierRule> Modifiers { get; }
 }

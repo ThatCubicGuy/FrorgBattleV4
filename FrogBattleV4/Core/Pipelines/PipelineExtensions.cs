@@ -14,9 +14,9 @@ internal static class PipelineExtensions
     /// <typeparam name="TQuery">Type of the query, matching context.</typeparam>
     /// <returns>The final <see cref="ModifierStack"/> calculated from every effect in the list.</returns>
     [Pure]
-    public static ModifierStack AggregateMods<TQuery>(this TQuery query, EffectInfoContext ctx) where TQuery : struct
-    {
-        return ctx.Holder.AttachedEffects.Aggregate(new ModifierStack(),
-            (stack, effect) => stack + effect.GetContributions(ctx, query));
+    public static ModifierStack AggregateEffectMods<TQuery>(this TQuery query, EffectInfoContext ctx) where TQuery : struct
+    {   
+        return ctx.Actor?.AttachedEffects.Aggregate(new ModifierStack(),
+            (stack, effect) => stack + effect.GetContributingModifiers(query)) ?? new ModifierStack();
     }
 }

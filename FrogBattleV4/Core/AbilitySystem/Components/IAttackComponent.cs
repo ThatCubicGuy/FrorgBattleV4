@@ -9,5 +9,5 @@ public interface IAttackComponent
 {
     [Pure]
     [return: NotNull]
-    IEnumerable<DamageRequest> GetDamageRequests(AbilityExecContext ctx);
+    IEnumerable<DamageIntent> GetDamageRequests(AbilityExecContext ctx);
 }

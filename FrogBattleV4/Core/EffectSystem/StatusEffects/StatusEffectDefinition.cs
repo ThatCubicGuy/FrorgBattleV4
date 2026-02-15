@@ -7,7 +7,7 @@ namespace FrogBattleV4.Core.EffectSystem.StatusEffects;
 public class StatusEffectDefinition : IEffectDefinition
 {
     public required string Id { get; init; }
-    public IEnumerable<IModifierRule> Modifiers { get; init; } = [];
+    public IEnumerable<ModifierRule> Modifiers { get; init; } = [];
     public IEnumerable<IMutatorComponent> Mutators { get; init; } = [];
 
     public required uint MaxStacks { get; init; }

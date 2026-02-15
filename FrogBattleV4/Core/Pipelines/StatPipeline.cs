@@ -21,9 +21,9 @@ internal static class StatPipeline
         {
             Stat = ctx.Stat,
             Channel = StatChannel.Owned,
-        }.AggregateMods(new EffectInfoContext
+        }.AggregateEffectMods(new EffectInfoContext
         {
-            Holder = ctx.Actor,
+            Actor = ctx.Actor,
             Other = ctx.Other
         });
 
@@ -35,12 +35,17 @@ internal static class StatPipeline
         {
             Stat = ctx.Stat,
             Channel = StatChannel.Penalty,
-        }.AggregateMods(new EffectInfoContext
+        }.AggregateEffectMods(new EffectInfoContext
         {
-            Holder = other,
+            Actor = other,
             Other = ctx.Actor
         });
 
         return mods.ApplyTo(baseStatValue);
+    }
+
+    public static double ComputePipeline(this ModifierContext ctx, double baseStatValue)
+    {
+        
     }
 }
