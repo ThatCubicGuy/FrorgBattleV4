@@ -441,5 +441,7 @@ TestResults/
 */[Bb]in/
 */[Oo]bj/
 */[Ll]og/
-**/.vscode
-**/.idea
+**/.vscode/
+**/.idea/
+**/bin/
+**/obj/
