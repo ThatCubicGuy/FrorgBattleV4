@@ -16,9 +16,9 @@ public class HumanoidHitbox : ITargetable
     /// </summary>
     public bool Floating { get; set; }
 
-    public required IEnumerable<DamageModifier> HeadshotModifiers { get; init; }
+    public required IEnumerable<DamageMutModifier> HeadshotModifiers { get; init; }
 
-    public IEnumerable<DamageModifier> NormalModifiers { get; init; } = [];
+    public IEnumerable<DamageMutModifier> NormalModifiers { get; init; } = [];
 
     [Pure]
     private HitboxRegion? GetRegionAtHeight(int height) => height switch
@@ -41,10 +41,10 @@ public class HumanoidHitbox : ITargetable
     {
         return targeting switch
         {
-            TargetingType.Region r => new TargetingResult(true, GetModifiers(r.Value)),
+            TargetingType.Region r => new TargetingResult(GetModifiers(r.Value)),
             TargetingType.Height h => GetRegionAtHeight(h.Value) is not { } region
                 ? TargetingResult.Miss
-                : new TargetingResult(true, GetModifiers(region)),
+                : new TargetingResult(GetModifiers(region)),
             _ => throw new NotSupportedException("Unknown targeting type: " + targeting)
         };
     }

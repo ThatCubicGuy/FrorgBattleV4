@@ -22,7 +22,7 @@ public abstract class ModifierRule
 /// <typeparam name="TQuery">Type of the handled queries.</typeparam>
 public abstract class ModifierRule<TQuery> : ModifierRule where TQuery : struct
 {
-    public ModifierDirection Direction { get; init; }
+    public ModifierDirection Direction { get; init; } = ModifierDirection.Actor;
     [Pure]
     protected abstract bool AppliesToQuery(TQuery query);
 
@@ -34,16 +34,32 @@ public abstract class ModifierRule<TQuery> : ModifierRule where TQuery : struct
     };
 }
 
+public abstract class MutModifierRule<TQuery> : ModifierRule<TQuery> where TQuery : struct
+{
+    public required MutModifierDirection MutDirection { get; init; }
+
+    [Pure]
+    public override bool AppliesTo(object query) => query switch
+    {
+        MutModifierQuery<TQuery> typedQuery => base.AppliesTo(query) && typedQuery.MutModifierDirection == MutDirection,
+        _ => false
+    };
+}
+
 public enum ModifierDirection
 {
     /// <summary>
-    /// Incoming damage mods, stat mods that affect you,
-    /// pool mods that affect incoming mutations.
+    /// Things that affect the holder as an actor.
     /// </summary>
-    Self,
+    Actor,
     /// <summary>
-    /// Outgoing damage mods, stat penalty mods, pool mods
-    /// that affect outgoing mutations (what the reference will suffer).
+    /// Things that affect the other as an actor.
     /// </summary>
-    Reference
+    Other
+}
+
+public enum MutModifierDirection
+{
+    Outgoing,
+    Incoming,
 }

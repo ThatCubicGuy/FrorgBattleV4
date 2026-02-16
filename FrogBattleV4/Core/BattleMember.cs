@@ -36,7 +36,7 @@ public abstract class BattleMember : ITakesTurns, IHasPools, ISupportsEffects
     [NotNull] public string? Name { get; protected init; }
     [NotNull] public IEnumerable<IAction> Turns { get; protected init; } = [];
 
-    [NotNull] public ITargetable Hitbox { get; protected init; }
+    [NotNull] public ITargetable Hitbox { get; init; }
     [NotNull] public IReadOnlyDictionary<StatId, double> BaseStats { get; }
     [NotNull] public IReadOnlyDictionary<PoolId, PoolComponent> Pools { get; }
 

@@ -4,7 +4,7 @@ using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
-public class DamageModifier : ModifierRule<DamageQuery>
+public class DamageMutModifier : MutModifierRule<DamageQuery>
 {
     public DamageType Type { get; init; }
     public DamageSource Source { get; init; }

@@ -1,4 +1,4 @@
-#nullable enable
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.EffectSystem.Modifiers;
 
@@ -15,30 +15,14 @@ public interface ITargetable
     TargetingResult Resolve(TargetingType targeting);
 }
 
-public readonly record struct TargetingResult(bool IsHit, IModifierProvider Modifier)
+public readonly record struct TargetingResult([NotNull] IModifierProvider Modifier)
 {
-    public static readonly TargetingResult Miss = new() { IsHit = false };
+    public bool WouldHit { get; private init; } = true;
+    public static readonly TargetingResult Miss = new() { WouldHit = false };
 }
 
 public enum HitboxRegion
 {
     Body,
     WeakPoint
-}
-
-/// <summary>
-/// Custom enum with a payload.
-/// </summary>
-public abstract record TargetingType
-{
-    // Block inheritance from outside
-    private TargetingType() { }
-
-    public sealed record Region(HitboxRegion Value) : TargetingType;
-
-    public sealed record Height(int Value) : TargetingType;
-
-    public static readonly TargetingType Body = new Region(HitboxRegion.Body);
-    public static readonly TargetingType WeakPoint = new Region(HitboxRegion.WeakPoint);
-    public static readonly TargetingType Ground = new Height(0);
 }

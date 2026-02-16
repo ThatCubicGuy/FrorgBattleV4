@@ -62,9 +62,9 @@ public class Character : BattleMember, IDamageable, IHasAbilities
         {
             HeadshotModifiers =
             [
-                new DamageModifier
+                new DamageMutModifier
                 {
-                    Direction = ModifierDirection.Self,
+                    MutDirection = MutModifierDirection.Incoming,
                     ModifierStack = new ModifierStack
                     {
                         MultiplyTotal = 1.2

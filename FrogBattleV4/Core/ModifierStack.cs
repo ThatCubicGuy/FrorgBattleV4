@@ -68,6 +68,42 @@ public struct ModifierStack()
         return total;
     }
 
+    /// <summary>
+    /// Returns a copy of this ModifierStack where
+    /// all fields have a positive or neutral effect.
+    /// </summary>
+    /// <returns>A new ModifierStack.</returns>
+    [Pure]
+    public ModifierStack AsPositive()
+    {
+        return new ModifierStack
+        {
+            AddValue = Math.Max(0, AddValue),
+            AddBasePercent = Math.Max(0, AddBasePercent),
+            MultiplyTotal = Math.Max(1, MultiplyTotal),
+            Minimum = Minimum,
+            Maximum = Maximum,
+        };
+    }
+
+    /// <summary>
+    /// Returns a copy of this ModifierStack where
+    /// all fields have a negative or neutral effect.
+    /// </summary>
+    /// <returns>A new ModifierStack.</returns>
+    [Pure]
+    public ModifierStack AsNegative()
+    {
+        return new ModifierStack
+        {
+            AddValue = Math.Min(0, AddValue),
+            AddBasePercent = Math.Min(0, AddBasePercent),
+            MultiplyTotal = Math.Min(1, MultiplyTotal),
+            Minimum = Minimum,
+            Maximum = Maximum,
+        };
+    }
+
     public override string ToString()
     {
         return $"Additive: {AddValue}," +

@@ -15,5 +15,5 @@ public class Team
         AllTeams.Add(this);
     }
 
-    public IReadOnlyCollection<BattleMember> Members { get; }
+    public IEnumerable<BattleMember> Members { get; }
 }

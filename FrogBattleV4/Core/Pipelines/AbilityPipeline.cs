@@ -40,14 +40,20 @@ internal static class AbilityPipeline
     public static bool ExecuteAbility(this AbilityExecContext ctx)
     {
         if (!ctx.CanExecute()) return false;
-        foreach (var request in ctx.Definition.Costs.SelectMany(cc => cc.GetCostRequests(ctx)))
+        foreach (var mutationIntent in ctx.Definition.Costs.SelectMany(cc => cc.GetCostRequests(ctx)))
         {
-            request.ExecuteMutation(new ModifierContext(ctx.User, ctx.MainTarget));
+            mutationIntent.ExecuteMutation(new ModifierContext
+            {
+                Actor = ctx.User,
+                Other = ctx.MainTarget,
+                Ability = ctx.Definition,
+                Rng = ctx.Rng,
+            });
         }
 
-        foreach (var dr in ctx.Definition.Attacks.SelectMany(ac => ac.GetDamageRequests(ctx)))
+        foreach (var damageIntent in ctx.Definition.Attacks.SelectMany(ac => ac.GetDamageRequests(ctx)))
         {
-            dr.ExecuteDamage(new DamageExecContext
+            damageIntent.ExecuteDamage(new DamageExecContext
             {
                 Source = ctx.User,
                 Definition = ctx.Definition,

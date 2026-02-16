@@ -10,16 +10,12 @@ namespace FrogBattleV4.Core.CharacterSystem;
 /// <param name="owner">The character who possesses this pool.</param>
 public class CharacterPoolComponent(Character owner) : PoolComponent
 {
-    // TODO: Fix! Currently you only allow mutations through PoolPipeline.
-    // TODO: See how u might solve this one.
-    public double Capacity => new ModifierContext(owner).ResolveMore(new StatQuery
+    public double Capacity => new PoolValueQuery
     {
-        Stat = "Max" + Id,
-    }, out var statStack).Resolve(new PoolValueQuery
-    {
-        Channel = PoolPropertyChannel.Max,
+        Channel = PoolValueChannel.Max,
         PoolId = Id
-    }).ApplyTo(statStack.ApplyTo(owner.BaseStats["Max" + Id]));
+    }.Compute(new ModifierContext(owner)
+        .ComputeStat("max_" + Id), new ModifierContext(owner));
 
     public override double? MaxValue => Capacity;
     public override double? MinValue => 0;

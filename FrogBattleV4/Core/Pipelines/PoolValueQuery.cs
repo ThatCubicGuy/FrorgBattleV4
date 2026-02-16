@@ -1,17 +1,16 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace FrogBattleV4.Core.Pipelines;
 
-[method: SetsRequiredMembers]
-public readonly struct PoolValueQuery(PoolId poolId, PoolPropertyChannel channel)
+/// <summary>
+/// Value query classifying a pool property (e.g. max value).
+/// </summary>
+public readonly struct PoolValueQuery
 {
-    public required PoolId PoolId { get; init; } = poolId;
-    public required PoolPropertyChannel Channel { get; init; } = channel;
+    public required PoolId PoolId { get; init; }
+    public required PoolValueChannel Channel { get; init; }
 }
 
-public enum PoolPropertyChannel
+public enum PoolValueChannel
 {
     Max,
-    Cost,
-    Regen
+    Min
 }

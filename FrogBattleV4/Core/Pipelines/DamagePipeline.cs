@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.DamageSystem;
 
@@ -17,19 +18,20 @@ public static class DamagePipeline
             Aiming = dmg.Targeting,
             Rng = ctx.Rng,
         };
-        var normalDamage = modCtx.Resolve(new DamageQuery
+
+        var normalDamage = new DamageQuery
         {
             Type = dmg.Type,
             Source = DamageSource.Ability,
             Crit = false,
-        }).ApplyTo(dmg.BaseAmount);
-        
-        var critDamage = modCtx.Resolve(new DamageQuery
+        }.ComputeMut(dmg.BaseAmount, modCtx);
+
+        var critDamage = new DamageQuery
         {
             Type = dmg.Type,
             Source = DamageSource.Ability,
             Crit = true,
-        }).ApplyTo(dmg.BaseAmount);
+        }.ComputeMut(dmg.BaseAmount, modCtx);
 
         return new DamagePreview(dmg.Target, normalDamage, critDamage);
     }
@@ -44,13 +46,27 @@ public static class DamagePipeline
             Aiming = dmg.Targeting,
             Rng = ctx.Rng,
         };
-        var isCrit = ctx.Rng.NextDouble() < modCtx.ComputeStat(StatId.CritRate);
-        var finalAmount = modCtx.Resolve(new DamageQuery
+
+        var isCrit = dmg.CanCrit && ctx.Rng.NextDouble() < modCtx.ComputeStat(StatId.CritRate);
+
+        var finalAmount = new DamageQuery
         {
             Type = dmg.Type,
             Source = DamageSource.Ability,
             Crit = isCrit,
-        }).ApplyTo(dmg.BaseAmount);
+        }.ComputeMut(dmg.BaseAmount * (isCrit ? 1 + modCtx.ComputeStat(StatId.CritDamage) : 1), modCtx);
+        // Crit damage is applied directly to base damage ^
+
+        // Def is applied after every calculation.
+        finalAmount -= new ModifierContext
+        {
+            Other = modCtx.Actor,
+            Actor = modCtx.Other,
+            Rng = modCtx.Rng,
+        }.ComputeStat(StatId.Def);
+        finalAmount = Math.Max(0, finalAmount);
+        if (dmg.Target.Hitbox.Resolve(dmg.Targeting).WouldHit) dmg.Target.Hp.CurrentValue -= finalAmount;
+        else finalAmount = 0;
         return new DamageResult(finalAmount, dmg.Target, dmg.Type, isCrit);
     }
 }
