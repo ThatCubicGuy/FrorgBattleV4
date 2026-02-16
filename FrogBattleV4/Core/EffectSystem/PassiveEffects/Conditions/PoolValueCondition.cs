@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.BattleSystem;
-using FrogBattleV4.Core.CharacterSystem;
+using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
 
@@ -11,7 +10,9 @@ public class PoolValueCondition : IConditionComponent
 {
     private readonly double _step;
 
-    [NotNull] public required string PoolId { get; init; }
+    #region Metadata
+
+    [NotNull] public required PoolId PoolId { get; init; }
     public required ConditionDirection Direction { get; init; }
 
     /// <summary>
@@ -46,18 +47,20 @@ public class PoolValueCondition : IConditionComponent
     /// </summary>
     public bool Percent { get; init; } = false;
 
+    #endregion
+
     [Pure]
-    public int GetContribution(EffectInfoContext ctx)
+    public int GetContribution(ModifierContext ctx)
     {
         // Funny ahh type check
-        if ((Direction == ConditionDirection.Self ? ctx.Actor as IHasPools : ctx.Other)?.Pools
+        if ((Direction == ConditionDirection.Self ? ctx.Actor : ctx.Other)?.Pools
             .GetValueOrDefault(PoolId) is not { } pool) return 0;
         if (Percent)
         {
             return pool.MaxValue.HasValue
                 ? GetPercentageValue(pool, pool.MaxValue.Value)
                 : throw new InvalidOperationException(
-                    $"Percentage type specified for a pool with no MaxValue! {PoolId}");
+                    $"Percentage type specified for a pool with no MaxValue! ({PoolId})");
         }
 
         return (int)Math.Floor((Math.Clamp(pool.CurrentValue, MinValue, MaxValue) - MinValue) / Step);
@@ -70,7 +73,7 @@ public class PoolValueCondition : IConditionComponent
     /// <param name="pool">Pool to calculate percentage for.</param>
     /// <param name="poolMaxValue">Non-nullable max value of the pool.</param>
     /// <returns>Contribution value for a percentage cost.</returns>
-    private int GetPercentageValue(CharacterSystem.Pools.PoolComponent pool, double poolMaxValue)
+    private int GetPercentageValue(Pipelines.Pools.PoolComponent pool, double poolMaxValue)
     {
         if (!Percent)
             throw new InvalidOperationException(

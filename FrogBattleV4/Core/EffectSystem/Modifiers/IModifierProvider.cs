@@ -13,9 +13,9 @@ public interface IModifierProvider
     /// </summary>
     /// <param name="query">Query for which to check contributions.</param>
     /// <param name="ctx">Context (holder/target) in which to check contributions.</param>
-    /// <typeparam name="TQuery">Type of the query struct.</typeparam>
+    /// <typeparam name="TQuery">Type of query to handle.</typeparam>
     /// <returns>A modifier stack revealing the final contribution.</returns>
     [Pure]
-    ModifierStack GetContributingModifiers<TQuery>(TQuery query, EffectInfoContext ctx)
+    ModifierStack GetContributingModifiers<TQuery>(ModifierQuery<TQuery> query, ModifierContext ctx)
         where TQuery : struct;
 }

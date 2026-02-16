@@ -12,7 +12,7 @@ public class StatusEffectCondition : IConditionComponent
     public required ConditionDirection Direction { get; init; }
 
     [Pure]
-    public int GetContribution(EffectInfoContext ctx)
+    public int GetContribution(ModifierContext ctx)
     {
         return (Direction switch
         {

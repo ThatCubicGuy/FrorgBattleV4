@@ -1,7 +1,5 @@
 #nullable enable
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.AbilitySystem.Components.Targeting;
 using FrogBattleV4.Core.EffectSystem.Modifiers;
 
 namespace FrogBattleV4.Core.BattleSystem;
@@ -17,7 +15,7 @@ public interface ITargetable
     TargetingResult Resolve(TargetingType targeting);
 }
 
-public readonly record struct TargetingResult(bool IsHit, IEnumerable<ModifierRule> Modifiers)
+public readonly record struct TargetingResult(bool IsHit, IModifierProvider Modifier)
 {
     public static readonly TargetingResult Miss = new() { IsHit = false };
 }

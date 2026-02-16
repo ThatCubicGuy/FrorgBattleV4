@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using FrogBattleV4.Core.EffectSystem.StatusEffects;
 
-namespace FrogBattleV4.Core.CharacterSystem.Pools;
+namespace FrogBattleV4.Core.Pipelines.Pools;
 
 public class PoolComponent
 {

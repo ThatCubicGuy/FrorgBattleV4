@@ -1,7 +1,6 @@
 #nullable enable
 using System.Diagnostics.CodeAnalysis;
 using FrogBattleV4.Core.BattleSystem;
-using FrogBattleV4.Core.Contexts;
 
 namespace FrogBattleV4.Core.DamageSystem;
 
@@ -9,7 +8,7 @@ namespace FrogBattleV4.Core.DamageSystem;
 /// A context for calculating damage modifiers.
 /// Randomness is already computed.
 /// </summary>
-public readonly struct DamageCalcContext() : IRelationshipContext
+public readonly struct DamageCalcContext()
 {
     public BattleMember? Attacker { get; init; }
     public BattleMember? Other { get; init; }
@@ -20,6 +19,4 @@ public readonly struct DamageCalcContext() : IRelationshipContext
     public required bool IsCrit { get; init; }
     public double DefPen { get; init; } = 0;
     public double TypeResPen { get; init; } = 0;
-    BattleMember? IActorContext.Actor => Attacker;
-    BattleMember? IReferenceContext.Other => Other;
 }

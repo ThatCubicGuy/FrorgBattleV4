@@ -13,23 +13,23 @@ public abstract class ModifierRule
     /// <param name="query">Query for which to check application.</param>
     /// <returns>True if the modifier applies, false otherwise.</returns>
     [Pure]
-    public abstract bool AppliesFor(object query);
+    public abstract bool AppliesTo(object query);
 }
 
 /// <summary>
-/// Directional modifier.
+/// Modifier that applies only to some queries.
 /// </summary>
-/// <typeparam name="TRequest">Request type that this modifier handles.</typeparam>
-public abstract class ModifierRule<TRequest> : ModifierRule where TRequest : struct
+/// <typeparam name="TQuery">Type of the handled queries.</typeparam>
+public abstract class ModifierRule<TQuery> : ModifierRule where TQuery : struct
 {
     public ModifierDirection Direction { get; init; }
     [Pure]
-    protected abstract bool AppliesToRequest(TRequest query);
+    protected abstract bool AppliesToQuery(TQuery query);
 
     [Pure]
-    public override bool AppliesFor(object query) => query switch
+    public override bool AppliesTo(object query) => query switch
     {
-        ModifierQuery<TRequest> typedQuery => AppliesToRequest(typedQuery.Request) && typedQuery.Direction == Direction,
+        ModifierQuery<TQuery> typedQuery => AppliesToQuery(typedQuery.Query) && typedQuery.Direction == Direction,
         _ => false
     };
 }

@@ -1,9 +1,9 @@
-using FrogBattleV4.Core.CharacterSystem.Pools;
 using FrogBattleV4.Core.EffectSystem.Modifiers;
+using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
-public class PoolModifier : ModifierRule<PoolQuery>
+public class PoolModifier : ModifierRule<PoolValueQuery>
 {
     public required PoolId PoolId { get; init; }
     /// <summary>
@@ -12,7 +12,7 @@ public class PoolModifier : ModifierRule<PoolQuery>
     /// </summary>
     public required PoolPropertyChannel Channel { get; init; }
 
-    protected override bool AppliesToRequest(PoolQuery query)
+    protected override bool AppliesToQuery(PoolValueQuery query)
     {
         return query.PoolId == PoolId && query.Channel == Channel;
     }

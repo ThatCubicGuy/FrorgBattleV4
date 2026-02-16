@@ -1,14 +1,12 @@
 #nullable enable
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.BattleSystem.Actions;
-using FrogBattleV4.Core.CharacterSystem;
-using FrogBattleV4.Core.CharacterSystem.Pools;
+using FrogBattleV4.Core.Pipelines.Pools;
 using FrogBattleV4.Core.EffectSystem;
 using FrogBattleV4.Core.EffectSystem.Modifiers;
 using FrogBattleV4.Core.EffectSystem.PassiveEffects;
@@ -17,11 +15,12 @@ using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core;
 
-public abstract class BattleMember : ITakesTurns, IHasStats, IHasPools, ISupportsEffects
+public abstract class BattleMember : ITakesTurns, IHasPools, ISupportsEffects
 {
     private readonly List<StatusEffectInstance> _activeEffects = [];
     private readonly List<PassiveEffectDefinition> _passiveEffects = [];
-    private readonly Dictionary<PoolId, PoolComponent> _pools;
+    private readonly Dictionary<PoolId, PoolComponent> _pools = new();
+    private readonly Dictionary<StatId, double> _baseStats = new();
 
     public event EventHandler<StatusEffectApplicationContext>? EffectApplySuccess;
     public event EventHandler<StatusEffectApplicationContext>? EffectApplyFailure;
@@ -30,15 +29,24 @@ public abstract class BattleMember : ITakesTurns, IHasStats, IHasPools, ISupport
 
     protected BattleMember()
     {
-        _pools = new Dictionary<PoolId, PoolComponent>();
         Pools = new ReadOnlyDictionary<PoolId, PoolComponent>(_pools);
+        BaseStats = new ReadOnlyDictionary<StatId, double>(_baseStats);
     }
 
     [NotNull] public string? Name { get; protected init; }
     [NotNull] public IEnumerable<IAction> Turns { get; protected init; } = [];
 
     [NotNull] public ITargetable Hitbox { get; protected init; }
+    [NotNull] public IReadOnlyDictionary<StatId, double> BaseStats { get; }
     [NotNull] public IReadOnlyDictionary<PoolId, PoolComponent> Pools { get; }
+
+    protected void SetStats(IDictionary<StatId, double> dict)
+    {
+        foreach (var pair in dict)
+        {
+            _baseStats[pair.Key] = pair.Value;
+        }
+    }
     public bool AddPool(PoolComponent pool) => _pools.TryAdd(pool.Id, pool);
     public bool RemovePool(PoolId poolId) => _pools.Remove(poolId);
 
@@ -56,8 +64,6 @@ public abstract class BattleMember : ITakesTurns, IHasStats, IHasPools, ISupport
     protected void ForceRemoveActive(StatusEffectInstance effect) => _activeEffects.Remove(effect);
     protected void ForceAddPassive(PassiveEffectDefinition passive) => _passiveEffects.Add(passive);
     protected void ForceRemovePassive(PassiveEffectDefinition passive) => _passiveEffects.Remove(passive);
-
-    public abstract double GetStat(StatId stat, BattleMember? target = null);
 
     public bool ApplyEffect(StatusEffectApplicationContext ctx)
     {

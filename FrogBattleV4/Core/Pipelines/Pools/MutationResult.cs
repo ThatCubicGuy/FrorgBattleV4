@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using FrogBattleV4.Core.Contexts;
 
-namespace FrogBattleV4.Core.CharacterSystem.Pools;
+namespace FrogBattleV4.Core.Pipelines.Pools;
 
 /// <summary>
 /// A fully calculated instance of a specific pool mutation. The raw value of <paramref name="FinalDeltaValue"/>

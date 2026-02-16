@@ -1,19 +1,19 @@
 #nullable enable
-using FrogBattleV4.Core.DamageSystem;
 using FrogBattleV4.Core.EffectSystem.Modifiers;
+using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.EffectSystem.Components;
 
-public class DamageModifier : ModifierRule<DamageRequest>
+public class DamageModifier : ModifierRule<DamageQuery>
 {
-    public string? Type { get; init; }
-    public string? Source { get; init; }
+    public DamageType Type { get; init; }
+    public DamageSource Source { get; init; }
     public bool CritOnly { get; init; }
 
-    protected override bool AppliesToRequest(DamageRequest request)
+    protected override bool AppliesToQuery(DamageQuery query)
     {
-        return (!CritOnly || request.Crit) &&
-               (Type ?? request.Type) == request.Type &&
-               (Source ?? request.Source) == request.Source;
+        return (!CritOnly || query.Crit) &&
+               Type.Matches(query.Type) &&
+               Source.Matches(query.Source);
     }
 }

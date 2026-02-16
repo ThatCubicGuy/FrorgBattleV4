@@ -1,5 +1,5 @@
 using FrogBattleV4.Core.BattleSystem;
-using FrogBattleV4.Core.CharacterSystem.Pools;
+using FrogBattleV4.Core.Pipelines.Pools;
 
 namespace FrogBattleV4.Core.DamageSystem;
 

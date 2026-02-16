@@ -1,75 +1,25 @@
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.BattleSystem;
-using FrogBattleV4.Core.CharacterSystem.Pools;
-using FrogBattleV4.Core.EffectSystem;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
+using FrogBattleV4.Core.Pipelines.Pools;
 
 namespace FrogBattleV4.Core.Pipelines;
 
-internal static class PoolPipeline
+public static class PoolPipeline
 {
-    /// <summary>
-    /// Calculates different channel modifiers for a pool (such as cost or max).
-    /// </summary>
-    /// <param name="ctx">The context for which to run the calculations.</param>
-    /// <param name="baseAmount">The base value of the cap/cost/regen.</param>
-    /// <returns>The final value.</returns>
     [Pure]
-    public static double ComputePipeline(this PoolValueCalcContext ctx, double baseAmount)
+    public static MutationResult PreviewMutation(this MutationIntent mut, ModifierContext ctx)
     {
-        var mods = new ModifierStack();
-        if (ctx.Holder is ISupportsEffects owner)
+        var pool = mut.Selector(ctx);
+        var finalAmount = ctx.Resolve(new PoolValueQuery
         {
-            mods += new PoolQuery
-            {
-                PoolId = ctx.PoolId,
-                Channel = ctx.Channel,
-                Direction = ModifierDirection.Self,
-            }.AggregateEffectMods(new EffectInfoContext
-            {
-                Actor = owner,
-                Other = ctx.Other,
-            });
-        }
-
-        if (ctx.Other is ISupportsEffects other)
-        {
-            mods += new PoolQuery
-            {
-                PoolId = ctx.PoolId,
-                Channel = ctx.Channel,
-                Direction = ModifierDirection.Reference,
-            }.AggregateEffectMods(new EffectInfoContext
-            {
-                Actor = other,
-                Other = ctx.Holder as BattleMember,
-            });
-        }
-
-        return mods.ApplyTo(baseAmount);
+            PoolId = pool.Id,
+            Channel = mut.BaseAmount < 0 ? PoolPropertyChannel.Cost : PoolPropertyChannel.Regen,
+        }).ApplyTo(mut.BaseAmount);
+        return new MutationResult(pool, finalAmount, finalAmount <= pool.CurrentValue);
     }
 
-    [Pure]
-    public static MutationResult PreviewMutation(this MutationRequest req, MutationExecContext ctx)
-    {
-        var amount = req.BaseAmount;
-        var pool = req.Selector(ctx);
-        var total = new PoolValueCalcContext
-        {
-            Channel = req.BaseAmount > 0 ? PoolPropertyChannel.Regen : PoolPropertyChannel.Cost,
-            Holder = ctx.Holder,
-            Other = ctx.Other,
-            PoolId = req.Selector(ctx).Id,
-            Flags = req.Flags,
-        }.ComputePipeline(amount);
-
-        return new MutationResult(pool, total,
-            total <= pool.CurrentValue);
-    }
-
-    public static void ExecuteMutation(this MutationRequest req, MutationExecContext ctx)
+    public static void ExecuteMutation(this MutationIntent req, ModifierContext ctx)
     {
         var result = req.PreviewMutation(ctx);
-        result.ResultTarget.CurrentValue += result.FinalDeltaValue;
+        if (result.Allowed) result.ResultTarget.CurrentValue -= result.FinalDeltaValue;
     }
 }

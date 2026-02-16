@@ -1,4 +1,4 @@
-namespace FrogBattleV4.Core.CharacterSystem.Pools;
+namespace FrogBattleV4.Core.Pipelines.Pools;
 
 public readonly record struct PoolTag(string Name)
 {

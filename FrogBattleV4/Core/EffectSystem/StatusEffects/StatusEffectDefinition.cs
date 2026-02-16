@@ -1,14 +1,13 @@
-#nullable enable
 using System.Collections.Generic;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FrogBattleV4.Core.EffectSystem.StatusEffects;
 
-public class StatusEffectDefinition : IEffectDefinition
+public class StatusEffectDefinition
 {
-    public required string Id { get; init; }
-    public IEnumerable<ModifierRule> Modifiers { get; init; } = [];
-    public IEnumerable<IMutatorComponent> Mutators { get; init; } = [];
+    [NotNull] public required string Id { get; init; }
+    [NotNull] public ModifierCollection Modifiers { get; init; } = new();
+    [NotNull] public IEnumerable<IMutatorComponent> Mutators { get; init; } = [];
 
     public required uint MaxStacks { get; init; }
     public required uint MaxDuration { get; init; }

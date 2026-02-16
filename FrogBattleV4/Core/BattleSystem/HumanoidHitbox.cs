@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.AbilitySystem.Components.Targeting;
+using System.Linq;
+using FrogBattleV4.Core.EffectSystem;
 using FrogBattleV4.Core.EffectSystem.Components;
 using FrogBattleV4.Core.EffectSystem.Modifiers;
 
@@ -29,12 +30,12 @@ public class HumanoidHitbox : ITargetable
     };
 
     [Pure]
-    private IEnumerable<ModifierRule> GetModifiers(HitboxRegion region) => region switch
+    private ModifierCollection GetModifiers(HitboxRegion region) => new((region switch
     {
         HitboxRegion.Body => NormalModifiers,
         HitboxRegion.WeakPoint => HeadshotModifiers,
         _ => []
-    };
+    }).ToArray<ModifierRule>());
 
     public TargetingResult Resolve(TargetingType targeting)
     {

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.CharacterSystem.Pools;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Costs;
 
@@ -12,7 +11,7 @@ public record ConditionalCost(
     ICostComponent CostIfFalse = null) : ICostComponent
 {
     [Pure]
-    public IEnumerable<MutationRequest> GetCostRequests(AbilityExecContext ctx)
+    public IEnumerable<Pipelines.Pools.MutationIntent> GetCostRequests(AbilityExecContext ctx)
     {
         return Condition(ctx) ? CostIfTrue.GetCostRequests(ctx) : CostIfFalse?.GetCostRequests(ctx) ?? [];
     }

@@ -31,7 +31,7 @@ public class AbilityDefinition
     /// <summary>
     /// This ability's base targeting. Underlying components fall back to this if they don't have their own targeting.
     /// </summary>
-    public ITargetingComponent? Targeting { get; init; }
+    public required ITargetingComponent Targeting { get; init; }
 
     /// <summary>
     /// Prerequisites for casting the ability.

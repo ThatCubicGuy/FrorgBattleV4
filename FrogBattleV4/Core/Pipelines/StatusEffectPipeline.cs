@@ -1,7 +1,5 @@
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.BattleSystem;
-using FrogBattleV4.Core.CharacterSystem;
 using FrogBattleV4.Core.EffectSystem;
 
 namespace FrogBattleV4.Core.Pipelines;
@@ -17,12 +15,14 @@ internal static class StatusEffectPipeline
     [Pure]
     public static double ComputeTotalChance(this StatusEffectApplicationContext statusEffect)
     {
+        var baseCtx = new ModifierContext(statusEffect.Source, statusEffect.Target as BattleMember);
+        var revCtx = new ModifierContext(baseCtx.Other, baseCtx.Actor);
         return statusEffect.ChanceType switch
         {
             ChanceType.Fixed => statusEffect.ApplicationChance,
             ChanceType.Base => statusEffect.ApplicationChance +
-                               (statusEffect.Source.GetStat(StatId.EffectHitRate, statusEffect.Target as BattleMember)) -
-                               ((statusEffect.Target as BattleMember)?.GetStat(StatId.EffectRes, statusEffect.Source) ?? 0),
+                               baseCtx.ComputeStat(StatId.EffectHitRate) -
+                               revCtx.ComputeStat(StatId.EffectRes),
             _ => throw new InvalidEnumArgumentException($"Invalid chance type: {statusEffect.ChanceType}")
         };
     }

@@ -2,29 +2,18 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using FrogBattleV4.Core.BattleSystem;
-using FrogBattleV4.Core.Contexts;
 
-namespace FrogBattleV4.Core.CharacterSystem.Pools;
+namespace FrogBattleV4.Core.Pipelines.Pools;
 
 /// <summary>
 /// The context for calculating a pool-related stat.
 /// This can be the pool's max value, a regen request, or a cost request.
 /// </summary>
-public readonly struct PoolValueCalcContext : IRelationshipContext
+public readonly struct PoolValueCalcContext
 {
-    [NotNull] public required PoolId PoolId { get; init; }
     [NotNull] public required IHasPools Holder { get; init; }
-    BattleMember? IActorContext.Actor => Holder as BattleMember;
     public BattleMember? Other { get; init; }
-    public PoolPropertyChannel Channel { get; init; }
     public PoolMutationFlags Flags { get; init; }
-}
-
-public enum PoolPropertyChannel
-{
-    Max,
-    Cost,
-    Regen
 }
 
 [Flags] public enum PoolMutationFlags

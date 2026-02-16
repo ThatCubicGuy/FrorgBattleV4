@@ -22,7 +22,7 @@ public class CharacterTurn(Character owner) : IAction
         Moment = TurnMoment.None
     };
 
-    public double BaseActionValue => 10000 / Owner.GetStat(StatId.Spd);
+    public double BaseActionValue => 10000 / new ModifierContext(Owner).ComputeStat(StatId.Spd);
 
     BattleMember IAction.Entity => Owner;
 

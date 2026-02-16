@@ -12,10 +12,10 @@ namespace FrogBattleV4.Core.EffectSystem.PassiveEffects;
 /// <summary>
 /// Defines a passive effect that is to be processed 
 /// </summary>
-public class PassiveEffectDefinition : IEffectDefinition, IModifierProvider
+public class PassiveEffectDefinition : IModifierProvider
 {
     public required string Id { get; init; }
-    public required IEnumerable<ModifierRule> Modifiers { get; init; }
+    public required ModifierCollection Modifiers { get; init; }
 
     /// <summary>
     /// List of conditions that enable the PassiveEffect's stacks.
@@ -25,7 +25,7 @@ public class PassiveEffectDefinition : IEffectDefinition, IModifierProvider
     public AccumulationType ConditionAccumulationType { get; set; } = AccumulationType.And;
 
     [Pure]
-    private int GetStacks(EffectInfoContext ctx)
+    private int GetStacks(ModifierContext ctx)
     {
         return Math.Max(0, ConditionAccumulationType switch
         {
@@ -38,13 +38,8 @@ public class PassiveEffectDefinition : IEffectDefinition, IModifierProvider
     }
 
     [Pure]
-    public ModifierStack GetContributingModifiers<TQuery>(TQuery query, EffectInfoContext ctx)
-        where TQuery : struct
-    {
-        return Modifiers.Where(mr => mr.AppliesFor(query))
-            .Aggregate(new ModifierStack(), (stack, rule) =>
-                stack + rule.ModifierStack * GetStacks(ctx));
-    }
+    public ModifierStack GetContributingModifiers<TRequest>(ModifierQuery<TRequest> query, ModifierContext ctx)
+        where TRequest : struct => Modifiers.GetContribution(query) * GetStacks(ctx);
 }
 
 public enum AccumulationType

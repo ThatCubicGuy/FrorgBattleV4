@@ -1,5 +1,5 @@
 #nullable enable
-namespace FrogBattleV4.Core.CharacterSystem;
+namespace FrogBattleV4.Core.Pipelines;
 
 public readonly record struct StatId(string Id)
 {

@@ -12,7 +12,7 @@ public interface IConditionComponent
     /// <param name="ctx">The context for which to check the contribution.</param>
     /// <returns>The fulfillment value.</returns>
     [Pure]
-    int GetContribution(EffectInfoContext ctx);
+    int GetContribution(ModifierContext ctx);
 }
 
 public enum ConditionDirection

@@ -1,10 +1,8 @@
-using System.Collections.Frozen;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.BattleSystem;
-using FrogBattleV4.Core.CharacterSystem.Pools;
+using FrogBattleV4.Core.Pipelines.Pools;
 using FrogBattleV4.Core.DamageSystem;
 using FrogBattleV4.Core.EffectSystem.Components;
 using FrogBattleV4.Core.EffectSystem.Modifiers;
@@ -17,31 +15,30 @@ public class Character : BattleMember, IDamageable, IHasAbilities
 {
     private readonly List<StatusEffectInstance> _markedForDeathEffects = [];
 
-    private readonly Dictionary<StatId, double> _baseStats = new()
-    {
-        { StatId.MaxHp, 400000 },
-        { StatId.MaxMana, 100 },
-        { StatId.MaxEnergy, 120 },
-        { StatId.Atk, 1000 },
-        { StatId.Def, 500 },
-        { StatId.Spd, 100 },
-        { StatId.Dex, 0 },
-        { StatId.CritRate, 0.1 },
-        { StatId.CritDamage, 0.5 },
-        { StatId.HitRateBonus, 0 },
-        { StatId.EffectHitRate, 1 },
-        { StatId.EffectRes, 0 },
-        { StatId.ManaCost, 1 },
-        { StatId.ManaRegen, 1 },
-        { StatId.EnergyRecharge, 1 },
-        { StatId.IncomingHealing, 1 },
-        { StatId.OutgoingHealing, 1 },
-        { StatId.ShieldToughness, 1 },
-    };
-
     public Character(string name)
     {
         Name = name;
+        SetStats(new Dictionary<StatId, double>
+        {
+            { StatId.MaxHp, 400000 },
+            { StatId.MaxMana, 100 },
+            { StatId.MaxEnergy, 120 },
+            { StatId.Atk, 1000 },
+            { StatId.Def, 500 },
+            { StatId.Spd, 100 },
+            { StatId.Dex, 0 },
+            { StatId.CritRate, 0.1 },
+            { StatId.CritDamage, 0.5 },
+            { StatId.HitRateBonus, 0 },
+            { StatId.EffectHitRate, 1 },
+            { StatId.EffectRes, 0 },
+            { StatId.ManaCost, 1 },
+            { StatId.ManaRegen, 1 },
+            { StatId.EnergyRecharge, 1 },
+            { StatId.IncomingHealing, 1 },
+            { StatId.OutgoingHealing, 1 },
+            { StatId.ShieldToughness, 1 },
+        });
         AddPool(new CharacterPoolComponent(this)
         {
             Id = PoolId.Hp,
@@ -78,8 +75,6 @@ public class Character : BattleMember, IDamageable, IHasAbilities
         Turns = [new CharacterTurn(this)];
     }
 
-    [NotNull] public IReadOnlyDictionary<StatId, double> BaseStats => _baseStats;
-
     #region Pools
 
     public PoolComponent Hp => Pools[PoolId.Hp];
@@ -95,16 +90,6 @@ public class Character : BattleMember, IDamageable, IHasAbilities
 
     public List<AbilityDefinition> Abilities { get; init; } = [];
     IEnumerable<AbilityDefinition> IHasAbilities.Abilities => Abilities;
-
-    public override double GetStat(StatId stat, BattleMember target = null)
-    {
-        return new StatCalcContext
-        {
-            Stat = stat,
-            Actor = this,
-            Other = target
-        }.ComputePipeline(BaseStats.GetValueOrDefault(stat));
-    }
 
     /// <summary>
     /// Decides whether the character can actually execute an ability and isn't stunned.

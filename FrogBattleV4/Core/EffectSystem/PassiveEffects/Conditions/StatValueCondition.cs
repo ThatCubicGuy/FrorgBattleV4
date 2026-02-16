@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.CharacterSystem;
+using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
 
@@ -40,9 +40,9 @@ public class StatValueCondition : IConditionComponent
     }
 
     [Pure]
-    public int GetContribution(EffectInfoContext ctx)
+    public int GetContribution(ModifierContext ctx)
     {
         if (ctx.Actor is not { } actor) return 0;
-        return (int)Math.Floor((Math.Clamp(actor.GetStat(Stat, ctx.Other), MinValue, MaxValue) - MinValue) / Step);
+        return (int)Math.Floor((Math.Clamp(ctx.ComputeStat(Stat), MinValue, MaxValue) - MinValue) / Step);
     }
 }

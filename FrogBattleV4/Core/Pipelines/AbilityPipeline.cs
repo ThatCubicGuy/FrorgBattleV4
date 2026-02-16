@@ -1,8 +1,6 @@
 using System.Diagnostics.Contracts;
 using System.Linq;
 using FrogBattleV4.Core.AbilitySystem;
-using FrogBattleV4.Core.BattleSystem;
-using FrogBattleV4.Core.CharacterSystem.Pools;
 using FrogBattleV4.Core.DamageSystem;
 
 namespace FrogBattleV4.Core.Pipelines;
@@ -17,21 +15,17 @@ internal static class AbilityPipeline
 
         var costs = ctx.Definition.Costs?
             .SelectMany(cc => cc.GetCostRequests(ctx))
-            .Select(mr => mr.PreviewMutation(
-                new MutationExecContext
-                {
-                    Holder = ctx.User,
-                    Other = ctx.MainTarget
-                })).ToArray();
+            .Select(mi => mi.PreviewMutation(
+                new ModifierContext(ctx.User, ctx.MainTarget))).ToArray();
 
         var damages = ctx.Definition.Attacks
             .SelectMany(ac => ac.GetDamageRequests(ctx))
-            .Select(dr => dr.PreviewDamage(
+            .Select(di => di.PreviewDamage(
                 new DamageExecContext
                 {
                     Source = ctx.User,
-                    Other = dr.Target as BattleMember,
-                    Rng = ctx.Rng
+                    Definition = ctx.Definition,
+                    Rng = ctx.Rng,
                 })).ToArray();
 
         return new AbilityPreview
@@ -48,11 +42,7 @@ internal static class AbilityPipeline
         if (!ctx.CanExecute()) return false;
         foreach (var request in ctx.Definition.Costs.SelectMany(cc => cc.GetCostRequests(ctx)))
         {
-            request.ExecuteMutation(new MutationExecContext
-            {
-                Holder = ctx.User,
-                Other = ctx.MainTarget
-            });
+            request.ExecuteMutation(new ModifierContext(ctx.User, ctx.MainTarget));
         }
 
         foreach (var dr in ctx.Definition.Attacks.SelectMany(ac => ac.GetDamageRequests(ctx)))
@@ -60,7 +50,7 @@ internal static class AbilityPipeline
             dr.ExecuteDamage(new DamageExecContext
             {
                 Source = ctx.User,
-                Other = dr.Target as BattleMember,
+                Definition = ctx.Definition,
                 Rng = ctx.Rng
             });
         }

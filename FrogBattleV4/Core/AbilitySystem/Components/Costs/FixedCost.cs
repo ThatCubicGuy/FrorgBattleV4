@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.CharacterSystem.Pools;
+using FrogBattleV4.Core.Pipelines.Pools;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Costs;
 
@@ -11,8 +11,8 @@ public record FixedCost(
     PoolMutationFlags CostFlags = PoolMutationFlags.None) : ICostComponent
 {
     [Pure]
-    public IEnumerable<MutationRequest> GetCostRequests(AbilityExecContext ctx)
+    public IEnumerable<MutationIntent> GetCostRequests(AbilityExecContext ctx)
     {
-        return [MutationRequestBuilder.ById(Pool, -BaseAmount, CostFlags)];
+        return [new MutationIntent(-BaseAmount, MutationSelector.ById(Pool), CostFlags)];
     }
 }

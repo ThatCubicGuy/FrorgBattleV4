@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using FrogBattleV4.Core.CharacterSystem.Pools;
+using FrogBattleV4.Core.Pipelines;
+using FrogBattleV4.Core.Pipelines.Pools;
 
 namespace FrogBattleV4.Core.BattleSystem;
 
