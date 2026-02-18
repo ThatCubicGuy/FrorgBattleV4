@@ -1,5 +1,5 @@
 using System;
-using FrogBattleV4.Core.BattleSystem;
+using FrogBattleV4.Core.Calculation.Pools;
 
 namespace FrogBattleV4.Core.EffectSystem.StatusEffects;
 
@@ -7,7 +7,7 @@ public class MutatorComponent : IMutatorComponent
 {
     public void OnApply(StatusEffectApplicationContext ctx)
     {
-        if (ctx.Target is not IHasPools target) return;
+        throw new NotImplementedException();
     }
 
     public void OnRemove(StatusEffectRemovalContext ctx)
@@ -15,12 +15,12 @@ public class MutatorComponent : IMutatorComponent
         throw new NotImplementedException();
     }
 
-    public void OnTurnStart(TurnContext ctx)
+    public void OnTurnStart(PoolComponent pool)
     {
         throw new NotImplementedException();
     }
 
-    public void OnTurnEnd(TurnContext ctx)
+    public void OnTurnEnd(PoolComponent pool)
     {
         throw new NotImplementedException();
     }

@@ -1,5 +1,5 @@
+using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.EffectSystem.Modifiers;
-using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.EffectSystem.Components;
 

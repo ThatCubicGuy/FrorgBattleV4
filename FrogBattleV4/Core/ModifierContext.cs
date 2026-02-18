@@ -13,9 +13,9 @@ namespace FrogBattleV4.Core;
 /// </summary>
 public record ModifierContext(
     // The actor in this context.
-    BattleMember? Actor = null,
+    IBattleMember? Actor = null,
     // Member we take as reference.
-    BattleMember? Other = null,
+    IBattleMember? Other = null,
     // Ability being used.
     AbilityDefinition? Ability = null,
     // Targeting type in case we attack the reference.
@@ -23,9 +23,9 @@ public record ModifierContext(
     // Rng for those who need it.
     System.Random? Rng = null);
 
-public record ModifierQuery<TQuery>(TQuery Query, ModifierDirection Direction) where TQuery : struct;
+public record ModifierQuery<TQuery>(TQuery Query, CalcDirection Direction) where TQuery : struct;
 
-public record MutModifierQuery<TQuery>(TQuery Query, ModifierDirection Direction, MutModifierDirection MutModifierDirection)
+public record MutModifierQuery<TQuery>(TQuery Query, CalcDirection Direction, MutModifierDirection MutModifierDirection)
     : ModifierQuery<TQuery>(Query, Direction) where TQuery : struct;
 
 public static class ModifierResolver
@@ -116,8 +116,8 @@ public static class ModifierResolver
 
         if (ctx.Actor is { } actor)
         {
-            var modQuery = new ModifierQuery<TQuery>(query, ModifierDirection.Actor);
-            mods += ctx.AggregateMods(actor.AttachedEffects, modQuery);
+            var modQuery = new ModifierQuery<TQuery>(query, CalcDirection.Self);
+            mods += ctx.AggregateMods(actor.Effects, modQuery);
 
             if (ctx.Ability is { } ability)
             {
@@ -127,9 +127,9 @@ public static class ModifierResolver
 
         if (ctx.Other is { } other)
         {
-            var modQuery = new ModifierQuery<TQuery>(query, ModifierDirection.Other);
+            var modQuery = new ModifierQuery<TQuery>(query, CalcDirection.Other);
             var revCtx = new ModifierContext(ctx.Other, ctx.Actor);
-            mods += revCtx.AggregateMods(other.AttachedEffects, modQuery);
+            mods += revCtx.AggregateMods(other.Effects, modQuery);
 
             if (ctx.Aiming is { } aiming)
             {
@@ -158,8 +158,8 @@ public static class ModifierResolver
 
         if (ctx.Actor is { } actor)
         {
-            var modQuery = new MutModifierQuery<TQuery>(query, ModifierDirection.Actor, mutDirection);
-            mods += ctx.AggregateMods(actor.AttachedEffects, modQuery);
+            var modQuery = new MutModifierQuery<TQuery>(query, CalcDirection.Self, mutDirection);
+            mods += ctx.AggregateMods(actor.Effects, modQuery);
 
             if (ctx.Ability is { } ability)
             {
@@ -169,9 +169,9 @@ public static class ModifierResolver
 
         if (ctx.Other is { } other)
         {
-            var modQuery = new MutModifierQuery<TQuery>(query, ModifierDirection.Other, mutDirection);
+            var modQuery = new MutModifierQuery<TQuery>(query, CalcDirection.Other, mutDirection);
             var revCtx = new ModifierContext(ctx.Other, ctx.Actor);
-            mods += revCtx.AggregateMods(other.AttachedEffects, modQuery);
+            mods += revCtx.AggregateMods(other.Effects, modQuery);
 
             if (ctx.Aiming is { } aiming)
             {

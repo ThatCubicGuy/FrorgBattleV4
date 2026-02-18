@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.Pipelines;
+using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.EffectSystem.Modifiers;
 
 namespace FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
 
@@ -13,17 +13,18 @@ public class PoolValueCondition : IConditionComponent
     #region Metadata
 
     [NotNull] public required PoolId PoolId { get; init; }
-    public required ConditionDirection Direction { get; init; }
+    public required CalcDirection Direction { get; init; }
 
     /// <summary>
     /// The starting value that the interval starts being calculated from.
+    /// Default is 0.
     /// </summary>
-    public required double MinValue { get; init; }
+    public required double MinValue { get; init; } = 0;
 
     /// <summary>
     /// The final value at which the interval stops being calculated.
     /// </summary>
-    public required double MaxValue { get; init; }
+    public required double? MaxValue { get; init; }
 
     /// <summary>
     /// The step by which the contribution is calculated.
@@ -53,32 +54,17 @@ public class PoolValueCondition : IConditionComponent
     public int GetContribution(ModifierContext ctx)
     {
         // Funny ahh type check
-        if ((Direction == ConditionDirection.Self ? ctx.Actor : ctx.Other)?.Pools
-            .GetValueOrDefault(PoolId) is not { } pool) return 0;
+        if ((Direction == CalcDirection.Self ? ctx.Actor : ctx.Other)?.Pools[PoolId] is not { } pool) return 0;
         if (Percent)
         {
             return pool.MaxValue.HasValue
-                ? GetPercentageValue(pool, pool.MaxValue.Value)
+                ? (int)Math.Floor((Math.Clamp(pool.CurrentValue / pool.MaxValue.Value,
+                    MinValue, MaxValue ?? double.MaxValue) - MinValue) * pool.MaxValue.Value / Step)
                 : throw new InvalidOperationException(
                     $"Percentage type specified for a pool with no MaxValue! ({PoolId})");
         }
 
-        return (int)Math.Floor((Math.Clamp(pool.CurrentValue, MinValue, MaxValue) - MinValue) / Step);
-    }
-
-    /// <summary>
-    /// Wrapper for percentage pool calculations since MaxValue is nullable,
-    /// and it would be a bit of a nightmare to cast it everywhere.
-    /// </summary>
-    /// <param name="pool">Pool to calculate percentage for.</param>
-    /// <param name="poolMaxValue">Non-nullable max value of the pool.</param>
-    /// <returns>Contribution value for a percentage cost.</returns>
-    private int GetPercentageValue(Pipelines.Pools.PoolComponent pool, double poolMaxValue)
-    {
-        if (!Percent)
-            throw new InvalidOperationException(
-                "Using GetValuePercentage() inside non-percent cost! What are you doing ??");
         return (int)Math.Floor(
-            (Math.Clamp(pool.CurrentValue / poolMaxValue, MinValue, MaxValue) - MinValue) * poolMaxValue / Step);
+            (Math.Clamp(pool.CurrentValue, MinValue, MaxValue ?? double.MaxValue) - MinValue) / Step);
     }
 }

@@ -1,16 +1,9 @@
-using System;
-using System.Collections.Generic;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
+#nullable enable
+using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.EffectSystem;
 
 public interface ISupportsEffects
 {
-    IEnumerable<IModifierProvider> AttachedEffects { get; }
-    bool ApplyEffect(StatusEffectApplicationContext ctx);
-    bool RemoveEffect(StatusEffectRemovalContext ctx);
-    event EventHandler<StatusEffectApplicationContext> EffectApplySuccess;
-    event EventHandler<StatusEffectApplicationContext> EffectApplyFailure;
-    event EventHandler<StatusEffectRemovalContext> EffectRemoveSuccess;
-    event EventHandler<StatusEffectRemovalContext> EffectRemoveFailure;
+    EffectContainer Effects { get; }
 }

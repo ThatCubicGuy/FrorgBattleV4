@@ -1,127 +1,61 @@
-#nullable enable
 using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.BattleSystem.Actions;
-using FrogBattleV4.Core.Pipelines.Pools;
-using FrogBattleV4.Core.EffectSystem;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
-using FrogBattleV4.Core.EffectSystem.PassiveEffects;
-using FrogBattleV4.Core.EffectSystem.StatusEffects;
-using FrogBattleV4.Core.Pipelines;
+using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.Calculation.Pools;
+using FrogBattleV4.Core.DamageSystem;
 
 namespace FrogBattleV4.Core;
 
-public abstract class BattleMember : ITakesTurns, IHasPools, ISupportsEffects
+public class BattleMember : IBattleMember
 {
-    private readonly List<StatusEffectInstance> _activeEffects = [];
-    private readonly List<PassiveEffectDefinition> _passiveEffects = [];
-    private readonly Dictionary<PoolId, PoolComponent> _pools = new();
-    private readonly Dictionary<StatId, double> _baseStats = new();
-
-    public event EventHandler<StatusEffectApplicationContext>? EffectApplySuccess;
-    public event EventHandler<StatusEffectApplicationContext>? EffectApplyFailure;
-    public event EventHandler<StatusEffectRemovalContext>? EffectRemoveSuccess;
-    public event EventHandler<StatusEffectRemovalContext>? EffectRemoveFailure;
-
-    protected BattleMember()
+    [NotNull] public required string Name { get; init; }
+    [NotNull] public required ITargetable Hitbox { get; init; }
+    [NotNull] public required IEnumerable<IAction> Turns { get; init; } = [];
+    [NotNull] public IEnumerable<AbilityDefinition> Abilities { get; init; } = [];
+    public void TakeDamage(DamageResult dmg)
     {
-        Pools = new ReadOnlyDictionary<PoolId, PoolComponent>(_pools);
-        BaseStats = new ReadOnlyDictionary<StatId, double>(_baseStats);
+        var pool = this.GetPoolsByTag(PoolTag.AbsorbsDamage).LastOrDefault() ??
+                   this.GetPoolsByTag(PoolTag.UsedForLife).LastOrDefault() ??
+                   throw new NotSupportedException("You are not able to damage this member.");
+        pool.CurrentValue -= dmg.Amount;
     }
 
-    [NotNull] public string? Name { get; protected init; }
-    [NotNull] public IEnumerable<IAction> Turns { get; protected init; } = [];
+    [NotNull] public required FrozenDictionary<StatId, double> BaseStats { get; init; }
 
-    [NotNull] public ITargetable Hitbox { get; init; }
-    [NotNull] public IReadOnlyDictionary<StatId, double> BaseStats { get; }
-    [NotNull] public IReadOnlyDictionary<PoolId, PoolComponent> Pools { get; }
-
-    protected void SetStats(IDictionary<StatId, double> dict)
-    {
-        foreach (var pair in dict)
-        {
-            _baseStats[pair.Key] = pair.Value;
-        }
-    }
-    public bool AddPool(PoolComponent pool) => _pools.TryAdd(pool.Id, pool);
-    public bool RemovePool(PoolId poolId) => _pools.Remove(poolId);
-
-    [NotNull] public IEnumerable<IModifierProvider> AttachedEffects =>
-        _passiveEffects.Concat<IModifierProvider>(_activeEffects);
-    [NotNull] protected IEnumerable<StatusEffectInstance> ActiveEffects => _activeEffects;
-
-    [NotNull] public IEnumerable<PassiveEffectDefinition> PassiveEffects
-    {
-        protected get => _passiveEffects;
-        init => _passiveEffects = value.ToList();
-    }
-
-    protected void ForceAddActive(StatusEffectInstance effect) => _activeEffects.Add(effect);
-    protected void ForceRemoveActive(StatusEffectInstance effect) => _activeEffects.Remove(effect);
-    protected void ForceAddPassive(PassiveEffectDefinition passive) => _passiveEffects.Add(passive);
-    protected void ForceRemovePassive(PassiveEffectDefinition passive) => _passiveEffects.Remove(passive);
-
-    public bool ApplyEffect(StatusEffectApplicationContext ctx)
-    {
-        if (ctx.ComputeTotalChance() < ctx.Rng.NextDouble())
-        {
-            EffectApplyFailure?.Invoke(this, ctx);
-            return false;
-        }
-
-        EffectApplySuccess?.Invoke(this, ctx);
-
-        var item = _activeEffects.FirstOrDefault(se => se.Definition == ctx.Definition);
-
-        if (item is null)
-        {
-            _activeEffects.Add(new StatusEffectInstance(ctx));
-            foreach (var mutator in ctx.Definition.Mutators)
-            {
-                mutator.OnApply(ctx);
-            }
-
-            return true;
-        }
-
-        item.Stacks += ctx.InitialStacks;
-        item.Turns = ctx.InitialTurns;
-
-        return true;
-    }
-
-    public bool RemoveEffect(StatusEffectRemovalContext ctx)
-    {
-        var item = _activeEffects.First(ctx.Query.Invoke);
-        if (ctx.Rng.NextDouble() < ctx.RemovalChance && _activeEffects.Remove(item))
-        {
-            EffectRemoveSuccess?.Invoke(this, ctx);
-        }
-
-        EffectRemoveFailure?.Invoke(this, ctx);
-        return false;
-    }
+    [NotNull] public EffectContainer Effects { get; } = new();
+    // ReSharper disable once UseCollectionExpression cuz cmon
+    [NotNull] public PoolContainer Pools { get; } = new();
 }
 
-public static class BattleMemberExtensions
+#nullable enable
+/// <summary>
+/// Linked battle member with optional stats. Anything initialized is used,
+/// otherwise parent's stats are used.
+/// </summary>
+/// <param name="parent">Member whose stats this one falls back on if they're missing.</param>
+public class LinkedBattleMember(string name, IBattleMember parent) : IBattleMember
 {
-    /// <summary>
-    /// Gets the team of which this BattleMember is a part of, or null if it is not part of them.
-    /// </summary>
-    /// <param name="member">The member whose team to find.</param>
-    /// <param name="teams">A list of teams to look through for the allied team.</param>
-    /// <returns>The team which contains the given member.</returns>
-    /// <exception cref="ArgumentNullException">member or list of teams is null.</exception>
-    /// <exception cref="System.InvalidOperationException">The battle member is part of
-    /// more than one of the given teams.</exception>
-    public static Team? GetAlliedTeam(this BattleMember member, IEnumerable<Team> teams)
-    {
-        ArgumentNullException.ThrowIfNull(member);
-        ArgumentNullException.ThrowIfNull(teams);
-        return teams.SingleOrDefault(team => team.Members.Contains(member));
-    }
+    public string Name { get; } = name;
+    public IBattleMember Parent { get; } = parent;
+    public IEnumerable<IAction>? OwnTurns { get; init; }
+    public ITargetable? OwnHitbox { get; init; }
+    public EffectContainer? OwnEffects { get; init; }
+    public FrozenDictionary<StatId, double>? OwnBaseStats { get; init; }
+    public PoolContainer? OwnPools { get; init; }
+    public IEnumerable<AbilityDefinition>? OwnAbilities { get; init; }
+
+    IEnumerable<IAction> ITakesTurns.Turns => OwnTurns ?? Parent.Turns;
+    ITargetable IDamageable.Hitbox => OwnHitbox ?? Parent.Hitbox;
+    EffectContainer EffectSystem.ISupportsEffects.Effects => OwnEffects ?? Parent.Effects;
+    FrozenDictionary<StatId, double> IBattleMember.BaseStats => OwnBaseStats ?? Parent.BaseStats;
+    PoolContainer IBattleMember.Pools => OwnPools ?? Parent.Pools;
+    IEnumerable<AbilityDefinition> IHasAbilities.Abilities => OwnAbilities ?? Parent.Abilities;
+    // Unsure how to go about making a method optional in data driven code...
+    void IDamageable.TakeDamage(DamageResult dmg) => Parent.TakeDamage(dmg);
 }

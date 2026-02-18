@@ -1,26 +1,25 @@
-#nullable enable
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using FrogBattleV4.Core.EffectSystem.Modifiers;
 using FrogBattleV4.Core.EffectSystem.StatusEffects;
 
 namespace FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
 
 public class StatusEffectCondition : IConditionComponent
 {
-    [NotNull] public required StatusEffectQuery Query { get; init; }
-    public required ConditionDirection Direction { get; init; }
+    [NotNull] public required System.Func<StatusEffectInstance, bool> Query { get; init; }
+    public required CalcDirection Direction { get; init; }
+    public bool SumStacks { get; init; }
 
     [Pure]
     public int GetContribution(ModifierContext ctx)
     {
         return (Direction switch
         {
-            ConditionDirection.Self => ctx.Actor,
-            ConditionDirection.Other => ctx.Other,
+            CalcDirection.Self => ctx.Actor,
+            CalcDirection.Other => ctx.Other,
             _ => null
-        })?.AttachedEffects.OfType<StatusEffectInstance>().Where(Query.Invoke).Sum(sei => sei.Stacks) ?? 0;
+        })?.Effects.OfType<StatusEffectInstance>().Where(Query).Sum(sei => SumStacks? sei.Stacks : 1) ?? 0;
     }
 }
-
-public delegate bool StatusEffectQuery(StatusEffectInstance eff);

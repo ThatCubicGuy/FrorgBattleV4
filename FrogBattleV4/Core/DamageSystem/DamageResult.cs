@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Contexts;
-using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.DamageSystem;
 

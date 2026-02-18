@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.DamageSystem;
-using FrogBattleV4.Core.Pipelines;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Attacks;
 

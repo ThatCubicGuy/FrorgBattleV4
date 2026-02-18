@@ -8,7 +8,7 @@ public struct AbilityTargetingContext
     /// <summary>
     /// The target of this hit.
     /// </summary>
-    [NotNull] public required BattleMember Target { get; init; }
+    [NotNull] public required IBattleMember Target { get; init; }
     /// <summary>
     /// The targeting that we are going to use to attack this member.
     /// </summary>

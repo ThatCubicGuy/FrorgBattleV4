@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.Pipelines;
+using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
 

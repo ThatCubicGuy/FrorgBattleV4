@@ -22,7 +22,7 @@ public abstract class ModifierRule
 /// <typeparam name="TQuery">Type of the handled queries.</typeparam>
 public abstract class ModifierRule<TQuery> : ModifierRule where TQuery : struct
 {
-    public ModifierDirection Direction { get; init; } = ModifierDirection.Actor;
+    public CalcDirection Direction { get; init; } = CalcDirection.Self;
     [Pure]
     protected abstract bool AppliesToQuery(TQuery query);
 
@@ -46,12 +46,12 @@ public abstract class MutModifierRule<TQuery> : ModifierRule<TQuery> where TQuer
     };
 }
 
-public enum ModifierDirection
+public enum CalcDirection
 {
     /// <summary>
     /// Things that affect the holder as an actor.
     /// </summary>
-    Actor,
+    Self,
     /// <summary>
     /// Things that affect the other as an actor.
     /// </summary>

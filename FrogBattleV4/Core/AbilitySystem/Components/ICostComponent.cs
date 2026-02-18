@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using FrogBattleV4.Core.Calculation.Pools;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components;
 
@@ -10,5 +11,5 @@ public interface ICostComponent
     /// </summary>
     /// <param name="ctx">Context in which to get the base cost.</param>
     /// <returns>Base cost request.</returns>
-    [Pure] IEnumerable<Pipelines.Pools.MutationIntent> GetCostRequests(AbilityExecContext ctx);
+    [Pure] IEnumerable<MutationIntent> GetCostRequests(AbilityExecContext ctx);
 }

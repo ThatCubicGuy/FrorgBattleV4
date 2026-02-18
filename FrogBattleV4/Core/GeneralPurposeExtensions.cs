@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace FrogBattleV4.Core;
 
-public static class GeneralPurposeExtensions
+public static class StringExtensions
 {
     public static string ToSnakeCase(this string input)
     {
@@ -20,10 +20,16 @@ public static class GeneralPurposeExtensions
         return string.Join('_', input.Words().Select(s => s.ToUpper()));
     }
 
+    /// <summary>
+    /// Splits the given string into words as best it can.
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
     private static List<string> Words(this string input)
     {
         var result = new List<string>();
         // Check if the string is in all caps before splitting every letter
+        var caps = !input.Any(char.IsLower);
         var allCaps = string.Equals(input, input.ToUpperInvariant());
         while (!string.IsNullOrWhiteSpace(input))
         {
@@ -42,5 +48,40 @@ public static class GeneralPurposeExtensions
         input = string.Concat(input[word.Length..].SkipWhile(c => !char.IsLetter(c)));
 
         return word;
+    }
+}
+
+public static class DoubleExtensions
+{
+    /// <summary>
+    /// Determines whether the value given is contained within an inclusive interval.
+    /// </summary>
+    /// <remarks>
+    /// Null is treated as a lack of limit - thus, any value
+    /// is contained within an interval of null and null.
+    /// </remarks>
+    /// <param name="value">The value to check.</param>
+    /// <param name="min">The inclusive lower bound of the interval.</param>
+    /// <param name="max">The inclusive upper bound of the interval.</param>
+    /// <returns>True if the given value is contained in the interval, false otherwise.</returns>
+    public static bool IsWithinRange(this double value, double? min, double? max)
+    {
+        return (!min.HasValue || min.Value <= value) && (!max.HasValue || value <= max.Value);
+    }
+
+    /// <summary>
+    /// Determines whether the value given is contained within an exclusive interval.
+    /// </summary>
+    /// <remarks>
+    /// Null is treated as a lack of limit - thus, any value
+    /// is contained within an interval of null and null.
+    /// </remarks>
+    /// <param name="value">The value to check.</param>
+    /// <param name="min">The exclusive lower bound of the interval.</param>
+    /// <param name="max">The exclusive upper bound of the interval.</param>
+    /// <returns>True if the given value is contained in the interval, false otherwise.</returns>
+    public static bool IsWithinRangeExclusive(this double value, double? min, double? max)
+    {
+        return (!min.HasValue || min.Value < value) && (!max.HasValue || value < max.Value);
     }
 }

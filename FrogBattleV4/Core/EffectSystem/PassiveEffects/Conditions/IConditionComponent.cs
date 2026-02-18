@@ -14,9 +14,3 @@ public interface IConditionComponent
     [Pure]
     int GetContribution(ModifierContext ctx);
 }
-
-public enum ConditionDirection
-{
-    Self,
-    Other
-}

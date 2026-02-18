@@ -10,7 +10,7 @@ namespace FrogBattleV4.Core.DamageSystem;
 /// </summary>
 public readonly struct DamageExecContext
 {
-    public required BattleMember? Source { get; init; }
+    public required IBattleMember? Source { get; init; }
     public required AbilityDefinition? Definition { get; init; }
     [NotNull] public required Random Rng { get; init; }
 }

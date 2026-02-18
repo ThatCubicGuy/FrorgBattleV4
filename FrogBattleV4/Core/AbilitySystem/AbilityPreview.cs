@@ -1,6 +1,6 @@
 #nullable enable
 using FrogBattleV4.Core.AbilitySystem.Components;
-using FrogBattleV4.Core.Pipelines.Pools;
+using FrogBattleV4.Core.Calculation.Pools;
 using FrogBattleV4.Core.DamageSystem;
 
 namespace FrogBattleV4.Core.AbilitySystem;

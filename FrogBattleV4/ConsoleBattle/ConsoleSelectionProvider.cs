@@ -9,7 +9,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
 {
     public async Task<ISelectionResult<TResult>> GetSelectionAsync<TResult>(ISelectionRequest<TResult> request)
     {
-        return (ISelectionResult<TResult>)(request switch
+        return request.Select(request switch
         {
             AbilitySelectionRequest ab => await GetAbilitySelectionAsync(ab),
             TargetSelectionRequest tg => await GetTargetSelectionAsync(tg),
@@ -17,7 +17,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
         });
     }
 
-    private static async Task<ISelectionResult> GetAbilitySelectionAsync(AbilitySelectionRequest request)
+    private static async Task<int> GetAbilitySelectionAsync(AbilitySelectionRequest request)
     {
         while (true)
         {
@@ -36,7 +36,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
 
                 return selection < 0 || selection >= request.ValidOptions.Count()
                     ? throw new IndexOutOfRangeException(nameof(selection))
-                    : request.Select(selection);
+                    : selection;
             }
             catch (Exception ex)
             {
@@ -49,7 +49,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
         }
     }
 
-    private static async Task<ISelectionResult> GetTargetSelectionAsync(TargetSelectionRequest request)
+    private static async Task<int> GetTargetSelectionAsync(TargetSelectionRequest request)
     {
         while (true)
         {
@@ -59,7 +59,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
                 if (int.TryParse(await Task.Run(Console.ReadLine), out var selection) &&
                     selection >= 0 && selection < request.ValidOptions.Count())
                 {
-                    return request.Select(selection);
+                    return selection;
                 }
 
                 await Console.Out.WriteLineAsync("Invalid target number!");

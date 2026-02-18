@@ -10,7 +10,7 @@ public class BounceTargeting(TargetingType type) : ITargetingComponent
 
     public IEnumerable<AbilityTargetingContext> SelectTargets(AbilityExecContext ctx)
     {
-        var targets = Enumerable.Empty<BattleMember>();
+        var targets = Enumerable.Empty<IBattleMember>();
         for (var i = 0; i < Count; i++)
         {
             targets = targets.Append(ctx.ValidTargets.MinBy(_ => ctx.Rng.NextDouble()));
