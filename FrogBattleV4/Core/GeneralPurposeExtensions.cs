@@ -1,21 +1,22 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace FrogBattleV4.Core;
 
 public static class StringExtensions
 {
-    public static string ToSnakeCase(this string input)
+    public static string ToSnakeCase([NotNull] this string input)
     {
         return string.Join('_', input.Words().Select(s => s.ToLower()));
     }
 
-    public static string ToPascalCase(this string input)
+    public static string ToPascalCase([NotNull] this string input)
     {
         return string.Concat(input.Words().Select(s => char.ToUpper(s[0]) + s[1..].ToLower()));
     }
 
-    public static string ToScreamingSnakeCase(this string input)
+    public static string ToScreamingSnakeCase([NotNull] this string input)
     {
         return string.Join('_', input.Words().Select(s => s.ToUpper()));
     }
@@ -25,7 +26,7 @@ public static class StringExtensions
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    private static List<string> Words(this string input)
+    private static List<string> Words([NotNull] this string input)
     {
         var result = new List<string>();
         // Check if the string is in all caps before splitting every letter
@@ -39,7 +40,7 @@ public static class StringExtensions
         return result;
     }
 
-    private static string NextWord(ref string input, bool allCaps)
+    private static string NextWord([NotNull] ref string input, bool allCaps)
     {
         // Take the next complete word
         var word = input[0] + string.Concat(input.Skip(1).TakeWhile(allCaps ? char.IsLetter : char.IsLower));

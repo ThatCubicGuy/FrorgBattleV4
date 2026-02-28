@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
@@ -16,7 +15,7 @@ public interface IBattleMember : ITakesTurns, DamageSystem.IDamageable, IHasAbil
     [NotNull] string Name { get; }
     [NotNull] EffectContainer Effects { get; }
     [NotNull] PoolContainer Pools { get; }
-    [NotNull] FrozenDictionary<StatId, double> BaseStats { get; }
+    [NotNull] StatContainer BaseStats { get; }
 }
 
 public static class BattleMemberExtensions

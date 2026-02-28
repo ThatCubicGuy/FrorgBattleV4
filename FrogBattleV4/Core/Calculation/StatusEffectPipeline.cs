@@ -9,21 +9,23 @@ internal static class StatusEffectPipeline
     /// <summary>
     /// Calculates the total chance of applying an effect in this context.
     /// </summary>
-    /// <param name="statusEffect">The status effect context to apply.</param>
+    /// <param name="cmd">The status effect command to apply.</param>
     /// <returns>Final application chance value.</returns>
     /// <exception cref="InvalidEnumArgumentException">Chance type is invalid.</exception>
     [Pure]
-    public static double ComputeTotalChance(this StatusEffectApplicationContext statusEffect)
+    public static double ComputeTotalChance(this ApplyEffectCommand cmd)
     {
-        var baseCtx = new ModifierContext(statusEffect.Source, statusEffect.Target);
-        var revCtx = new ModifierContext(baseCtx.Other, baseCtx.Actor);
-        return statusEffect.ChanceType switch
+        var outCtx = new ModifierContext(cmd.EffectSource, cmd.Target);
+        var inCtx = new ModifierContext(cmd.Target, cmd.EffectSource);
+        return cmd.ChanceType switch
         {
-            ChanceType.Fixed => statusEffect.ApplicationChance,
-            ChanceType.Base => statusEffect.ApplicationChance +
-                               baseCtx.ComputeStat(StatId.EffectHitRate) -
-                               revCtx.ComputeStat(StatId.EffectRes),
-            _ => throw new InvalidEnumArgumentException($"Invalid chance type: {statusEffect.ChanceType}")
+            ChanceType.Fixed => cmd.ApplicationChance,
+            ChanceType.Base => cmd.ApplicationChance +
+                               new StatQuery(StatId.EffectHitRate).Compute(
+                                   cmd.EffectSource.BaseStats[StatId.EffectHitRate]
+                                   + cmd.ApplicationChance, outCtx) -
+                               inCtx.ComputeStat(StatId.EffectRes),
+            _ => throw new InvalidEnumArgumentException($"Invalid chance type: {cmd.ChanceType}")
         };
     }
 }

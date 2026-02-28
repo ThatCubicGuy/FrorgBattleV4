@@ -6,14 +6,15 @@ using FrogBattleV4.Core.Calculation.Pools;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Costs;
 
-public record ConditionalCost(
-    [NotNull] Predicate<AbilityExecContext> Condition,
-    [NotNull] ICostComponent CostIfTrue,
-    ICostComponent CostIfFalse = null) : ICostComponent
+public class ConditionalCost : CostComponent
 {
+    [NotNull] public required Func<AbilityExecContext, bool> Predicate { get; init; }
+    [NotNull] public required CostComponent CostIfTrue { get; init; }
+    public CostComponent CostIfFalse { get; init; }
+
     [Pure]
-    public IEnumerable<MutationIntent> GetCostRequests(AbilityExecContext ctx)
+    public override IEnumerable<MutationCommand> GetCostRequests(AbilityExecContext ctx)
     {
-        return Condition(ctx) ? CostIfTrue.GetCostRequests(ctx) : CostIfFalse?.GetCostRequests(ctx) ?? [];
+        return Predicate(ctx) ? CostIfTrue.GetCostRequests(ctx) : CostIfFalse?.GetCostRequests(ctx) ?? [];
     }
 }

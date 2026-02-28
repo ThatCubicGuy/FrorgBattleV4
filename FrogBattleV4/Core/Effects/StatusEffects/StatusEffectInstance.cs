@@ -4,11 +4,9 @@ using System.Diagnostics.Contracts;
 
 namespace FrogBattleV4.Core.Effects.StatusEffects;
 
-public class StatusEffectInstance(StatusEffectApplicationContext ctx) : ApplicableEffect
+public class StatusEffectInstance(ApplyEffectCommand ctx) : ApplicableEffect
 {
     public StatusEffectDefinition Definition { get; } = ctx.Definition;
-    public IBattleMember Holder { get; } = ctx.Target;
-    public IBattleMember? EffectSource { get; } = ctx.Source;
     public int Turns { get; set; } = ctx.InitialTurns;
     public int Stacks { get; set; } = ctx.AddedStacks;
     public EffectFlags Props { get; init; } = EffectFlags.None;

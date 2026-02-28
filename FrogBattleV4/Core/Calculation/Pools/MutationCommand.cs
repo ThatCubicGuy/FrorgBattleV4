@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using FrogBattleV4.Core.AbilitySystem;
 
 namespace FrogBattleV4.Core.Calculation.Pools;
 
@@ -11,10 +12,10 @@ namespace FrogBattleV4.Core.Calculation.Pools;
 /// <param name="PoolSelector">Selector to extract a pool to mutate from the target.</param>
 /// <param name="BaseAmount">Base amount of the mutation.</param>
 /// <param name="Flags">Mutation flags, such as... immutability of the mutation.</param>
-public record MutationIntent(
+public record MutationCommand(
     double BaseAmount,
     [NotNull] Func<ModifierContext, PoolComponent> PoolSelector,
-    PoolMutationFlags Flags = PoolMutationFlags.None);
+    PoolMutationFlags Flags = PoolMutationFlags.None) : IBattleCommand;
 
 [Flags] public enum PoolMutationFlags
 {

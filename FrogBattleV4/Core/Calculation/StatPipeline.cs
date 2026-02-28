@@ -13,7 +13,7 @@ public static class StatPipeline
             return new StatQuery
             {
                 Stat = stat
-            }.Compute(actor.BaseStats.GetValueOrDefault(stat), ctx);
+            }.Compute(actor.BaseStats[stat], ctx);
         }
 
         System.Diagnostics.Debug.WriteLine($"WARNING: Attempt to compute stat for null actor! (Stat: {stat})");

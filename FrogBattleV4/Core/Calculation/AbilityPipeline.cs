@@ -1,48 +1,43 @@
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using FrogBattleV4.Core.AbilitySystem;
-using FrogBattleV4.Core.DamageSystem;
+using FrogBattleV4.Core.AbilitySystem.Components;
 
 namespace FrogBattleV4.Core.Calculation;
 
 internal static class AbilityPipeline
 {
     [Pure]
+    public static IEnumerable<IBattleCommand> GetCommands(this AbilityExecContext ctx)
+    {
+        return ctx.Definition.Components.OfType<IAbilityCommandComponent>().SelectMany(ac => ac.GetContribution(ctx));
+    }
+
+    [Pure]
     public static AbilityPreview PreviewAbility(this AbilityExecContext ctx)
     {
-        var unmetRequirements = ctx.Definition.Requirements
-            .Where(rc => !rc.IsFulfilled(ctx)).ToArray();
-
-        var costs = ctx.Definition.Costs?
-            .SelectMany(cc => cc.GetCostRequests(ctx))
-            .Select(mi => mi.PreviewMutation(
-                new ModifierContext(ctx.User, ctx.MainTarget))).ToArray();
-
-        var damages = ctx.Definition.Attacks
-            .SelectMany(ac => ac.GetDamageRequests(ctx))
-            .Select(di => di.PreviewDamage(
-                new DamageExecContext
-                {
-                    Source = ctx.User,
-                    Definition = ctx.Definition,
-                    Rng = ctx.Rng,
-                })).ToArray();
+        var commands = ctx.GetCommands().ToArray();
+        var unmetReqs = ctx.Definition.Components
+            .OfType<IAbilityRequirementComponent>()
+            .Where(arc => !arc.IsFulfilled(ctx)).ToArray();
 
         return new AbilityPreview
         {
-            CanUse = ctx.CanExecute(),
-            Mutations = costs,
-            Damages = damages,
-            UnfulfilledRequirements = unmetRequirements
+            CanUse = unmetReqs.Length == 0,
+            Commands = commands,
+            UnfulfilledRequirements = unmetReqs,
         };
     }
 
     public static bool ExecuteAbility(this AbilityExecContext ctx)
     {
-        if (!ctx.CanExecute()) return false;
-        foreach (var mutationIntent in ctx.Definition.Costs.SelectMany(cc => cc.GetCostRequests(ctx)))
+        var preview = ctx.PreviewAbility();
+        if (!preview.CanUse) return false;
+
+        foreach (var command in preview.Commands)
         {
-            mutationIntent.ExecuteMutation(new ModifierContext
+            command.ExecuteCommand(new ModifierContext
             {
                 Actor = ctx.User,
                 Other = ctx.MainTarget,
@@ -51,22 +46,6 @@ internal static class AbilityPipeline
             });
         }
 
-        foreach (var damageIntent in ctx.Definition.Attacks.SelectMany(ac => ac.GetDamageRequests(ctx)))
-        {
-            damageIntent.ExecuteDamage(new DamageExecContext
-            {
-                Source = ctx.User,
-                Definition = ctx.Definition,
-                Rng = ctx.Rng
-            });
-        }
-
         return true;
-    }
-
-    [Pure]
-    private static bool CanExecute(this AbilityExecContext ctx)
-    {
-        return ctx.Definition.Requirements.All(item => item.IsFulfilled(ctx));
     }
 }

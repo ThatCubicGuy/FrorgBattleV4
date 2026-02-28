@@ -1,7 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
 using FrogBattleV4.Core.AbilitySystem.Components;
-using FrogBattleV4.Core.Effects.Modifiers;
 
 namespace FrogBattleV4.Core.AbilitySystem;
 
@@ -34,29 +33,9 @@ public class AbilityDefinition
     public required ITargetingComponent Targeting { get; init; }
 
     /// <summary>
-    /// Prerequisites for casting the ability.
+    /// Every component of the ability.
     /// </summary>
-    public IEnumerable<IRequirementComponent> Requirements { get; init; } = [];
-
-    /// <summary>
-    /// Ability wide modifiers to be included in calculations.
-    /// </summary>
-    public IEnumerable<IModifierProvider> Passives { get; init; } = [];
-
-    /// <summary>
-    /// The costs of the ability, taxed after successful casting.
-    /// </summary>
-    public IEnumerable<ICostComponent> Costs { get; init; } = [];
-
-    /// <summary>
-    /// Every attack that this ability causes in order to damage others.
-    /// </summary>
-    public IEnumerable<IAttackComponent> Attacks { get; init; } = [];
-
-    /// <summary>
-    /// An array of effects that this ability might apply to the targets.
-    /// </summary>
-    public IEnumerable<IEffectComponent> Effects { get; init; } = [];
+    public required IReadOnlyList<IAbilityComponent> Components { get; init; }
 
     #endregion
 }

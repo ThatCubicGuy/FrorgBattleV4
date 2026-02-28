@@ -6,12 +6,20 @@ using FrogBattleV4.Core.Calculation.Pools;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Costs;
 
-public record MultiCost(
-    [NotNull] params ICostComponent[] Costs) : ICostComponent
+public class MultiCost : CostComponent
 {
-    [Pure]
-    public IEnumerable<MutationIntent> GetCostRequests(AbilityExecContext ctx)
+    private readonly List<CostComponent> _costs;
+    
+    [NotNull]
+    public required IEnumerable<CostComponent> Costs
     {
-        return Costs.SelectMany(cc => cc.GetCostRequests(ctx));
+        get => _costs;
+        init => _costs = value.ToList();
+    }
+
+    [Pure]
+    public override IEnumerable<MutationCommand> GetCostRequests(AbilityExecContext ctx)
+    {
+        return _costs.SelectMany(cc => cc.GetCostRequests(ctx));
     }
 }

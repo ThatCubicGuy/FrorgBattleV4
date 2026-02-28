@@ -2,7 +2,7 @@ using System.Diagnostics.Contracts;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components;
 
-public interface IRequirementComponent
+public interface IAbilityRequirementComponent : IAbilityComponent
 {
     /// <summary>
     /// Determines whether the requirement is fulfilled in this context.

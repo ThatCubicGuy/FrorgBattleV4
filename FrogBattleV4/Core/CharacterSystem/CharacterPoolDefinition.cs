@@ -14,7 +14,7 @@ public class CharacterPoolDefinition : IPoolDefinition
     private readonly HashSet<PoolTag> _tags = [];
 
     public required PoolId Id { get; init; }
-    public double InitialPercent { get; init; } = 0;
+    public double InitialPercent { get; init; }
     double IPoolDefinition.GetInitialValue(ModifierContext ctx) => InitialPercent * ctx.ComputeStat(MaxValueStat);
     public required StatId MaxValueStat { get; init; }
     public IEnumerable<PoolTag> Tags

@@ -38,7 +38,7 @@ internal static class ModifierResolver
         return new ModifierContext(ctx.Other, ctx.Actor)
             .ResolveMut(query, MutModifierDirection.Incoming)
             .ApplyTo(ctx
-                    // Resolve outgoing bonuses and penalties for attacker->target
+                // Resolve outgoing bonuses and penalties for attacker->target
                 .ResolveMut(query, MutModifierDirection.Outgoing)
                 .ApplyTo(baseValue));
     }
@@ -60,7 +60,7 @@ internal static class ModifierResolver
             mods += ctx.AggregateMods(actor.Effects, modQuery);
             if (ctx.Ability is { } ability)
             {
-                mods += ctx.AggregateMods(ability.Passives, modQuery);
+                mods += ctx.AggregateMods(ability.Components.OfType<IModifierProvider>(), modQuery);
             }
         }
 
@@ -102,7 +102,7 @@ internal static class ModifierResolver
 
             if (ctx.Ability is { } ability)
             {
-                mods += ctx.AggregateMods(ability.Passives, modQuery);
+                mods += ctx.AggregateMods(ability.Components.OfType<IModifierProvider>(), modQuery);
             }
         }
 
@@ -142,15 +142,12 @@ internal static class ModifierResolver
             Unc(stack + eff.GetContributingModifiers(query, ctx)));
 
         // unc fixing my modifiers :100:
-        ModifierStack Unc(ModifierStack stack)
+        ModifierStack Unc(ModifierStack stack) => type switch
         {
-            return type switch
-            {
-                AggregationType.Positive => stack.AsPositive(),
-                AggregationType.Negative => stack.AsNegative(),
-                _ => stack,
-            };
-        }
+            AggregationType.Positive => stack.AsPositive(),
+            AggregationType.Negative => stack.AsNegative(),
+            _ => stack,
+        };
     }
 
     private enum AggregationType

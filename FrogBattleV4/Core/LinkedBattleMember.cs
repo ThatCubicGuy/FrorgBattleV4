@@ -23,14 +23,14 @@ public class LinkedBattleMember(string name, IBattleMember parent) : IBattleMemb
     public ITargetable? OwnHitbox { get; init; }
     public EffectContainer? OwnEffects { get; init; }
     public PoolContainer? OwnPools { get; init; }
-    public FrozenDictionary<StatId, double>? OwnBaseStats { get; init; }
+    public StatContainer? OwnBaseStats { get; init; }
     public IEnumerable<AbilityDefinition>? OwnAbilities { get; init; }
 
     IEnumerable<ScheduledAction> ITakesTurns.Turns => OwnTurns ?? Parent.Turns;
     ITargetable IDamageable.Hitbox => OwnHitbox ?? Parent.Hitbox;
     EffectContainer IBattleMember.Effects => OwnEffects ?? Parent.Effects;
     PoolContainer IBattleMember.Pools => OwnPools ?? Parent.Pools;
-    FrozenDictionary<StatId, double> IBattleMember.BaseStats => OwnBaseStats ?? Parent.BaseStats;
+    StatContainer IBattleMember.BaseStats => OwnBaseStats ?? Parent.BaseStats;
     IEnumerable<AbilityDefinition> IHasAbilities.Abilities => OwnAbilities ?? Parent.Abilities;
     // Unsure how to go about making a method optional in data driven code...
     void IDamageable.TakeDamage(DamageResult dmg) => Parent.TakeDamage(dmg);

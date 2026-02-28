@@ -1,13 +1,13 @@
-using System;
 using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.AbilitySystem.Components.Requirements;
 
-public record StatRequirement(
-    StatId Stat,
-    double? MinValue = null,
-    double? MaxValue = null) : IRequirementComponent
+public class StatRequirement : IAbilityRequirementComponent
 {
+    public required StatId Stat { get; init; }
+    public double? MinValue { get; init; } = null;
+    public double? MaxValue { get; init; } = null;
+
     public bool IsFulfilled(AbilityExecContext ctx)
     {
         return new ModifierContext

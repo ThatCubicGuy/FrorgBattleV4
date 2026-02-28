@@ -17,7 +17,7 @@ public class EffectContainer : IEnumerable<IModifierProvider>
     private readonly List<StatusEffectInstance> _markedForDeathEffects = [];
 
     public event EventHandler<StatusEffectInstance>? EffectApplySuccess;
-    public event EventHandler<StatusEffectApplicationContext>? EffectApplyFailure;
+    public event EventHandler<ApplyEffectCommand>? EffectApplyFailure;
     public event EventHandler<StatusEffectInstance>? EffectRemoveSuccess;
     public event EventHandler<StatusEffectRemovalContext>? EffectRemoveFailure;
     
@@ -26,7 +26,7 @@ public class EffectContainer : IEnumerable<IModifierProvider>
 
     public void TickStart()
     {
-        var markedForImmediateDeath = new List<StatusEffectInstance>();
+        var markedForImmediateDeath = new List<StatusEffectInstance>(_statusEffects.Count);
 
         foreach (var effect in _statusEffects.Where(effect => !effect.Props.HasFlag(EffectFlags.Infinite)))
         {
@@ -54,30 +54,31 @@ public class EffectContainer : IEnumerable<IModifierProvider>
         _markedForDeathEffects.Clear();
     }
 
-    public bool Apply(StatusEffectApplicationContext ctx)
+    public bool Apply(ApplyEffectCommand cmd)
     {
-        if (ctx.ComputeTotalChance() < ctx.Rng.NextDouble())
+        if (!(cmd.Rng.NextDouble() < cmd.ComputeTotalChance()))
         {
-            EffectApplyFailure?.Invoke(this, ctx);
+            EffectApplyFailure?.Invoke(this, cmd);
             return false;
         }
 
-        var item = _statusEffects.FirstOrDefault(se => se.Definition == ctx.Definition);
+        var item = _statusEffects.FirstOrDefault(se => se.Definition == cmd.Definition);
 
         if (item is null)
         {
-            item = new StatusEffectInstance(ctx);
+            item = new StatusEffectInstance(cmd);
             _statusEffects.Add(item);
             _markedForDeathEffects.Remove(item);
-            foreach (var mutator in ctx.Definition.Mutators)
+            foreach (var mutator in cmd.Definition.Mutators)
             {
-                mutator.OnApply(ctx);
+                mutator.OnApply(cmd);
             }
         }
         else
         {
-            item.Stacks += ctx.AddedStacks;
-            item.Turns = ctx.InitialTurns;
+            item.Stacks += cmd.AddedStacks;
+            item.Turns = cmd.InitialTurns;
+            _markedForDeathEffects.Remove(item);
         }
 
         EffectApplySuccess?.Invoke(this, item);
@@ -86,8 +87,8 @@ public class EffectContainer : IEnumerable<IModifierProvider>
 
     public bool Remove(StatusEffectRemovalContext ctx)
     {
-        var item = _statusEffects.FirstOrDefault(ctx.Query.Invoke);
-        if (!(ctx.Rng.NextDouble() < ctx.RemovalChance) || item is null)
+        var item = _statusEffects.FirstOrDefault(ctx.Query);
+        if (item is null || !(ctx.Rng.NextDouble() < ctx.RemovalChance))
         {
             EffectRemoveFailure?.Invoke(this, ctx);
             return false;
@@ -95,21 +96,17 @@ public class EffectContainer : IEnumerable<IModifierProvider>
 
         if (ctx.RemovedStacks > 0 || ctx.RemovedTurns > 0)
         {
-            _statusEffects.Remove(item);
-        }
-        else
-        {
             item.Stacks -= ctx.RemovedStacks;
             item.Turns -= ctx.RemovedTurns;
             if (item.ShouldRemove()) _statusEffects.Remove(item);
         }
+        else _statusEffects.Remove(item);
 
         EffectRemoveSuccess?.Invoke(this, item);
         return true;
     }
 
     public void AddPassive(PassiveEffectDefinition passiveEffect) => _passiveEffects.Add(passiveEffect);
-    public void RemovePassive(PassiveEffectDefinition passiveEffect) => _passiveEffects.Remove(passiveEffect);
 
     public IEnumerator<IModifierProvider> GetEnumerator() =>
         _statusEffects.Concat<IModifierProvider>(_passiveEffects).GetEnumerator();

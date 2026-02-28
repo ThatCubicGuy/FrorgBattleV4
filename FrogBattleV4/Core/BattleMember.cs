@@ -26,7 +26,7 @@ public class BattleMember : IBattleMember
         pool.CurrentValue -= dmg.Amount;
     }
 
-    [NotNull] public required FrozenDictionary<StatId, double> BaseStats { get; init; }
+    [NotNull] public required StatContainer BaseStats { get; init; }
 
     [NotNull] public EffectContainer Effects { get; } = new();
     // ReSharper disable once UseCollectionExpression cuz cmon

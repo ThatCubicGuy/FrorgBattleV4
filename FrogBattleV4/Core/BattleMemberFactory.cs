@@ -52,6 +52,18 @@ public static class BattleMemberFactory
             return this;
         }
 
+        public CharacterBuilder BaseStatOverrides([NotNull] params KeyValuePair<StatId, double>[] stats)
+        {
+            _createOptions.BaseStatOverrides = stats.ToDictionary();
+            return this;
+        }
+
+        public CharacterBuilder BaseStatOverrides([NotNull] params (StatId, double)[] stats)
+        {
+            _createOptions.BaseStatOverrides = stats.ToDictionary();
+            return this;
+        }
+
         public CharacterBuilder Pools([NotNull] params IPoolDefinition[] pools)
         {
             _createOptions.Pools = pools;
@@ -116,7 +128,7 @@ public static class BattleMemberFactory
             var character = new BattleMember
             {
                 Name = _createOptions.Name,
-                BaseStats = stats.ToFrozenDictionary(),
+                BaseStats = new StatContainer(stats),
                 Hitbox = new HumanoidHitbox
                 {
                     Floating = false,

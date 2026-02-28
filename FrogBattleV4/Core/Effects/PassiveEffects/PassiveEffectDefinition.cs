@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.Effects.PassiveEffects.Conditions;
 
 namespace FrogBattleV4.Core.Effects.PassiveEffects;

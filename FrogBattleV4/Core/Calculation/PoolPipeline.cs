@@ -12,7 +12,7 @@ public static class PoolPipeline
     /// <param name="ctx">Context in which to calculate mutation.</param>
     /// <returns>A mutation result previewing how the pool would mutate.</returns>
     [Pure]
-    public static MutationResult PreviewMutation(this MutationIntent mut, ModifierContext ctx)
+    public static MutationResult PreviewMutation(this MutationCommand mut, ModifierContext ctx)
     {
         var pool = mut.PoolSelector(ctx);
         var finalAmount = new PoolMutQuery
@@ -24,7 +24,7 @@ public static class PoolPipeline
         // TODO: Figure out "Allowed" logic, if it even makes any sense
     }
 
-    public static void ExecuteMutation(this MutationIntent req, ModifierContext ctx)
+    public static void ExecuteMutation(this MutationCommand req, ModifierContext ctx)
     {
         var result = req.PreviewMutation(ctx);
         result.ResultTarget.CurrentValue -= result.FinalDeltaValue;
