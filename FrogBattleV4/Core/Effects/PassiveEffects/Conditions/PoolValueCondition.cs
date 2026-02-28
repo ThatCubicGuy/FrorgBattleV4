@@ -2,9 +2,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.Calculation;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
+using FrogBattleV4.Core.Effects.Modifiers;
 
-namespace FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
+namespace FrogBattleV4.Core.Effects.PassiveEffects.Conditions;
 
 public class PoolValueCondition : IConditionComponent
 {

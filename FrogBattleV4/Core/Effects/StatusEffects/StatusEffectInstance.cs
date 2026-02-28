@@ -2,12 +2,12 @@
 using System;
 using System.Diagnostics.Contracts;
 
-namespace FrogBattleV4.Core.EffectSystem.StatusEffects;
+namespace FrogBattleV4.Core.Effects.StatusEffects;
 
 public class StatusEffectInstance(StatusEffectApplicationContext ctx) : ApplicableEffect
 {
     public StatusEffectDefinition Definition { get; } = ctx.Definition;
-    public ISupportsEffects Holder { get; } = ctx.Target;
+    public IBattleMember Holder { get; } = ctx.Target;
     public IBattleMember? EffectSource { get; } = ctx.Source;
     public int Turns { get; set; } = ctx.InitialTurns;
     public int Stacks { get; set; } = ctx.AddedStacks;

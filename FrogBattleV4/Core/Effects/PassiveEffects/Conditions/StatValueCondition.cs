@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.Calculation;
 
-namespace FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
+namespace FrogBattleV4.Core.Effects.PassiveEffects.Conditions;
 
 public class StatValueCondition : IConditionComponent
 {

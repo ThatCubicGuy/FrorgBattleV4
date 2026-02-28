@@ -1,7 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using FrogBattleV4.Core.AbilitySystem.Components;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
+using FrogBattleV4.Core.Effects.Modifiers;
 
 namespace FrogBattleV4.Core.AbilitySystem;
 

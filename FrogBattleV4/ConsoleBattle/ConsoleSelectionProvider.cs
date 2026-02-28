@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using FrogBattleV4.Core.BattleSystem.Selections;
+using FrogBattleV4.Core.Combat.Selections;
 
 namespace FrogBattleV4.ConsoleBattle;
 

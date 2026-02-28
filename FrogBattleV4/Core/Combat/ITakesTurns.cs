@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using FrogBattleV4.Core.BattleSystem.Actions;
+using FrogBattleV4.Core.Combat.Actions;
 
-namespace FrogBattleV4.Core.BattleSystem;
+namespace FrogBattleV4.Core.Combat;
 
 public interface ITakesTurns
 {
@@ -10,5 +10,5 @@ public interface ITakesTurns
     /// Turns that this IBattleMember may take during the battle.
     /// They appear on the actionbar.
     /// </summary>
-    [NotNull] IEnumerable<IAction> Turns { get; }
+    [NotNull] IEnumerable<ScheduledAction> Turns { get; }
 }

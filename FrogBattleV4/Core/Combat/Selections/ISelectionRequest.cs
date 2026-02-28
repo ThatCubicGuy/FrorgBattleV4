@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace FrogBattleV4.Core.BattleSystem.Selections;
+namespace FrogBattleV4.Core.Combat.Selections;
 
 public interface ISelectionRequest<out TResult>
 {

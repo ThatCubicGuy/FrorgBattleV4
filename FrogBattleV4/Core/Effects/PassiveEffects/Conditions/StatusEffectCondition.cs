@@ -1,10 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
-using FrogBattleV4.Core.EffectSystem.StatusEffects;
+using FrogBattleV4.Core.Effects.Modifiers;
+using FrogBattleV4.Core.Effects.StatusEffects;
 
-namespace FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
+namespace FrogBattleV4.Core.Effects.PassiveEffects.Conditions;
 
 public class StatusEffectCondition : IConditionComponent
 {

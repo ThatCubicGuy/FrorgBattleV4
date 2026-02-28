@@ -5,9 +5,9 @@ namespace FrogBattleV4.Core.Calculation;
 public readonly record struct DamageType([NotNull] string Type)
 {
     /// <summary>
-    /// Unique ID of the damage type. Automatically converted into snake case.
+    /// Unique ID of the damage type. Automatically converted into pascal case.
     /// </summary>
-    [NotNull] public string Type { get; private init; } = Type.ToSnakeCase();
+    [NotNull] public string Type { get; private init; } = Type.ToPascalCase();
 
     public override string ToString() => Type;
 

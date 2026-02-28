@@ -1,4 +1,4 @@
-namespace FrogBattleV4.Core.BattleSystem;
+namespace FrogBattleV4.Core.Combat;
 
 /// <summary>
 /// Custom enum with a payload.

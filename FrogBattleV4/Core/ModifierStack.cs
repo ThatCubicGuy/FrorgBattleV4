@@ -11,18 +11,17 @@ namespace FrogBattleV4.Core;
 // OUT OF MODIFIER STACKS
 // AND COMPUTE THE BEST POSSIBLE COMBINATION OF THEM ???
 // I CAN * APPLY * LINEAR ALGEBRA ???
-public struct ModifierStack()
+public record ModifierStack(
+    double AddValue = 0,
+    double AddBasePercent = 0,
+    double MultiplyTotal = 1,
+    double Minimum = double.MinValue,
+    double Maximum = double.MaxValue)
 {
-    public double AddValue { get; set; } = 0;
-    public double AddBasePercent { get; set; } = 0;
-    public double MultiplyTotal { get; set; } = 1;
-    public double Minimum { get; set; } = double.MinValue;
-    public double Maximum { get; set; } = double.MaxValue;
-
     public double this[ModifierOperation operation]
     {
         get => this[(int)operation];
-        set => this[(int)operation] = value;
+        init => this[(int)operation] = value;
     }
 
     private double this[int index]
@@ -36,7 +35,7 @@ public struct ModifierStack()
             4 => Maximum,
             _ => throw new IndexOutOfRangeException($"Invalid ModifierOperation! ({index})")
         };
-        set
+        init
         {
             switch (index)
             {
@@ -74,17 +73,14 @@ public struct ModifierStack()
     /// </summary>
     /// <returns>A new ModifierStack.</returns>
     [Pure]
-    public ModifierStack AsPositive()
+    public ModifierStack AsPositive() => new()
     {
-        return new ModifierStack
-        {
-            AddValue = Math.Max(0, AddValue),
-            AddBasePercent = Math.Max(0, AddBasePercent),
-            MultiplyTotal = Math.Max(1, MultiplyTotal),
-            Minimum = Minimum,
-            Maximum = Maximum,
-        };
-    }
+        AddValue = Math.Max(0, AddValue),
+        AddBasePercent = Math.Max(0, AddBasePercent),
+        MultiplyTotal = Math.Max(1, MultiplyTotal),
+        Minimum = Minimum,
+        Maximum = Maximum,
+    };
 
     /// <summary>
     /// Returns a copy of this ModifierStack where
@@ -92,17 +88,14 @@ public struct ModifierStack()
     /// </summary>
     /// <returns>A new ModifierStack.</returns>
     [Pure]
-    public ModifierStack AsNegative()
+    public ModifierStack AsNegative() => new()
     {
-        return new ModifierStack
-        {
-            AddValue = Math.Min(0, AddValue),
-            AddBasePercent = Math.Min(0, AddBasePercent),
-            MultiplyTotal = Math.Min(1, MultiplyTotal),
-            Minimum = Minimum,
-            Maximum = Maximum,
-        };
-    }
+        AddValue = Math.Min(0, AddValue),
+        AddBasePercent = Math.Min(0, AddBasePercent),
+        MultiplyTotal = Math.Min(1, MultiplyTotal),
+        Minimum = Minimum,
+        Maximum = Maximum,
+    };
 
     public override string ToString()
     {
@@ -120,17 +113,14 @@ public struct ModifierStack()
     /// <param name="right">The second mod to add to the first.</param>
     /// <returns>A new modifier with the combined values.</returns>
     [Pure]
-    public static ModifierStack operator +(ModifierStack left, ModifierStack right)
+    public static ModifierStack operator +(ModifierStack left, ModifierStack right) => new()
     {
-        left.AddValue += right.AddValue;
-        left.AddBasePercent += right.AddBasePercent;
-        left.MultiplyTotal *= right.MultiplyTotal;
-
-        left.Minimum = Math.Max(left.Minimum, right.Minimum);
-        left.Maximum = Math.Min(left.Maximum, right.Maximum);
-
-        return left;
-    }
+        AddValue = left.AddValue + right.AddValue,
+        AddBasePercent = left.AddBasePercent + right.AddBasePercent,
+        MultiplyTotal = left.MultiplyTotal * right.MultiplyTotal,
+        Minimum = Math.Max(left.Minimum, right.Minimum),
+        Maximum = Math.Min(left.Maximum, right.Maximum),
+    };
 
     /// <summary>
     /// Multiplies a modifier stack by a scalar.
@@ -139,15 +129,13 @@ public struct ModifierStack()
     /// <param name="scalar">Real value to scale by.</param>
     /// <returns>A scaled modifier result.</returns>
     [Pure]
-    public static ModifierStack operator *(ModifierStack mod, int scalar)
+    public static ModifierStack operator *(ModifierStack mod, int scalar) => new()
     {
-        mod.AddValue *= scalar;
-        mod.AddBasePercent *= scalar;
-        mod.MultiplyTotal = Math.Pow(mod.MultiplyTotal, scalar);
-
+        AddValue = mod.AddValue * scalar,
+        AddBasePercent = mod.AddBasePercent * scalar,
+        MultiplyTotal = Math.Pow(mod.MultiplyTotal, scalar),
         // Completely clueless as to how I'd modify min/max by a scalar... 
-        return mod;
-    }
+    };
 
     /// <summary>
     /// Multiplies a modifier stack by a scalar.

@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.EffectSystem;
+using FrogBattleV4.Core.Effects;
 
 namespace FrogBattleV4.Core.Calculation;
 
@@ -15,7 +15,7 @@ internal static class StatusEffectPipeline
     [Pure]
     public static double ComputeTotalChance(this StatusEffectApplicationContext statusEffect)
     {
-        var baseCtx = new ModifierContext(statusEffect.Source, statusEffect.Target as IBattleMember);
+        var baseCtx = new ModifierContext(statusEffect.Source, statusEffect.Target);
         var revCtx = new ModifierContext(baseCtx.Other, baseCtx.Actor);
         return statusEffect.ChanceType switch
         {

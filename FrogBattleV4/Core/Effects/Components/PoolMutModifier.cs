@@ -1,7 +1,7 @@
 using FrogBattleV4.Core.Calculation;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
+using FrogBattleV4.Core.Effects.Modifiers;
 
-namespace FrogBattleV4.Core.EffectSystem.Components;
+namespace FrogBattleV4.Core.Effects.Components;
 
 public class PoolMutModifier : MutModifierRule<PoolMutQuery>
 {

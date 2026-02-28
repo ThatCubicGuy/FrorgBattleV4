@@ -3,10 +3,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using FrogBattleV4.Core.EffectSystem;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
-using FrogBattleV4.Core.EffectSystem.PassiveEffects;
-using FrogBattleV4.Core.EffectSystem.StatusEffects;
+using FrogBattleV4.Core.Effects;
+using FrogBattleV4.Core.Effects.Modifiers;
+using FrogBattleV4.Core.Effects.PassiveEffects;
+using FrogBattleV4.Core.Effects.StatusEffects;
 
 namespace FrogBattleV4.Core.Calculation;
 

@@ -1,8 +1,8 @@
 #nullable enable
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
+using FrogBattleV4.Core.Effects.Modifiers;
 
-namespace FrogBattleV4.Core.EffectSystem;
+namespace FrogBattleV4.Core.Effects;
 
 /// <summary>
 /// Encapsulates an effect that may be applied to a battle member.

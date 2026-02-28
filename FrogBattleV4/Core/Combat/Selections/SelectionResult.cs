@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace FrogBattleV4.Core.BattleSystem.Selections;
+namespace FrogBattleV4.Core.Combat.Selections;
 
 // Work on this or don't, IDK.
 public interface ISelectionResult<out TResult>

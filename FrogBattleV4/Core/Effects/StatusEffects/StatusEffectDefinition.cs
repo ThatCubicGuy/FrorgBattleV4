@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace FrogBattleV4.Core.EffectSystem.StatusEffects;
+namespace FrogBattleV4.Core.Effects.StatusEffects;
 
 public class StatusEffectDefinition
 {

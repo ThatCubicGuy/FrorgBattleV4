@@ -2,7 +2,7 @@
 // game.Run();
 
 using FrogBattleV4.ConsoleBattle;
-using FrogBattleV4.Core.BattleSystem;
+using FrogBattleV4.Core.Combat;
 
 var provider = new ConsoleSelectionProvider();
 var game = new BattleManager(provider, new Team(), new Team());

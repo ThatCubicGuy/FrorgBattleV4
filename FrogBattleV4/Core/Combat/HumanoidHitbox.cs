@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using FrogBattleV4.Core.EffectSystem;
-using FrogBattleV4.Core.EffectSystem.Components;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
+using FrogBattleV4.Core.Effects;
+using FrogBattleV4.Core.Effects.Components;
+using FrogBattleV4.Core.Effects.Modifiers;
 
-namespace FrogBattleV4.Core.BattleSystem;
+namespace FrogBattleV4.Core.Combat;
 
 public class HumanoidHitbox : ITargetable
 {

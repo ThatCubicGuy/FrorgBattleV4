@@ -8,10 +8,15 @@ public static class StatPipeline
     [Pure]
     public static double ComputeStat(this ModifierContext ctx, StatId stat)
     {
-        if (ctx.Actor is null) return 0;
-        return new StatQuery
+        if (ctx.Actor is { } actor)
         {
-            Stat = stat
-        }.Compute(ctx.Actor.BaseStats.GetValueOrDefault(stat), ctx);
+            return new StatQuery
+            {
+                Stat = stat
+            }.Compute(actor.BaseStats.GetValueOrDefault(stat), ctx);
+        }
+
+        System.Diagnostics.Debug.WriteLine($"WARNING: Attempt to compute stat for null actor! (Stat: {stat})");
+        return 0;
     }
 }

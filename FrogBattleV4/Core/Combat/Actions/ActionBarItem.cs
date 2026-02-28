@@ -1,13 +1,14 @@
 #nullable enable
 using System;
 
-namespace FrogBattleV4.Core.BattleSystem.Actions;
+namespace FrogBattleV4.Core.Combat.Actions;
 
-public class ActionBarItem(IAction action) : IComparable<ActionBarItem?>
+public class ActionBarItem(ScheduledAction action) : IComparable<ActionBarItem?>
 {
     private double _actionValue = action.BaseActionValue;
 
-    public IAction TurnAction { get; } = action;
+    public ScheduledAction TurnAction { get; } = action;
+
     public double ActionValue
     {
         get => _actionValue;
@@ -27,7 +28,7 @@ public class ActionBarItem(IAction action) : IComparable<ActionBarItem?>
     {
         ActionValue -= TurnAction.BaseActionValue * value;
     }
-    
+
     public int CompareTo(ActionBarItem? other)
     {
         if (ReferenceEquals(this, other)) return 0;

@@ -1,6 +1,8 @@
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.Calculation.Pools;
+using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core;
 
@@ -27,4 +29,71 @@ public static class Registry
         { StatId.OutgoingHealing, 1 },
         { StatId.ShieldToughness, 1 },
     }.ToFrozenDictionary();
+
+    public static readonly FrozenDictionary<PoolId, IPoolDefinition> BaseCharacterPools = new List<IPoolDefinition>
+    {
+        new CharacterPoolDefinition
+        {
+            Id = PoolId.Hp,
+            Tags = [PoolTag.UsedForLife],
+            MaxValueStat = StatId.MaxHp,
+            InitialPercent = 1,
+        },
+        new CharacterPoolDefinition
+        {
+            Id = PoolId.Mana,
+            Tags = [PoolTag.UsedForSpells],
+            MaxValueStat = StatId.MaxMana,
+            InitialPercent = 0.5,
+        },
+        new CharacterPoolDefinition
+        {
+            Id = PoolId.Energy,
+            Tags = [PoolTag.UsedForBurst],
+            MaxValueStat = StatId.MaxEnergy,
+        },
+    }.ToFrozenDictionary(pd => pd.Id);
+
+    public static void ApplyBaseCharacterPools(IBattleMember character)
+    {
+        if (!character.Pools.Add(new PoolInitContext
+            {
+                Definition = new CharacterPoolDefinition
+                {
+                    Id = PoolId.Hp,
+                    Tags = [PoolTag.UsedForLife],
+                    MaxValueStat = StatId.MaxHp,
+                    InitialPercent = 1,
+                },
+                Target = character,
+            }) ||
+            !character.Pools.Add(new PoolInitContext
+            {
+                Definition = new CharacterPoolDefinition
+                {
+                    Id = PoolId.Mana,
+                    Tags = [PoolTag.UsedForSpells],
+                    MaxValueStat = StatId.MaxMana,
+                    InitialPercent = 0.5,
+                },
+                Target = character,
+            }) ||
+            !character.Pools.Add(new PoolInitContext
+            {
+                Definition = new CharacterPoolDefinition
+                {
+                    Id = PoolId.Energy,
+                    Tags = [PoolTag.UsedForBurst],
+                    MaxValueStat = StatId.MaxEnergy,
+                },
+                Target = character,
+            }))
+        {
+            throw new System.InvalidOperationException("Pool add failure");
+        }
+        var ctx = new ModifierContext(character);
+        character.Pools[PoolId.Hp]!.CurrentValue = ctx.ComputeStat(StatId.MaxHp);
+        character.Pools[PoolId.Mana]!.CurrentValue = ctx.ComputeStat(StatId.MaxMana) / 2;
+        character.Pools[PoolId.Energy]!.CurrentValue = 0;
+    }
 }

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using FrogBattleV4.Core.BattleSystem.Actions;
-using FrogBattleV4.Core.BattleSystem.Selections;
+using FrogBattleV4.Core.Combat.Actions;
+using FrogBattleV4.Core.Combat.Selections;
 
-namespace FrogBattleV4.Core.BattleSystem;
+namespace FrogBattleV4.Core.Combat;
 
 public class BattleManager
 {
@@ -29,7 +29,6 @@ public class BattleManager
     // public event EventHandler<BattleMember> OnMemberAdded;
     // public event EventHandler<BattleMember> OnMemberRemoved;
     public event EventHandler<BattleContext> TurnStart;
-    public event EventHandler<BattleContext> TurnPlay;
     public event EventHandler<BattleContext> TurnEnd;
     
     public async Task RunAsync()
@@ -38,8 +37,8 @@ public class BattleManager
         while (true)
         {
             TryGetNextTurn(out var next);
-            var member = next.TurnAction.Entity;
-            var allyTeam = next.TurnAction.Entity.GetAlliedTeam(AllTeams);
+            var member = next.TurnAction.Actor;
+            var allyTeam = next.TurnAction.Actor.GetAlliedTeam(AllTeams);
             var ctx = new BattleContext
             {
                 Manager = this,
@@ -75,6 +74,6 @@ public class BattleManager
 
     public void AdvanceTarget(IBattleMember target, double percentage)
     {
-        ActionBar.First(action => action.TurnAction.Entity == target).AdvancePercentage(percentage);
+        ActionBar.First(action => action.TurnAction.Actor == target).AdvancePercentage(percentage);
     }
 }

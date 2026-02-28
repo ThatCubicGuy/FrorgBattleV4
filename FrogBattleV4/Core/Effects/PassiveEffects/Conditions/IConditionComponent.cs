@@ -1,7 +1,7 @@
 #nullable enable
 using System.Diagnostics.Contracts;
 
-namespace FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
+namespace FrogBattleV4.Core.Effects.PassiveEffects.Conditions;
 
 public interface IConditionComponent
 {

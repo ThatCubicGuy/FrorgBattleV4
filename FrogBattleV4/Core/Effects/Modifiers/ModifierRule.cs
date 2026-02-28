@@ -2,11 +2,11 @@
 
 using System.Diagnostics.Contracts;
 
-namespace FrogBattleV4.Core.EffectSystem.Modifiers;
+namespace FrogBattleV4.Core.Effects.Modifiers;
 
 public abstract class ModifierRule
 {
-    public ModifierStack ModifierStack { get; init; }
+    public required ModifierStack ModifierStack { get; init; }
     /// <summary>
     /// Determines whether this modifier applies for this query.
     /// </summary>
@@ -49,17 +49,23 @@ public abstract class MutModifierRule<TQuery> : ModifierRule<TQuery> where TQuer
 public enum CalcDirection
 {
     /// <summary>
-    /// Things that affect the holder as an actor.
+    /// The effects of this modifier will affect the holder.
     /// </summary>
     Self,
     /// <summary>
-    /// Things that affect the other as an actor.
+    /// The effects of this modifier will affect the target.
     /// </summary>
     Other
 }
 
 public enum MutModifierDirection
 {
+    /// <summary>
+    /// Modifies outgoing mutations.
+    /// </summary>
     Outgoing,
+    /// <summary>
+    /// Modifies incoming mutations.
+    /// </summary>
     Incoming,
 }

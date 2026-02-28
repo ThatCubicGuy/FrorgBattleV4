@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FrogBattleV4.Core.BattleSystem.Actions;
+using FrogBattleV4.Core.Combat.Actions;
 
-namespace FrogBattleV4.Core.BattleSystem;
+namespace FrogBattleV4.Core.Combat;
 
 public struct BattleContext
 {

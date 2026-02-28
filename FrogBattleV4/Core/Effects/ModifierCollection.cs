@@ -4,9 +4,9 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
+using FrogBattleV4.Core.Effects.Modifiers;
 
-namespace FrogBattleV4.Core.EffectSystem;
+namespace FrogBattleV4.Core.Effects;
 
 public class ModifierCollection([NotNull] params ModifierRule[] rules) : IEnumerable<ModifierRule>, IModifierProvider
 {

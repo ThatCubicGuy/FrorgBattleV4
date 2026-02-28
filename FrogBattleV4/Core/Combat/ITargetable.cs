@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.EffectSystem.Modifiers;
+using FrogBattleV4.Core.Effects.Modifiers;
 
-namespace FrogBattleV4.Core.BattleSystem;
+namespace FrogBattleV4.Core.Combat;
 
 public interface ITargetable
 {

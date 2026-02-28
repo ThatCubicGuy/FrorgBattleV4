@@ -1,6 +1,6 @@
 using System.Diagnostics.Contracts;
 
-namespace FrogBattleV4.Core.EffectSystem.Modifiers;
+namespace FrogBattleV4.Core.Effects.Modifiers;
 
 /// <summary>
 /// Represents a full AttributeModifier wrapper that returns a total ModifierStack for a query in a context.

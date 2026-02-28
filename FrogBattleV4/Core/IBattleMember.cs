@@ -5,17 +5,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using FrogBattleV4.Core.AbilitySystem;
-using FrogBattleV4.Core.BattleSystem;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Calculation.Pools;
+using FrogBattleV4.Core.Combat;
 
 namespace FrogBattleV4.Core;
 
-public interface IBattleMember : ITakesTurns, DamageSystem.IDamageable, EffectSystem.ISupportsEffects, IHasAbilities
+public interface IBattleMember : ITakesTurns, DamageSystem.IDamageable, IHasAbilities
 {
     [NotNull] string Name { get; }
-    [NotNull] FrozenDictionary<StatId, double> BaseStats { get; }
+    [NotNull] EffectContainer Effects { get; }
     [NotNull] PoolContainer Pools { get; }
+    [NotNull] FrozenDictionary<StatId, double> BaseStats { get; }
 }
 
 public static class BattleMemberExtensions

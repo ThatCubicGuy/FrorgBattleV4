@@ -3,9 +3,9 @@ namespace FrogBattleV4.Core.Calculation;
 public readonly record struct PoolId(string Id)
 {
     /// <summary>
-    /// Unique ID of the pool. Automatically converted into snake case.
+    /// Unique ID of the pool. Automatically converted into pascal case.
     /// </summary>
-    public string Id { get; } = Id.ToSnakeCase();
+    public string Id { get; } = Id.ToPascalCase();
 
     public override string ToString() => Id;
 

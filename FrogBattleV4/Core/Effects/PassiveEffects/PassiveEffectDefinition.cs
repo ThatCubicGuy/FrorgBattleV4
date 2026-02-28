@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using FrogBattleV4.Core.EffectSystem.PassiveEffects.Conditions;
+using FrogBattleV4.Core.Effects.PassiveEffects.Conditions;
 
-namespace FrogBattleV4.Core.EffectSystem.PassiveEffects;
+namespace FrogBattleV4.Core.Effects.PassiveEffects;
 
 /// <summary>
 /// Defines a passive effect that is to be processed 

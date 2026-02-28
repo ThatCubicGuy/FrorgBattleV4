@@ -17,7 +17,7 @@ public static class PoolPipeline
         var pool = mut.PoolSelector(ctx);
         var finalAmount = new PoolMutQuery
         {
-            PoolId = pool.Id,
+            PoolId = pool.Definition.Id,
             Channel = mut.BaseAmount < 0 ? PoolMutChannel.Cost : PoolMutChannel.Regen,
         }.ComputeMut(mut.BaseAmount, ctx);
         return new MutationResult(pool, finalAmount);

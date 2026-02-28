@@ -1,7 +1,7 @@
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 
-namespace FrogBattleV4.Core.BattleSystem.Selections;
+namespace FrogBattleV4.Core.Combat.Selections;
 
 public interface ISelectionProvider
 {

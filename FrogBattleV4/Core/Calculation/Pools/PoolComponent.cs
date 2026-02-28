@@ -1,24 +1,26 @@
+#nullable enable
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using FrogBattleV4.Core.EffectSystem.StatusEffects;
 
 namespace FrogBattleV4.Core.Calculation.Pools;
 
-public class PoolComponent
+public sealed class PoolComponent
 {
     private double _currentValue;
-    private readonly HashSet<PoolTag> _tags = [];
-    private readonly List<IMutatorComponent> _mutators = [];
-    // I like having both '?' and [NotNull] tags in my code, so in
-    // this context where I only have one nullable reference field
-    // I won't enable file-wide nullable annotations because Rider
-    // will give me warnings about redundant [NotNull] attributes.
-    #nullable enable
+    // Context for calculating capacity is always identical
+    private readonly ModifierContext _ctx;
+
+    public PoolComponent(PoolInitContext ctx)
+    {
+        Definition = ctx.Definition;
+        _ctx = new ModifierContext(ctx.Target);
+        _currentValue = ctx.Definition.GetInitialValue(_ctx);
+    }
+
     public event Action<PoolComponent, double, double>? ValueChanged;
-    #nullable disable
-    public required PoolId Id { get; init; }
+
+    public IPoolDefinition Definition { get; }
 
     public double CurrentValue
     {
@@ -26,46 +28,33 @@ public class PoolComponent
         set
         {
             var old = _currentValue;
-            _currentValue = value;
-            if (MinValue.HasValue) _currentValue = Math.Max(_currentValue, MinValue.Value);
-            if (MaxValue.HasValue) _currentValue = Math.Min(_currentValue, MaxValue.Value);
+            _currentValue = Math.Clamp(value,
+                MinValue ?? double.MinValue,
+                MaxValue ?? double.MaxValue);
             if (!old.Equals(_currentValue)) ValueChanged?.Invoke(this, old, _currentValue);
         }
     }
 
-    public virtual double? MaxValue { get; init; }
-    public virtual double? MinValue { get; init; }
+    public double? MaxValue => Definition.GetMaxValue(_ctx);
+    public double? MinValue => Definition.GetMinValue(_ctx);
 
-    [NotNull] public IEnumerable<PoolTag> Tags
+    // I like having both '?' and [NotNull] tags in my code, so in
+    // this context where I only have one nullable reference field
+    // I won't enable file-wide nullable annotations because Rider
+    // will give me warnings about redundant [NotNull] attributes.
+#nullable disable
+    public bool HasTag(PoolTag tag)
     {
-        get => _tags;
-        init => _tags = value.ToHashSet();
+        return Definition.Tags.Contains(tag);
     }
 
-    [NotNull]
-    public IEnumerable<IMutatorComponent> Mutators
+    public bool HasAllTags([NotNull] params PoolTag[] tags)
     {
-        get => _mutators;
-        init => _mutators = value.ToList();
+        return tags.All(Definition.Tags.Contains);
     }
 
-    public void AddMutator(IMutatorComponent mutator) => _mutators.Add(mutator);
-}
-
-public static class PoolComponentExtensions
-{
-    public static bool HasTag([NotNull] this PoolComponent pc, PoolTag tag)
+    public bool HasAnyTags([NotNull] params PoolTag[] tags)
     {
-        return pc.Tags.Contains(tag);
-    }
-
-    public static bool HasAllTags([NotNull] this PoolComponent pc, [NotNull] params PoolTag[] tags)
-    {
-        return tags.All(pc.Tags.Contains);
-    }
-
-    public static bool HasAnyTags([NotNull] this PoolComponent pc, [NotNull] params PoolTag[] tags)
-    {
-        return tags.Any(tag => pc.Tags.Contains(tag));
+        return tags.Any(tag => Definition.Tags.Contains(tag));
     }
 }
