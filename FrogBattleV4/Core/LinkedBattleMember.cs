@@ -1,6 +1,6 @@
 #nullable enable
-using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Linq;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
@@ -13,25 +13,47 @@ namespace FrogBattleV4.Core;
 /// Linked battle member with optional stats. Anything initialized is used,
 /// otherwise parent's stats are used.
 /// </summary>
-/// <param name="parent">Member whose stats this one falls back on if they're missing.</param>
-public class LinkedBattleMember(string name, IBattleMember parent) : IBattleMember
+public class LinkedBattleMember : IBattleMember
 {
-    public string Name { get; } = name;
-    public IBattleMember Parent { get; } = parent;
+    public LinkedBattleMember(IBattleMember parent)
+    {
+        Parent = parent;
+        Components.ComponentAdded += RegisterCache;
+    }
+    public required string Name { get; init; }
+    public IBattleMember Parent { get; }
 
+    public ComponentContainer Components { get; } = [];
     public IEnumerable<ScheduledAction>? OwnTurns { get; init; }
     public ITargetable? OwnHitbox { get; init; }
-    public EffectContainer? OwnEffects { get; init; }
-    public PoolContainer? OwnPools { get; init; }
-    public StatContainer? OwnBaseStats { get; init; }
-    public IEnumerable<AbilityDefinition>? OwnAbilities { get; init; }
+    public AbilityContainer? OwnAbilities { get; private set; }
+    public EffectContainer? OwnEffects { get; private set; }
+    public PoolContainer? OwnPools { get; private set; }
+    public StatContainer? OwnStats { get; private set; }
+
+    private void RegisterCache(IBattleMemberComponent component)
+    {
+        switch (component)
+        {
+            case AbilityContainer container:
+                OwnAbilities = container;
+                break;
+            case EffectContainer container:
+                OwnEffects = container;
+                break;
+            case PoolContainer container:
+                OwnPools = container;
+                break;
+            case StatContainer container:
+                OwnStats = container;
+                break;
+        }
+    }
 
     IEnumerable<ScheduledAction> ITakesTurns.Turns => OwnTurns ?? Parent.Turns;
-    ITargetable IDamageable.Hitbox => OwnHitbox ?? Parent.Hitbox;
+    ITargetable IBattleMember.Hitbox => OwnHitbox ?? Parent.Hitbox;
+    AbilityContainer IBattleMember.Abilities => OwnAbilities ?? Parent.Abilities;
     EffectContainer IBattleMember.Effects => OwnEffects ?? Parent.Effects;
     PoolContainer IBattleMember.Pools => OwnPools ?? Parent.Pools;
-    StatContainer IBattleMember.BaseStats => OwnBaseStats ?? Parent.BaseStats;
-    IEnumerable<AbilityDefinition> IHasAbilities.Abilities => OwnAbilities ?? Parent.Abilities;
-    // Unsure how to go about making a method optional in data driven code...
-    void IDamageable.TakeDamage(DamageResult dmg) => Parent.TakeDamage(dmg);
+    StatContainer IBattleMember.BaseStats => OwnStats ?? Parent.BaseStats;
 }

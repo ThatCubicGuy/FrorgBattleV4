@@ -15,15 +15,15 @@ namespace FrogBattleV4.Core.DamageSystem;
 /// <param name="IsCrit">Whether this damage instance is a critical hit.</param>
 public record DamageResult(
     double Amount,
-    [NotNull] IDamageable ResultTarget,
+    [NotNull] IBattleMember ResultTarget,
     DamageType Type,
-    bool IsCrit) : IResultContext<IDamageable>;
+    bool IsCrit) : IResultContext<IBattleMember>;
 
 /// <summary>
 /// A fully calculated instance of damage. The raw value of <see cref="Amount"/>
 /// is deducted from the HP of the target.<br/>This record is mostly used for displays.
 /// </summary>
-file readonly struct OldDamageResult : IResultContext<IDamageable>
+file readonly struct OldDamageResult : IResultContext<IBattleMember>
 {
     /// <summary>
     /// The amount of damage taken.
@@ -32,7 +32,7 @@ file readonly struct OldDamageResult : IResultContext<IDamageable>
     /// <summary>
     /// The target of the damage.
     /// </summary>
-    [NotNull] public required IDamageable ResultTarget { get; init; }
+    [NotNull] public required IBattleMember ResultTarget { get; init; }
     /// <summary>
     /// The type of the damage dealt.
     /// </summary>

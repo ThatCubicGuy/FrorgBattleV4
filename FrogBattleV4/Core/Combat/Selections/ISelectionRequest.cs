@@ -13,20 +13,20 @@ public interface ISelectionRequest<out TResult>
 public static class SelectionRequestExtensions
 {
     [Pure]
-    public static SelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, int selection)
+    public static ISelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, int selection)
     {
         return request.Select(new Range(selection, selection + 1));
     }
 
     [Pure]
-    public static SelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, int start, int end)
+    public static ISelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, int start, int end)
     {
         return request.Select(new Range(start, end));
     }
 
     [Pure]
-    public static SelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, Range range)
+    public static ISelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, Range range)
     {
-        return new SelectionResult<TResult>(request.ValidOptions.Take(range));
+        return new SelectionResult<TResult>(request.ValidOptions.Take(range).ToArray());
     }
 }

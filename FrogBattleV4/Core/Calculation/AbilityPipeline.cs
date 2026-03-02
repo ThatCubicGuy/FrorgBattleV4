@@ -9,7 +9,7 @@ namespace FrogBattleV4.Core.Calculation;
 internal static class AbilityPipeline
 {
     [Pure]
-    public static IEnumerable<IBattleCommand> GetCommands(this AbilityExecContext ctx)
+    private static IEnumerable<IBattleCommand> GetCommands(this AbilityExecContext ctx)
     {
         return ctx.Definition.Components.OfType<IAbilityCommandComponent>().SelectMany(ac => ac.GetContribution(ctx));
     }
@@ -18,15 +18,15 @@ internal static class AbilityPipeline
     public static AbilityPreview PreviewAbility(this AbilityExecContext ctx)
     {
         var commands = ctx.GetCommands().ToArray();
-        var unmetReqs = ctx.Definition.Components
+        var unmetRequirements = ctx.Definition.Components
             .OfType<IAbilityRequirementComponent>()
             .Where(arc => !arc.IsFulfilled(ctx)).ToArray();
 
         return new AbilityPreview
         {
-            CanUse = unmetReqs.Length == 0,
+            CanUse = unmetRequirements.Length == 0,
             Commands = commands,
-            UnfulfilledRequirements = unmetReqs,
+            UnfulfilledRequirements = unmetRequirements,
         };
     }
 

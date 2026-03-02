@@ -1,23 +1,24 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core.Combat.Selections;
 
 namespace FrogBattleV4.ConsoleBattle;
 
-public class ConsoleSelectionProvider : ISelectionProvider
+public class ConsoleSelectionProvider(CancellationToken cancellationToken) : ISelectionProvider
 {
     public async Task<ISelectionResult<TResult>> GetSelectionAsync<TResult>(ISelectionRequest<TResult> request)
     {
         return request.Select(request switch
         {
-            AbilitySelectionRequest ab => await GetAbilitySelectionAsync(ab),
-            TargetSelectionRequest tg => await GetTargetSelectionAsync(tg),
+            AbilitySelectionRequest ab => await GetAbilitySelectionAsync(ab, cancellationToken),
+            TargetSelectionRequest tg => await GetTargetSelectionAsync(tg, cancellationToken),
             _ => throw new NotSupportedException($"Decision type {typeof(TResult).Name} not supported")
         });
     }
 
-    private static async Task<int> GetAbilitySelectionAsync(AbilitySelectionRequest request)
+    private static async Task<int> GetAbilitySelectionAsync(AbilitySelectionRequest request, CancellationToken cancel)
     {
         while (true)
         {
@@ -27,7 +28,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
                 await Console.Out.WriteAsync($"Select ability for {request.Requestor.Name}: ");
                 try
                 {
-                    selection = int.Parse(await Task.Run(Console.ReadLine) ?? string.Empty);
+                    selection = int.Parse(await Task.Run(Console.ReadLine, cancel) ?? string.Empty);
                 }
                 catch (FormatException ex)
                 {
@@ -49,14 +50,14 @@ public class ConsoleSelectionProvider : ISelectionProvider
         }
     }
 
-    private static async Task<int> GetTargetSelectionAsync(TargetSelectionRequest request)
+    private static async Task<int> GetTargetSelectionAsync(TargetSelectionRequest request, CancellationToken cancel)
     {
         while (true)
         {
             try
             {
                 await Console.Out.WriteLineAsync($"Select target for {request.Requestor.Name}: ");
-                if (int.TryParse(await Task.Run(Console.ReadLine), out var selection) &&
+                if (int.TryParse(await Task.Run(Console.ReadLine, cancel), out var selection) &&
                     selection >= 0 && selection < request.ValidOptions.Count())
                 {
                     return selection;

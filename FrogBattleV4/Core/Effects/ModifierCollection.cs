@@ -4,16 +4,19 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.Effects.Modifiers;
 
 namespace FrogBattleV4.Core.Effects;
 
-public class ModifierCollection([NotNull] params ModifierRule[] rules) : IEnumerable<ModifierRule>, IModifierProvider
+public class ModifierCollection([NotNull] params ModifierRule[] rules)
+    : IReadOnlyCollection<ModifierRule>, IModifierProvider, IAbilityComponent
 {
     private readonly ImmutableList<ModifierRule> _rules = rules.ToImmutableList();
-    
+
     [NotNull] public IReadOnlyCollection<ModifierRule> Rules => _rules;
-    
+    public int Count => _rules.Count;
+
     /// <summary>
     /// Aggregates all contained modifiers that contribute to this query.
     /// </summary>
@@ -32,6 +35,5 @@ public class ModifierCollection([NotNull] params ModifierRule[] rules) : IEnumer
         where TQuery : struct => GetContribution(query);
 
     public IEnumerator<ModifierRule> GetEnumerator() => _rules.GetEnumerator();
-
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

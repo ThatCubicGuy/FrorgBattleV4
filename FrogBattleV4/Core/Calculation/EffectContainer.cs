@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FrogBattleV4.Core.Effects;
@@ -10,7 +9,7 @@ using FrogBattleV4.Core.Effects.StatusEffects;
 
 namespace FrogBattleV4.Core.Calculation;
 
-public class EffectContainer : IEnumerable<IModifierProvider>
+public class EffectContainer : IBattleMemberComponent
 {
     private readonly List<StatusEffectInstance> _statusEffects = [];
     private readonly List<PassiveEffectDefinition> _passiveEffects = [];
@@ -19,10 +18,11 @@ public class EffectContainer : IEnumerable<IModifierProvider>
     public event EventHandler<StatusEffectInstance>? EffectApplySuccess;
     public event EventHandler<ApplyEffectCommand>? EffectApplyFailure;
     public event EventHandler<StatusEffectInstance>? EffectRemoveSuccess;
-    public event EventHandler<StatusEffectRemovalContext>? EffectRemoveFailure;
-    
+    public event EventHandler<RemoveEffectCommand>? EffectRemoveFailure;
+
     public IEnumerable<StatusEffectInstance> StatusEffects => _statusEffects;
     public IEnumerable<PassiveEffectDefinition> PassiveEffects => _passiveEffects;
+    public IEnumerable<IModifierProvider> All => StatusEffects.Concat<IModifierProvider>(PassiveEffects);
 
     public void TickStart()
     {
@@ -85,7 +85,7 @@ public class EffectContainer : IEnumerable<IModifierProvider>
         return true;
     }
 
-    public bool Remove(StatusEffectRemovalContext ctx)
+    public bool Remove(RemoveEffectCommand ctx)
     {
         var item = _statusEffects.FirstOrDefault(ctx.Query);
         if (item is null || !(ctx.Rng.NextDouble() < ctx.RemovalChance))
@@ -107,9 +107,4 @@ public class EffectContainer : IEnumerable<IModifierProvider>
     }
 
     public void AddPassive(PassiveEffectDefinition passiveEffect) => _passiveEffects.Add(passiveEffect);
-
-    public IEnumerator<IModifierProvider> GetEnumerator() =>
-        _statusEffects.Concat<IModifierProvider>(_passiveEffects).GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

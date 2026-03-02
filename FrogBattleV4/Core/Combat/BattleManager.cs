@@ -11,7 +11,7 @@ namespace FrogBattleV4.Core.Combat;
 public class BattleManager
 {
     private readonly ISelectionProvider _playerInputInterface;
-    private readonly ActionBarItem[] _actionBar;
+    private readonly List<ActionBarItem> _actionBar;
     private readonly Random _rng = new();
     public List<Team> AllTeams { get; init; }
     [NotNull] public IOrderedEnumerable<ActionBarItem> ActionBar => _actionBar.Order();
@@ -23,7 +23,7 @@ public class BattleManager
         _actionBar = AllTeams
             .SelectMany(team => team.Members)
             .SelectMany(tt => tt.Turns.Select(action => new ActionBarItem(action)))
-            .ToArray();
+            .ToList();
     }
 
     // public event EventHandler<BattleMember> OnMemberAdded;
@@ -58,7 +58,7 @@ public class BattleManager
     
     public bool TryGetNextTurn(out ActionBarItem action)
     {
-        if (_actionBar.Length == 0)
+        if (_actionBar.Count == 0)
         {
             action = null;
             return false;

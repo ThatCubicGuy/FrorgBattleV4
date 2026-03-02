@@ -25,6 +25,12 @@ public record MutationCommand(
 
 public static class MutationSelector
 {
+    /// <summary>
+    /// Finds a pool by its ID, or throws an exception if the pool was not found.
+    /// </summary>
+    /// <param name="poolId">PoolID to search for.</param>
+    /// <returns>A selector function that returns a pool with the given ID.</returns>
+    /// <exception cref="InvalidOperationException">Pool was not found.</exception>
     [Pure]
     public static Func<ModifierContext, PoolComponent> ById(PoolId poolId)
     {
@@ -32,39 +38,26 @@ public static class MutationSelector
 
         PoolComponent Selector(ModifierContext ctx)
         {
-            return ctx.Actor?.GetPoolById(poolId) ??
+            return ctx.Actor?.Pools[poolId] ??
                    throw new InvalidOperationException("Pool not found for " + poolId);
         }
     }
 
-    [Pure]
-    public static Func<ModifierContext, PoolComponent> ByAllTags([NotNull] params PoolTag[] poolTags)
-    {
-        return Selector;
-
-        PoolComponent Selector(ModifierContext ctx)
-        {
-            return ctx.Actor?.Pools.LastOrDefault(pc => pc.HasAllTags(poolTags)) ??
-                   throw new InvalidOperationException($"Pool not found for tags [{string.Join(", ", poolTags.Select(tag => $"\"{tag}\""))}]");
-        }
-    }
-
     /// <summary>
-    /// Picks the first pool that satisfies the first tag, or the first pool that satisfies the second, etc.
+    /// Finds the last pool that has the given tag, or throws an exception if no pool has the requested tag.
     /// </summary>
-    /// <param name="poolTags">Pool tags to scan in order.</param>
-    /// <returns>A new MutationRequest.</returns>
+    /// <param name="poolTag">Pool tag to search for.</param>
+    /// <returns>A selector function that returns the last pool with the given tag.</returns>
+    /// <exception cref="InvalidOperationException">No pool has the given tag.</exception>
     [Pure]
-    public static Func<ModifierContext, PoolComponent> ByAnyTags([NotNull] params PoolTag[] poolTags)
+    public static Func<ModifierContext, PoolComponent> LastByTag(PoolTag poolTag)
     {
         return Selector;
 
         PoolComponent Selector(ModifierContext ctx)
         {
-            // This is probably a horrible way to do this. Too bad!
-            var pool = poolTags.Aggregate((PoolComponent)null, (accumulate, flag) =>
-                accumulate ?? ctx.Actor?.GetPoolsByTag(flag).LastOrDefault());
-            return pool ?? throw new InvalidOperationException("Cannot find a pool for any of the flags given.");
+            return ctx.Actor?.Pools.WithTag(poolTag).LastOrDefault() ??
+                   throw new InvalidOperationException("Pool not found for " + poolTag);
         }
     }
 }

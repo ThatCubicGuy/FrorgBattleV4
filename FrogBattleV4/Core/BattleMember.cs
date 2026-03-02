@@ -1,34 +1,60 @@
-using System;
-using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.Calculation;
-using FrogBattleV4.Core.Calculation.Pools;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Combat.Actions;
-using FrogBattleV4.Core.DamageSystem;
 
 namespace FrogBattleV4.Core;
 
-public class BattleMember : IBattleMember
+public partial class BattleMember : IBattleMember
 {
-    [NotNull] public required string Name { get; init; }
-    [NotNull] public required ITargetable Hitbox { get; init; }
-    [NotNull] public required IEnumerable<ScheduledAction> Turns { get; init; } = [];
-    [NotNull] public IEnumerable<AbilityDefinition> Abilities { get; init; } = [];
-    public void TakeDamage(DamageResult dmg)
+    private BattleMember(string name)
     {
-        var pool = this.GetPoolsByTag(PoolTag.AbsorbsDamage).LastOrDefault() ??
-                   this.GetPoolsByTag(PoolTag.UsedForLife).LastOrDefault() ??
-                   throw new NotSupportedException("You are not able to damage this member.");
-        pool.CurrentValue -= dmg.Amount;
+        Name = name;
+        Components.ComponentAdded += RegisterCache;
     }
 
-    [NotNull] public required StatContainer BaseStats { get; init; }
+    [NotNull] public string Name { get; }
+    [NotNull] public ComponentContainer Components { get; } = [];
 
-    [NotNull] public EffectContainer Effects { get; } = new();
-    // ReSharper disable once UseCollectionExpression cuz cmon
-    [NotNull] public PoolContainer Pools { get; } = new();
+    [NotNull] public required ITargetable Hitbox { get; init; }
+    [NotNull] public required IEnumerable<ScheduledAction> Turns { get; init; }
+
+    #region Caches
+
+    public AbilityContainer Abilities { get; private set; }
+    public EffectContainer Effects { get; private set; }
+    public PoolContainer Pools { get; private set; }
+    public StatContainer BaseStats { get; private set; }
+
+    internal void BuildCaches()
+    {
+        Abilities = (AbilityContainer)Components.FirstOrDefault(bmc => bmc is AbilityContainer);
+        Effects = (EffectContainer)Components.FirstOrDefault(bmc => bmc is EffectContainer);
+        Pools = (PoolContainer)Components.FirstOrDefault(bmc => bmc is PoolContainer);
+        BaseStats = (StatContainer)Components.FirstOrDefault(bmc => bmc is StatContainer);
+    }
+
+    private void RegisterCache(IBattleMemberComponent component)
+    {
+        switch (component)
+        {
+            case AbilityContainer container:
+                Abilities = container;
+                break;
+            case EffectContainer container:
+                Effects = container;
+                break;
+            case PoolContainer container:
+                Pools = container;
+                break;
+            case StatContainer container:
+                BaseStats = container;
+                break;
+        }
+    }
+
+    #endregion
 }

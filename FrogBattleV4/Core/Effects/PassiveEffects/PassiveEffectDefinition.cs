@@ -11,7 +11,7 @@ namespace FrogBattleV4.Core.Effects.PassiveEffects;
 /// <summary>
 /// Defines a passive effect that is to be processed 
 /// </summary>
-public class PassiveEffectDefinition : ApplicableEffect
+public class PassiveEffectDefinition : ApplicableEffect, IAbilityComponent
 {
     public required string Id { get; init; }
     public required ModifierCollection Modifiers { get; init; }
@@ -19,7 +19,7 @@ public class PassiveEffectDefinition : ApplicableEffect
     /// <summary>
     /// List of conditions that enable the PassiveEffect's stacks.
     /// </summary>
-    public required IEnumerable<IConditionComponent> Conditions { get; init; }
+    public List<IConditionComponent> Conditions { get; } = [];
 
     public AccumulationType ConditionAccumulationType { get; set; } = AccumulationType.And;
 

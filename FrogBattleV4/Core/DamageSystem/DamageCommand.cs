@@ -12,7 +12,7 @@ public record DamageCommand : IBattleCommand
 {
     public required double BaseAmount { get; init; }
     public required DamageType Type { get; init; }
-    [NotNull] public required IDamageable Target { get; init; }
+    [NotNull] public required IBattleMember Target { get; init; }
     [NotNull] public required TargetingType Targeting { get; init; }
     public bool CanCrit { get; init; } = true;
 }

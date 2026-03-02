@@ -35,7 +35,7 @@ public class AbilityDefinition
     /// <summary>
     /// Every component of the ability.
     /// </summary>
-    public required IReadOnlyList<IAbilityComponent> Components { get; init; }
+    public List<IAbilityComponent> Components { get; } = [];
 
     #endregion
 }

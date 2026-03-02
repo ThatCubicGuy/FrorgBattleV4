@@ -18,10 +18,9 @@ public static class PoolPipeline
         var finalAmount = new PoolMutQuery
         {
             PoolId = pool.Definition.Id,
-            Channel = mut.BaseAmount < 0 ? PoolMutChannel.Cost : PoolMutChannel.Regen,
+            Channel = mut.BaseAmount > 0 ? PoolMutChannel.Regen : PoolMutChannel.Cost,
         }.ComputeMut(mut.BaseAmount, ctx);
         return new MutationResult(pool, finalAmount);
-        // TODO: Figure out "Allowed" logic, if it even makes any sense
     }
 
     public static void ExecuteMutation(this MutationCommand req, ModifierContext ctx)

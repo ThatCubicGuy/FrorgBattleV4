@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics.Contracts;
+using System.Linq;
+using FrogBattleV4.Core.Calculation.Pools;
 using FrogBattleV4.Core.DamageSystem;
 
 namespace FrogBattleV4.Core.Calculation;
@@ -13,7 +15,7 @@ public static class DamagePipeline
         if (ctx.Rng is null) throw new ArgumentException("Damage context requires an RNG property.", nameof(ctx));
         ctx = ctx with
         {
-            Other = dmg.Target as IBattleMember,
+            Other = dmg.Target,
             Aiming = dmg.Targeting,
         };
 
@@ -38,9 +40,11 @@ public static class DamagePipeline
     {
         ctx = ctx with
         {
-            Other = dmg.Target as IBattleMember,
+            Other = dmg.Target,
             Aiming = dmg.Targeting,
         };
+
+        if (ctx.Rng is null) throw new ArgumentException("Damage context requires an RNG property.", nameof(ctx));
 
         var isCrit = dmg.CanCrit && ctx.Rng.NextDouble() < ctx.ComputeStat(StatId.CritRate);
 
@@ -55,12 +59,20 @@ public static class DamagePipeline
         // Def is applied after every calculation.
         finalAmount -= new ModifierContext
         {
-            Other = ctx.Actor,
             Actor = ctx.Other,
+            Other = ctx.Actor,
             Rng = ctx.Rng,
         }.ComputeStat(StatId.Def);
         finalAmount = Math.Max(0, finalAmount);
         if (dmg.Target.Hitbox.Resolve(dmg.Targeting).WouldHit)
             dmg.Target.TakeDamage(new DamageResult(finalAmount, dmg.Target, dmg.Type, isCrit));
+    }
+
+    private static void TakeDamage(this IBattleMember bm, DamageResult dmg)
+    {
+        var pool = bm.Pools.WithTag(PoolTag.AbsorbsDamage).LastOrDefault() ??
+                   bm.Pools.WithTag(PoolTag.UsedForLife).LastOrDefault();
+        if (pool is null) return;
+        pool.CurrentValue -= dmg.Amount;
     }
 }

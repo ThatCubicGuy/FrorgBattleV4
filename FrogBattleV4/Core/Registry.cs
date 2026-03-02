@@ -53,47 +53,4 @@ public static class Registry
             MaxValueStat = StatId.MaxEnergy,
         },
     }.ToFrozenDictionary(pd => pd.Id);
-
-    public static void ApplyBaseCharacterPools(IBattleMember character)
-    {
-        if (!character.Pools.Add(new PoolInitContext
-            {
-                Definition = new CharacterPoolDefinition
-                {
-                    Id = PoolId.Hp,
-                    Tags = [PoolTag.UsedForLife],
-                    MaxValueStat = StatId.MaxHp,
-                    InitialPercent = 1,
-                },
-                Target = character,
-            }) ||
-            !character.Pools.Add(new PoolInitContext
-            {
-                Definition = new CharacterPoolDefinition
-                {
-                    Id = PoolId.Mana,
-                    Tags = [PoolTag.UsedForSpells],
-                    MaxValueStat = StatId.MaxMana,
-                    InitialPercent = 0.5,
-                },
-                Target = character,
-            }) ||
-            !character.Pools.Add(new PoolInitContext
-            {
-                Definition = new CharacterPoolDefinition
-                {
-                    Id = PoolId.Energy,
-                    Tags = [PoolTag.UsedForBurst],
-                    MaxValueStat = StatId.MaxEnergy,
-                },
-                Target = character,
-            }))
-        {
-            throw new System.InvalidOperationException("Pool add failure");
-        }
-        var ctx = new ModifierContext(character);
-        character.Pools[PoolId.Hp]!.CurrentValue = ctx.ComputeStat(StatId.MaxHp);
-        character.Pools[PoolId.Mana]!.CurrentValue = ctx.ComputeStat(StatId.MaxMana) / 2;
-        character.Pools[PoolId.Energy]!.CurrentValue = 0;
-    }
 }

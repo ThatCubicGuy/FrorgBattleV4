@@ -5,17 +5,24 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using FrogBattleV4.Core.AbilitySystem;
 using FrogBattleV4.Core.Calculation;
-using FrogBattleV4.Core.Calculation.Pools;
 using FrogBattleV4.Core.Combat;
 
 namespace FrogBattleV4.Core;
 
-public interface IBattleMember : ITakesTurns, DamageSystem.IDamageable, IHasAbilities
+public interface IBattleMember : ITakesTurns
 {
     [NotNull] string Name { get; }
-    [NotNull] EffectContainer Effects { get; }
-    [NotNull] PoolContainer Pools { get; }
-    [NotNull] StatContainer BaseStats { get; }
+    [NotNull] ComponentContainer Components { get; }
+
+    #region Caches
+
+    AbilityContainer Abilities { get; }
+    EffectContainer Effects { get; }
+    StatContainer BaseStats { get; }
+    PoolContainer Pools { get; }
+    ITargetable Hitbox { get; }
+
+    #endregion
 }
 
 public static class BattleMemberExtensions
@@ -35,18 +42,5 @@ public static class BattleMemberExtensions
         ArgumentNullException.ThrowIfNull(bm);
         ArgumentNullException.ThrowIfNull(teams);
         return teams.SingleOrDefault(team => team.Members.Contains(bm));
-    }
-
-    [Pure]
-    public static PoolComponent GetPoolById([NotNull] this IBattleMember bm, PoolId poolId)
-    {
-        ArgumentNullException.ThrowIfNull(bm);
-        return bm.Pools[poolId];
-    }
-
-    [Pure]
-    public static IEnumerable<PoolComponent> GetPoolsByTag([NotNull] this IBattleMember bm, PoolTag tag)
-    {
-        return bm.Pools.Where(pc => pc.HasTag(tag));
     }
 }

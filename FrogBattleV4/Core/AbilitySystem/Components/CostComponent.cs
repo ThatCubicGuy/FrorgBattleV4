@@ -16,6 +16,6 @@ public abstract class CostComponent : IAbilityCommandComponent
 
     IEnumerable<IBattleCommand> IAbilityCommandComponent.GetContribution(AbilityExecContext ctx)
     {
-        return (GetCostRequests(ctx));
+        return GetCostRequests(ctx);
     }
 }

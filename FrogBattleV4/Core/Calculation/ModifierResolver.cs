@@ -57,7 +57,7 @@ internal static class ModifierResolver
         if (ctx.Actor is { } actor)
         {
             var modQuery = new ModifierQuery<TQuery>(query, CalcDirection.Self);
-            mods += ctx.AggregateMods(actor.Effects, modQuery);
+            mods += ctx.AggregateMods(actor.Effects.All, modQuery);
             if (ctx.Ability is { } ability)
             {
                 mods += ctx.AggregateMods(ability.Components.OfType<IModifierProvider>(), modQuery);
@@ -68,7 +68,7 @@ internal static class ModifierResolver
         {
             var modQuery = new ModifierQuery<TQuery>(query, CalcDirection.Other);
             var revCtx = new ModifierContext(ctx.Other, ctx.Actor);
-            mods += revCtx.AggregateMods(other.Effects, modQuery);
+            mods += revCtx.AggregateMods(other.Effects.All, modQuery);
 
             if (ctx.Aiming is { } aiming)
             {
@@ -98,7 +98,7 @@ internal static class ModifierResolver
         if (ctx.Actor is { } actor)
         {
             var modQuery = new MutModifierQuery<TQuery>(mutQuery, CalcDirection.Self, mutDirection);
-            mods += ctx.AggregateMods(actor.Effects, modQuery);
+            mods += ctx.AggregateMods(actor.Effects.All, modQuery);
 
             if (ctx.Ability is { } ability)
             {
@@ -110,7 +110,7 @@ internal static class ModifierResolver
         {
             var modQuery = new MutModifierQuery<TQuery>(mutQuery, CalcDirection.Other, mutDirection);
             var revCtx = new ModifierContext(ctx.Other, ctx.Actor);
-            mods += revCtx.AggregateMods(other.Effects, modQuery);
+            mods += revCtx.AggregateMods(other.Effects.All, modQuery);
 
             if (ctx.Aiming is { } aiming)
             {

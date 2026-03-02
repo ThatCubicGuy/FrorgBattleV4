@@ -13,22 +13,22 @@ using FrogBattleV4.Core.Effects.PassiveEffects;
 
 namespace FrogBattleV4.Core;
 
-public static class BattleMemberFactory
+// Factory methods separated into a different file
+public partial class BattleMember
 {
     public static CharacterBuilder CharacterWith => new();
-
-    public record struct CreateCharacterOptions(
-        string Name,
-        IReadOnlyDictionary<StatId, double> BaseStatOverrides,
-        IList<IPoolDefinition> Pools,
-        IList<AbilityDefinition> Abilities,
-        IList<PassiveEffectDefinition> Passives,
-        IList<DamageMutModifier> NormalModifiers,
-        IList<DamageMutModifier> HeadshotModifiers,
-        IList<ScheduledAction> Turns);
-
     public sealed class CharacterBuilder
     {
+        private record struct CreateCharacterOptions(
+            string Name,
+            Dictionary<StatId, double> BaseStatOverrides,
+            List<IPoolDefinition> Pools,
+            List<AbilityDefinition> Abilities,
+            List<PassiveEffectDefinition> Passives,
+            List<DamageMutModifier> NormalModifiers,
+            List<DamageMutModifier> HeadshotModifiers,
+            List<ScheduledAction> Turns);
+
         private CreateCharacterOptions _createOptions = new()
         {
             Name = "Character",
@@ -46,37 +46,26 @@ public static class BattleMemberFactory
             return this;
         }
 
-        public CharacterBuilder BaseStatOverrides([NotNull] IReadOnlyDictionary<StatId, double> stats)
+        public CharacterBuilder BaseStat(StatId statId, double value)
         {
-            _createOptions.BaseStatOverrides = stats;
-            return this;
-        }
-
-        public CharacterBuilder BaseStatOverrides([NotNull] params KeyValuePair<StatId, double>[] stats)
-        {
-            _createOptions.BaseStatOverrides = stats.ToDictionary();
-            return this;
-        }
-
-        public CharacterBuilder BaseStatOverrides([NotNull] params (StatId, double)[] stats)
-        {
-            _createOptions.BaseStatOverrides = stats.ToDictionary();
+            _createOptions.BaseStatOverrides.Add(statId, value);
             return this;
         }
 
         public CharacterBuilder Pools([NotNull] params IPoolDefinition[] pools)
         {
-            _createOptions.Pools = pools;
+            _createOptions.Pools.AddRange(pools);
             return this;
         }
 
         public CharacterBuilder Abilities([NotNull] params AbilityDefinition[] abilities)
         {
-            _createOptions.Abilities = abilities;
+            _createOptions.Abilities.AddRange(abilities);
             return this;
         }
 
-        public CharacterBuilder HeadshotModifier(ModifierStack modStack, DamageType? type = null, DamageSource? source = null, bool critOnly = false)
+        public CharacterBuilder HeadshotModifier(ModifierStack modStack, DamageType? type = null,
+            DamageSource? source = null, bool critOnly = false)
         {
             _createOptions.HeadshotModifiers.Add(new DamageMutModifier
             {
@@ -90,12 +79,13 @@ public static class BattleMemberFactory
             return this;
         }
 
-        public CharacterBuilder NormalModifier(ModifierStack modStack, DamageType type, DamageSource source, bool critOnly)
+        public CharacterBuilder NormalModifier(ModifierStack modStack, DamageType? type = null,
+            DamageSource? source = null, bool critOnly = false)
         {
             _createOptions.NormalModifiers.Add(new DamageMutModifier
             {
-                Type = type,
-                Source = source,
+                Type = type ?? DamageType.None,
+                Source = source ?? DamageSource.None,
                 CritOnly = critOnly,
                 ModifierStack = modStack,
                 Direction = CalcDirection.Self,
@@ -106,13 +96,13 @@ public static class BattleMemberFactory
 
         public CharacterBuilder Passives([NotNull] params PassiveEffectDefinition[] effects)
         {
-            _createOptions.Passives = effects;
+            _createOptions.Passives = effects.ToList();
             return this;
         }
 
         public CharacterBuilder Turns([NotNull] params ScheduledAction[] actions)
         {
-            _createOptions.Turns = actions;
+            _createOptions.Turns = actions.ToList();
             return this;
         }
 
@@ -120,15 +110,15 @@ public static class BattleMemberFactory
         {
             var stats = new Dictionary<StatId, double>(Registry.BaseCharacterStats);
             if (_createOptions.BaseStatOverrides is not null)
+            {
                 foreach (var stat in _createOptions.BaseStatOverrides)
                 {
                     stats[stat.Key] = stat.Value;
                 }
+            }
 
-            var character = new BattleMember
+            var character = new BattleMember(_createOptions.Name)
             {
-                Name = _createOptions.Name,
-                BaseStats = new StatContainer(stats),
                 Hitbox = new HumanoidHitbox
                 {
                     Floating = false,
@@ -136,12 +126,27 @@ public static class BattleMemberFactory
                     NormalModifiers = _createOptions.NormalModifiers.ToFrozenSet(),
                 },
                 Turns = _createOptions.Turns.ToFrozenSet(),
+                Components =
+                {
+                    new AbilityContainer(_createOptions.Abilities),
+                    new StatContainer(stats),
+                    new PoolContainer(),
+                    new EffectContainer(),
+                },
             };
 
-            var buildCtx = new ModifierContext(character);
+            // Generate component caches
+            character.BuildCaches();
 
-            Registry.ApplyBaseCharacterPools(character);
+            // Add pools
+            if (Registry.BaseCharacterPools.Values.Concat(_createOptions.Pools).Any(pd =>
+                    !character.Pools.Add(new PoolInitContext
+                    {
+                        Definition = pd,
+                        Target = character,
+                    }))) throw new System.InvalidOperationException("Pool add failure");
 
+            // Add passive effects
             foreach (var passive in _createOptions.Passives)
             {
                 character.Effects.AddPassive(passive);

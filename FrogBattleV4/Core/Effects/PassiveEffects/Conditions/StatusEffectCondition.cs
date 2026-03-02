@@ -20,6 +20,6 @@ public class StatusEffectCondition : IConditionComponent
             CalcDirection.Self => ctx.Actor,
             CalcDirection.Other => ctx.Other,
             _ => null
-        })?.Effects.OfType<StatusEffectInstance>().Where(Query).Sum(sei => SumStacks? sei.Stacks : 1) ?? 0;
+        })?.Effects.StatusEffects.Where(Query).Sum(sei => SumStacks? sei.Stacks : 1) ?? 0;
     }
 }

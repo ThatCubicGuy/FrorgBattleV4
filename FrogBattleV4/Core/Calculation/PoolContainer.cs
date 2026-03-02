@@ -1,18 +1,16 @@
-using System.Collections;
+#nullable enable
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using FrogBattleV4.Core.Calculation.Pools;
 using FrogBattleV4.Core.Effects.StatusEffects;
 
 namespace FrogBattleV4.Core.Calculation;
 
-public class PoolContainer : IEnumerable<PoolComponent>
+public class PoolContainer : IBattleMemberComponent
 {
     private readonly Dictionary<PoolId, PoolComponent> _pools = new();
     private readonly List<IMutatorComponent> _mutators = [];
 
-    [NotNull]
     public IEnumerable<IMutatorComponent> Mutators
     {
         get => _mutators;
@@ -40,13 +38,11 @@ public class PoolContainer : IEnumerable<PoolComponent>
 
     public bool Remove(PoolId id) => _pools.Remove(id);
 
-#nullable enable
+    public IEnumerable<PoolComponent> WithTag(PoolTag tag) => _pools.Values.Where(pc => pc.HasTag(tag));
+
     /// <summary>
     /// Dictionary-like indexing used to get pools by id.
     /// </summary>
     /// <param name="id">Key to search pools by.</param>
     public PoolComponent? this[PoolId id] => _pools.GetValueOrDefault(id);
-
-    public IEnumerator<PoolComponent> GetEnumerator() => _pools.Values.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
