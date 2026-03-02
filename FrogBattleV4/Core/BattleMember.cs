@@ -20,7 +20,7 @@ public partial class BattleMember : IBattleMember
     [NotNull] public ComponentContainer Components { get; } = [];
 
     [NotNull] public required ITargetable Hitbox { get; init; }
-    [NotNull] public required IEnumerable<ScheduledAction> Turns { get; init; }
+    [NotNull] public required IEnumerable<IScheduledAction> Turns { get; init; }
 
     #region Caches
 

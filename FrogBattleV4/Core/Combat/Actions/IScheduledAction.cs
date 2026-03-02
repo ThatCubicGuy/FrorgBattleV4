@@ -10,10 +10,12 @@ using FrogBattleV4.Core.Combat.Selections;
 
 namespace FrogBattleV4.Core.Combat.Actions;
 
-public class ScheduledAction
+public interface IScheduledAction
 {
-    public IBattleMember Actor { get; init; }
-    public double BaseActionValue { get; init; }
+    bool InstantRequeue { get; }
+    IBattleMember Actor { get; }
+    double BaseActionValue { get; }
+    Task PlayTurn(ISelectionProvider provider, BattleContext ctx);
 }
 
 public static class ActionPipeline
@@ -24,7 +26,7 @@ public static class ActionPipeline
     // There probably should be a separation there.
     // ALSO, the selection provider might need to be per action.
     // NPC Enemies shouldn't get the same provider as the player.
-    public static async Task PlayTurn(this ScheduledAction action, ISelectionProvider provider, BattleContext ctx)
+    public static async Task PlayTurn(this IScheduledAction action, ISelectionProvider provider, BattleContext ctx)
     {
         action.Actor.Effects.TickStart();
         action.Actor.Pools.TickStart();

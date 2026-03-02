@@ -27,17 +27,18 @@ public partial class BattleMember
             List<PassiveEffectDefinition> Passives,
             List<DamageMutModifier> NormalModifiers,
             List<DamageMutModifier> HeadshotModifiers,
-            List<ScheduledAction> Turns);
+            List<IScheduledAction> Turns);
 
         private CreateCharacterOptions _createOptions = new()
         {
             Name = "Character",
             HeadshotModifiers = [],
             NormalModifiers = [],
-            Pools = [],
             Abilities = [],
             Passives = [],
             Turns = [],
+            Pools = [],
+            BaseStatOverrides = new Dictionary<StatId, double>(),
         };
 
         public CharacterBuilder Name([NotNull] string name)
@@ -64,7 +65,7 @@ public partial class BattleMember
             return this;
         }
 
-        public CharacterBuilder HeadshotModifier(ModifierStack modStack, DamageType? type = null,
+        public CharacterBuilder HeadshotModifier([NotNull] ModifierStack modStack, DamageType? type = null,
             DamageSource? source = null, bool critOnly = false)
         {
             _createOptions.HeadshotModifiers.Add(new DamageMutModifier
@@ -79,7 +80,7 @@ public partial class BattleMember
             return this;
         }
 
-        public CharacterBuilder NormalModifier(ModifierStack modStack, DamageType? type = null,
+        public CharacterBuilder NormalModifier([NotNull] ModifierStack modStack, DamageType? type = null,
             DamageSource? source = null, bool critOnly = false)
         {
             _createOptions.NormalModifiers.Add(new DamageMutModifier
@@ -100,7 +101,7 @@ public partial class BattleMember
             return this;
         }
 
-        public CharacterBuilder Turns([NotNull] params ScheduledAction[] actions)
+        public CharacterBuilder Turns([NotNull] params IScheduledAction[] actions)
         {
             _createOptions.Turns = actions.ToList();
             return this;

@@ -10,5 +10,5 @@ public interface ITakesTurns
     /// Turns that this IBattleMember may take during the battle.
     /// They appear on the actionbar.
     /// </summary>
-    [NotNull] IEnumerable<ScheduledAction> Turns { get; }
+    [NotNull] IEnumerable<IScheduledAction> Turns { get; }
 }

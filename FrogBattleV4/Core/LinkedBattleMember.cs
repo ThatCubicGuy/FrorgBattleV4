@@ -24,7 +24,7 @@ public class LinkedBattleMember : IBattleMember
     public IBattleMember Parent { get; }
 
     public ComponentContainer Components { get; } = [];
-    public IEnumerable<ScheduledAction>? OwnTurns { get; init; }
+    public IEnumerable<IScheduledAction>? OwnTurns { get; init; }
     public ITargetable? OwnHitbox { get; init; }
     public AbilityContainer? OwnAbilities { get; private set; }
     public EffectContainer? OwnEffects { get; private set; }
@@ -50,7 +50,7 @@ public class LinkedBattleMember : IBattleMember
         }
     }
 
-    IEnumerable<ScheduledAction> ITakesTurns.Turns => OwnTurns ?? Parent.Turns;
+    IEnumerable<IScheduledAction> ITakesTurns.Turns => OwnTurns ?? Parent.Turns;
     ITargetable IBattleMember.Hitbox => OwnHitbox ?? Parent.Hitbox;
     AbilityContainer IBattleMember.Abilities => OwnAbilities ?? Parent.Abilities;
     EffectContainer IBattleMember.Effects => OwnEffects ?? Parent.Effects;
