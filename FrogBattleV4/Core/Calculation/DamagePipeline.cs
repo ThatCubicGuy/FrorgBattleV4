@@ -1,59 +1,57 @@
 using System;
 using System.Diagnostics.Contracts;
-using System.Linq;
-using FrogBattleV4.Core.Calculation.Pools;
-using FrogBattleV4.Core.DamageSystem;
+using FrogBattleV4.Core.Calculation.Damage;
 
 namespace FrogBattleV4.Core.Calculation;
 
 public static class DamagePipeline
 {
-    // Separate context input because DamageIntent supplies target and targeting.
+    // Separate context input because DamageCommand supplies target and targeting.
     [Pure]
-    public static DamagePreview PreviewDamage(this DamageCommand dmg, ModifierContext ctx)
+    public static DamagePreview PreviewDamage(this DamageCommand cmd, ModifierContext ctx)
     {
-        if (ctx.Rng is null) throw new ArgumentException("Damage context requires an RNG property.", nameof(ctx));
         ctx = ctx with
         {
-            Other = dmg.Target,
-            Aiming = dmg.Targeting,
+            Other = cmd.Target,
+            Aiming = cmd.Targeting,
         };
 
         var normalDamage = new DamageQuery
         {
-            Type = dmg.Type,
+            Type = cmd.Type,
             Source = DamageSource.Ability,
             Crit = false,
-        }.ComputeMut(dmg.BaseAmount, ctx);
+        }.ComputeMut(cmd.BaseAmount, ctx);
 
         var critDamage = new DamageQuery
         {
-            Type = dmg.Type,
+            Type = cmd.Type,
             Source = DamageSource.Ability,
             Crit = true,
-        }.ComputeMut(dmg.BaseAmount, ctx);
+        }.ComputeMut(cmd.BaseAmount, ctx);
 
-        return new DamagePreview(dmg.Target, normalDamage, critDamage);
+        return new DamagePreview(cmd.Target, normalDamage + (critDamage - normalDamage) *
+            Math.Clamp(ctx.ComputeStat(StatId.CritRate), 0, 1));
     }
 
-    public static void ExecuteDamage(this DamageCommand dmg, ModifierContext ctx)
+    public static void ExecuteDamage(this DamageCommand cmd, ModifierContext ctx)
     {
         ctx = ctx with
         {
-            Other = dmg.Target,
-            Aiming = dmg.Targeting,
+            Other = cmd.Target,
+            Aiming = cmd.Targeting,
         };
 
         if (ctx.Rng is null) throw new ArgumentException("Damage context requires an RNG property.", nameof(ctx));
 
-        var isCrit = dmg.CanCrit && ctx.Rng.NextDouble() < ctx.ComputeStat(StatId.CritRate);
+        var isCrit = cmd.CanCrit && ctx.Rng.NextDouble() < ctx.ComputeStat(StatId.CritRate);
 
         var finalAmount = new DamageQuery
         {
-            Type = dmg.Type,
-            Source = DamageSource.Ability,
+            Type = cmd.Type,
+            Source = cmd.Source,
             Crit = isCrit,
-        }.ComputeMut(dmg.BaseAmount * (isCrit ? 1 + ctx.ComputeStat(StatId.CritDamage) : 1), ctx);
+        }.ComputeMut(cmd.BaseAmount * (isCrit ? 1 + ctx.ComputeStat(StatId.CritDamage) : 1), ctx);
         // Crit damage is applied directly to base damage ^
 
         // Def is applied after every calculation.
@@ -64,15 +62,7 @@ public static class DamagePipeline
             Rng = ctx.Rng,
         }.ComputeStat(StatId.Def);
         finalAmount = Math.Max(0, finalAmount);
-        if (dmg.Target.Hitbox.Resolve(dmg.Targeting).WouldHit)
-            dmg.Target.TakeDamage(new DamageResult(finalAmount, dmg.Target, dmg.Type, isCrit));
-    }
-
-    private static void TakeDamage(this IBattleMember bm, DamageResult dmg)
-    {
-        var pool = bm.Pools.WithTag(PoolTag.AbsorbsDamage).LastOrDefault() ??
-                   bm.Pools.WithTag(PoolTag.UsedForLife).LastOrDefault();
-        if (pool is null) return;
-        pool.CurrentValue -= dmg.Amount;
+        if (cmd.Target.Hitbox.Resolve(cmd.Targeting).WouldHit)
+            cmd.Target.Pools.TakeDamage(new DamageResult(finalAmount, cmd.Target, cmd.Type, isCrit));
     }
 }

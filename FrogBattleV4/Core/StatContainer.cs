@@ -5,7 +5,7 @@ using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core;
 
-public class StatContainer([NotNull] IEnumerable<KeyValuePair<StatId, double>> stats) : IBattleMemberComponent
+public class StatContainer([NotNull] IEnumerable<KeyValuePair<StatId, double>> stats)
 {
     private readonly FrozenDictionary<StatId, double> _stats = stats.ToFrozenDictionary();
 

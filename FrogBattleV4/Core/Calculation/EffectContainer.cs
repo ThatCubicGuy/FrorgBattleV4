@@ -9,7 +9,7 @@ using FrogBattleV4.Core.Effects.StatusEffects;
 
 namespace FrogBattleV4.Core.Calculation;
 
-public class EffectContainer : IBattleMemberComponent
+public class EffectContainer
 {
     private readonly List<StatusEffectInstance> _statusEffects = [];
     private readonly List<PassiveEffectDefinition> _passiveEffects = [];

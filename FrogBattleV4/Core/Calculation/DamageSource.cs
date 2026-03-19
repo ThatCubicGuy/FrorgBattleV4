@@ -7,7 +7,7 @@ public readonly record struct DamageSource([NotNull] string Source)
     /// <summary>
     /// Unique ID of the damage type. Automatically converted into pascal case.
     /// </summary>
-    [NotNull] public string Source { get; private init; } = Source.ToPascalCase();
+    [NotNull] public string Source { get; } = Source.ToPascalCase();
 
     public override string ToString() => Source;
 
@@ -15,7 +15,7 @@ public readonly record struct DamageSource([NotNull] string Source)
 
     #region Common Sources
 
-    public static readonly DamageSource None = new() { Source = null! };
+    public static readonly DamageSource None = default;
     public static readonly DamageSource Ability = nameof(Ability);
     public static readonly DamageSource FollowUp = nameof(FollowUp);
     public static readonly DamageSource Ultimate = nameof(Ultimate);

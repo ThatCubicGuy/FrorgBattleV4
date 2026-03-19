@@ -11,14 +11,34 @@ public class TimelineScheduler
     private double _now;
 
     /// <summary>
-    /// Cached current action.
+    /// The last dequeued action of the scheduler.
     /// </summary>
     public IScheduledAction Current { get; private set; }
 
+    /// <summary>
+    /// Advance an action in the timeline by a flat amount.
+    /// </summary>
+    /// <param name="action">Action to advance. Must be part of the timeline.</param>
+    /// <param name="flatValue">Value to advance by.</param>
+    /// <exception cref="ArgumentException">Action is not part of the timeline.</exception>
     public void Advance(IScheduledAction action, double flatValue)
     {
-        _queue.Remove(action, out action, out var currentPriority);
+        // Non-exception throwing guard against null actions
+        if (action is null) return;
+        if (!_queue.Remove(action, out action, out var currentPriority))
+            throw new ArgumentException("Action does not exist!", nameof(action));
         _queue.Enqueue(action, currentPriority with { Time = Math.Max(_now, currentPriority.Time - flatValue) });
+    }
+
+    /// <summary>
+    /// Advance an action in the timeline by a percentage of its base action value.
+    /// </summary>
+    /// <param name="action">Action to advance. Must be part of the timeline.</param>
+    /// <param name="percentValue">Percentage to advance by.</param>
+    /// <exception cref="ArgumentException">Action is not part of the timeline.</exception>
+    public void AdvancePercent(IScheduledAction action, double percentValue)
+    {
+        Advance(action, action.BaseActionValue * percentValue);
     }
 
     public void Schedule(IScheduledAction action)
@@ -52,11 +72,11 @@ public class TimelineScheduler
         return true;
     }
 
-    public IEnumerable<TimelineItem> GetOrderedActions()
+    public IOrderedEnumerable<TimelineItem> GetOrderedActions()
     {
         return _queue.UnorderedItems
-            .OrderBy(tuple => tuple.Priority)
-            .Select(tuple => new TimelineItem(tuple.Element, tuple.Priority.Time - _now));
+            .Select(tuple => new TimelineItem(tuple.Element, tuple.Priority.Time - _now))
+            .OrderBy(ti => ti.CurrentActionValue);
     }
 
     public readonly record struct TimelineItem(IScheduledAction Action, double CurrentActionValue);
@@ -65,6 +85,7 @@ public class TimelineScheduler
     {
         public int CompareTo(PriorityKey other)
         {
+            
             // If IsInstant is true, we want this instance to be considered earlier than the other.
             var isInstantComparison = -IsInstant.CompareTo(other.IsInstant);
             if (isInstantComparison != 0) return isInstantComparison;

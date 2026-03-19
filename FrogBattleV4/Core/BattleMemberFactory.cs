@@ -2,7 +2,7 @@ using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using FrogBattleV4.Core.AbilitySystem;
+using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Calculation.Pools;
 using FrogBattleV4.Core.Combat;
@@ -26,8 +26,7 @@ public partial class BattleMember
             List<AbilityDefinition> Abilities,
             List<PassiveEffectDefinition> Passives,
             List<DamageMutModifier> NormalModifiers,
-            List<DamageMutModifier> HeadshotModifiers,
-            List<IScheduledAction> Turns);
+            List<DamageMutModifier> HeadshotModifiers);
 
         private CreateCharacterOptions _createOptions = new()
         {
@@ -36,7 +35,6 @@ public partial class BattleMember
             NormalModifiers = [],
             Abilities = [],
             Passives = [],
-            Turns = [],
             Pools = [],
             BaseStatOverrides = new Dictionary<StatId, double>(),
         };
@@ -101,12 +99,6 @@ public partial class BattleMember
             return this;
         }
 
-        public CharacterBuilder Turns([NotNull] params IScheduledAction[] actions)
-        {
-            _createOptions.Turns = actions.ToList();
-            return this;
-        }
-
         public IBattleMember Build()
         {
             var stats = new Dictionary<StatId, double>(Registry.BaseCharacterStats);
@@ -126,18 +118,12 @@ public partial class BattleMember
                     HeadshotModifiers = _createOptions.HeadshotModifiers.ToFrozenSet(),
                     NormalModifiers = _createOptions.NormalModifiers.ToFrozenSet(),
                 },
-                Turns = _createOptions.Turns.ToFrozenSet(),
-                Components =
-                {
-                    new AbilityContainer(_createOptions.Abilities),
-                    new StatContainer(stats),
-                    new PoolContainer(),
-                    new EffectContainer(),
-                },
+                Abilities = new AbilityContainer(_createOptions.Abilities),
+                BaseStats = new StatContainer(stats),
+                Effects = new EffectContainer(),
+                Pools = new PoolContainer(),
+                Turn = new TurnContainer(),
             };
-
-            // Generate component caches
-            character.BuildCaches();
 
             // Add pools
             if (Registry.BaseCharacterPools.Values.Concat(_createOptions.Pools).Any(pd =>

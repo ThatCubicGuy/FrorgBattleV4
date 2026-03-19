@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using FrogBattleV4.Core.AbilitySystem;
+using FrogBattleV4.Core.Abilities;
 
 namespace FrogBattleV4.Core.Combat.Selections;
 
@@ -8,6 +8,3 @@ public record AbilitySelectionRequest(IBattleMember Requestor, IEnumerable<Abili
 
 public record TargetSelectionRequest(IBattleMember Requestor, IEnumerable<IBattleMember> ValidOptions, int Count = 1)
     : ISelectionRequest<IBattleMember>;
-
-public record PartSelectionRequest(IBattleMember Requestor, IEnumerable<ITargetable> ValidOptions, int Count = 1)
-    : ISelectionRequest<ITargetable>;

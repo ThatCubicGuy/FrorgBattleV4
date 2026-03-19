@@ -13,6 +13,7 @@ public readonly record struct PoolId(string Id)
 
     #region Common Pools
 
+    public static readonly PoolId None = default;
     public static readonly PoolId Hp = nameof(Hp);
     public static readonly PoolId Mana = nameof(Mana);
     public static readonly PoolId Energy = nameof(Energy);

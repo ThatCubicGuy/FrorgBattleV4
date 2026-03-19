@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using FrogBattleV4.Core.AbilitySystem;
+using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Effects.Modifiers;
 
 namespace FrogBattleV4.Core.Effects;

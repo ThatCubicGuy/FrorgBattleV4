@@ -6,7 +6,7 @@ using FrogBattleV4.ConsoleBattle;
 using FrogBattleV4.Core.Combat;
 
 var provider = new ConsoleSelectionProvider(CancellationToken.None);
-var game = new BattleManager(provider, new Team(), new Team());
+var game = new BattleManager(new Team(provider), new Team(provider));
 var runningTask = game.RunAsync();
 while (true)
 {

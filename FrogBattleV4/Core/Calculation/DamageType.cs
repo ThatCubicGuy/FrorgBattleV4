@@ -7,7 +7,7 @@ public readonly record struct DamageType([NotNull] string Type)
     /// <summary>
     /// Unique ID of the damage type. Automatically converted into pascal case.
     /// </summary>
-    [NotNull] public string Type { get; private init; } = Type.ToPascalCase();
+    [NotNull] public string Type { get; } = Type.ToPascalCase();
 
     public override string ToString() => Type;
 
@@ -15,7 +15,7 @@ public readonly record struct DamageType([NotNull] string Type)
 
     #region Common Types
 
-    public static readonly DamageType None = new() { Type = null! };
+    public static readonly DamageType None = default;
     public static readonly DamageType True = nameof(True);
     public static readonly DamageType Blunt = nameof(Blunt);
     public static readonly DamageType Slash = nameof(Slash);

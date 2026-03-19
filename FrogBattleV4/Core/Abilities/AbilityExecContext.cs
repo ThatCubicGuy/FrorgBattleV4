@@ -1,0 +1,26 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
+namespace FrogBattleV4.Core.Abilities;
+
+public struct AbilityExecContext
+{
+    [NotNull] public required IBattleMember User { get; init; }
+    [NotNull] public required AbilityDefinition Definition { get; init; }
+
+    /// <summary>
+    /// Main target selected by the user.
+    /// </summary>
+    [NotNull]
+    public required IBattleMember MainTarget { get; init; }
+
+    /// <summary>
+    /// Pool of targets that the ability's targeting components can select from, knowing the main target.
+    /// </summary>
+    /// <remarks>Order sensitive.</remarks>
+    [NotNull]
+    public required IEnumerable<IBattleMember> ValidTargets { get; init; }
+
+    [NotNull] public required Random Rng { get; init; }
+}

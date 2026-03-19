@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using FrogBattleV4.Core.AbilitySystem;
+using FrogBattleV4.Core.Abilities;
 
 namespace FrogBattleV4.Core.Effects;
 

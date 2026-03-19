@@ -1,0 +1,18 @@
+using System.Collections.Generic;
+using System.Linq;
+using FrogBattleV4.Core.Combat;
+
+namespace FrogBattleV4.Core.Abilities.Components.Targeting;
+
+public class AreaOfEffectTargeting(TargetingType type) : ITargetingComponent
+{
+    public IEnumerable<AbilityTargetingContext> SelectTargets(AbilityExecContext ctx)
+    {
+        return ctx.ValidTargets.Select(bm => new AbilityTargetingContext
+        {
+            Target = bm,
+            Aiming = type,
+            Rank = 0,
+        });
+    }
+}

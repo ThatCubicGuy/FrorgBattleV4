@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Effects.Modifiers;
@@ -12,7 +11,7 @@ public class PoolValueCondition : IConditionComponent
 
     #region Metadata
 
-    [NotNull] public required PoolId PoolId { get; init; }
+    public required PoolId PoolId { get; init; }
     public required CalcDirection Direction { get; init; }
 
     /// <summary>
@@ -38,6 +37,8 @@ public class PoolValueCondition : IConditionComponent
         init
         {
             if (value == 0) throw new ArgumentException("Step cannot be zero");
+            if (!double.IsRealNumber(value)) throw new ArgumentException("Step value must be real");
+            if (double.IsInfinity(value)) throw new ArgumentException("Step cannot be infinity");
             _step = value;
         }
     }

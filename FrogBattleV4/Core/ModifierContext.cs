@@ -1,5 +1,5 @@
 #nullable enable
-using FrogBattleV4.Core.AbilitySystem;
+using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Effects.Modifiers;
 

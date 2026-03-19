@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -15,17 +14,17 @@ public static class SelectionRequestExtensions
     [Pure]
     public static ISelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, int selection)
     {
-        return request.Select(new Range(selection, selection + 1));
+        return request.Select(new System.Range(selection, selection + 1));
     }
 
     [Pure]
     public static ISelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, int start, int end)
     {
-        return request.Select(new Range(start, end));
+        return request.Select(new System.Range(start, end));
     }
 
     [Pure]
-    public static ISelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, Range range)
+    public static ISelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, System.Range range)
     {
         return new SelectionResult<TResult>(request.ValidOptions.Take(range).ToArray());
     }

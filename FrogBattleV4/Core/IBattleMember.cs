@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using FrogBattleV4.Core.AbilitySystem;
+using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
 
 namespace FrogBattleV4.Core;
 
-public interface IBattleMember : ITakesTurns
+public interface IBattleMember
 {
     [NotNull] string Name { get; }
-    [NotNull] ComponentContainer Components { get; }
 
-    #region Caches
+    #region Containers
 
     AbilityContainer Abilities { get; }
     EffectContainer Effects { get; }
     StatContainer BaseStats { get; }
     PoolContainer Pools { get; }
+    TurnContainer Turn { get; }
     ITargetable Hitbox { get; }
 
     #endregion
