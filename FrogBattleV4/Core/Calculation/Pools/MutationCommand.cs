@@ -1,19 +1,21 @@
 using System;
-using FrogBattleV4.Core.Abilities;
+using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Calculation.Pools;
 
 /// <summary>
 /// Initializes a new mutation command with the given properties.
 /// </summary>
-/// <param name="TargetPool">The ID of the pool to mutate.</param>
-/// <param name="BaseAmount">Base amount of the mutation.</param>
-/// <param name="Flags">Mutation flags, such as... immutability of the mutation.</param>
-public record MutationCommand(
-    IBattleMember Target,
-    double BaseAmount,
-    PoolId TargetPool,
-    PoolMutationFlags Flags = PoolMutationFlags.None) : IBattleCommand;
+public record MutationCommand
+{
+    public IBattleMember Target { get; init; }
+    /// <summary>The ID of the pool to mutate.</summary>
+    public PoolId TargetPool { get; init; }
+    /// <summary>Base amount of the mutation.</summary>
+    public double BaseAmount { get; init; }
+    /// <summary>Mutation flags, such as... immutability of the mutation.</summary>
+    public PoolMutationFlags Flags { get; init; }
+}
 
 [Flags] public enum PoolMutationFlags
 {

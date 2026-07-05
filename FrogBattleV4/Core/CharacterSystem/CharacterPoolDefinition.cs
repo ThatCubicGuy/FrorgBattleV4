@@ -1,6 +1,5 @@
 #nullable enable
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Frozen;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Calculation.Pools;
 
@@ -11,27 +10,29 @@ namespace FrogBattleV4.Core.CharacterSystem;
 /// </summary>
 public class CharacterPoolDefinition : IPoolDefinition
 {
-    private readonly HashSet<PoolTag> _tags = [];
+    private readonly FrozenSet<PoolTag> _tags = [];
 
     public required PoolId Id { get; init; }
     public double InitialPercent { get; init; }
     double IPoolDefinition.GetInitialValue(ModifierContext ctx) => InitialPercent * ctx.ComputeStat(MaxValueStat);
     public required StatId MaxValueStat { get; init; }
-    public IEnumerable<PoolTag> Tags
+    public FrozenSet<PoolTag> Tags
     {
         get => _tags;
-        init => _tags = value.ToHashSet();
+        init => _tags = value.ToFrozenSet();
     }
 
-    public double? GetMaxValue(ModifierContext ctx) => new PoolValueQuery
+    public double MaxValue => new PoolValueQuery
     {
         Channel = PoolValueChannel.Max,
-        PoolId = Id
-    }.Compute(ctx.ComputeStat(MaxValueStat), ctx);
+        PoolId = Id,
+        Ctx = new ModifierContext()
+    }.Compute(new ModifierContext().ComputeStat(MaxValueStat));
 
-    public double? GetMinValue(ModifierContext ctx) => new PoolValueQuery
+    public double MinValue => new PoolValueQuery
     {
         Channel = PoolValueChannel.Max,
-        PoolId = Id
-    }.Compute(0, ctx);
+        PoolId = Id,
+        Ctx = new ModifierContext()
+    }.Compute(0);
 }

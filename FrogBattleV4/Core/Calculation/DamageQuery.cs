@@ -4,7 +4,7 @@ namespace FrogBattleV4.Core.Calculation;
 /// <summary>
 /// Mutation query classifying damage.
 /// </summary>
-public struct DamageQuery
+public record DamageQuery : QueryBase
 {
     public DamageType Type { get; init; }
     public DamageSource Source { get; init; }

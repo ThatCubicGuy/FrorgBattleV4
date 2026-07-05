@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FrogBattleV4.Core.Combat;
+using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
 

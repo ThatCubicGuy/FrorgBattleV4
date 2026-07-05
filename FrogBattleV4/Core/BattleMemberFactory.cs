@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -6,10 +7,10 @@ using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Calculation.Pools;
 using FrogBattleV4.Core.Combat;
-using FrogBattleV4.Core.Combat.Actions;
 using FrogBattleV4.Core.Effects.Components;
 using FrogBattleV4.Core.Effects.Modifiers;
 using FrogBattleV4.Core.Effects.PassiveEffects;
+using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core;
 
@@ -25,14 +26,13 @@ public partial class BattleMember
             List<IPoolDefinition> Pools,
             List<AbilityDefinition> Abilities,
             List<PassiveEffectDefinition> Passives,
-            List<DamageMutModifier> NormalModifiers,
-            List<DamageMutModifier> HeadshotModifiers);
+            List<DamageMutModifier> DamageTakenModifiers,
+            List<DamageMutModifier> WeakPointModifiers);
 
         private CreateCharacterOptions _createOptions = new()
         {
             Name = "Character",
-            HeadshotModifiers = [],
-            NormalModifiers = [],
+            DamageTakenModifiers = [],
             Abilities = [],
             Passives = [],
             Pools = [],
@@ -66,7 +66,8 @@ public partial class BattleMember
         public CharacterBuilder HeadshotModifier([NotNull] ModifierStack modStack, DamageType? type = null,
             DamageSource? source = null, bool critOnly = false)
         {
-            _createOptions.HeadshotModifiers.Add(new DamageMutModifier
+            throw new NotImplementedException("Weak point modifiers are not implemented");
+            _createOptions.WeakPointModifiers.Add(new DamageMutModifier
             {
                 Type = type ?? DamageType.None,
                 Source = source ?? DamageSource.None,
@@ -78,10 +79,10 @@ public partial class BattleMember
             return this;
         }
 
-        public CharacterBuilder NormalModifier([NotNull] ModifierStack modStack, DamageType? type = null,
+        public CharacterBuilder DamageTakenModifier([NotNull] ModifierStack modStack, DamageType? type = null,
             DamageSource? source = null, bool critOnly = false)
         {
-            _createOptions.NormalModifiers.Add(new DamageMutModifier
+            _createOptions.DamageTakenModifiers.Add(new DamageMutModifier
             {
                 Type = type ?? DamageType.None,
                 Source = source ?? DamageSource.None,
@@ -115,8 +116,8 @@ public partial class BattleMember
                 Hitbox = new HumanoidHitbox
                 {
                     Floating = false,
-                    HeadshotModifiers = _createOptions.HeadshotModifiers.ToFrozenSet(),
-                    NormalModifiers = _createOptions.NormalModifiers.ToFrozenSet(),
+                    DamageModifiers = _createOptions.DamageTakenModifiers.ToFrozenSet(),
+                    WeakPointModifiers = _createOptions.WeakPointModifiers.ToFrozenSet(),
                 },
                 Abilities = new AbilityContainer(_createOptions.Abilities),
                 BaseStats = new StatContainer(stats),
@@ -131,7 +132,7 @@ public partial class BattleMember
                     {
                         Definition = pd,
                         Target = character,
-                    }))) throw new System.InvalidOperationException("Pool add failure");
+                    }))) throw new InvalidOperationException("Pool add failure");
 
             // Add passive effects
             foreach (var passive in _createOptions.Passives)

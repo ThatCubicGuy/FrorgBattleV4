@@ -20,11 +20,17 @@ internal static class StatusEffectPipeline
         return cmd.ChanceType switch
         {
             ChanceType.Fixed => cmd.ApplicationChance,
-            ChanceType.Base => cmd.ApplicationChance +
-                               new StatQuery(StatId.EffectHitRate).Compute(
-                                   cmd.EffectSource.BaseStats[StatId.EffectHitRate]
-                                   + cmd.ApplicationChance, outCtx) -
-                               inCtx.ComputeStat(StatId.EffectRes),
+            ChanceType.Base => cmd.ApplicationChance
+                               + cmd.EffectSource.GetStat(new StatQuery
+                               {
+                                   Stat = StatId.EffectHitRate,
+                                   Ctx = inCtx
+                               })
+                               - cmd.Target.GetStat(new StatQuery
+                               {
+                                   Stat = StatId.EffectRes,
+                                   Ctx = outCtx
+                               }),
             _ => throw new InvalidEnumArgumentException($"Invalid chance type: {cmd.ChanceType}")
         };
     }

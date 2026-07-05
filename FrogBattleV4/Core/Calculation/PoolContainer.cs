@@ -78,6 +78,6 @@ public readonly record struct PoolSnapshot(double CurrentValue, double? MinValue
     public PoolSnapshot(PoolComponent pool) : this(pool.CurrentValue, pool.MinValue, pool.MaxValue) { }
     public override string ToString()
     {
-        return $"{CurrentValue}/{MaxValue}";
+        return $"{CurrentValue}" + (MaxValue is null ? string.Empty : $"/{MaxValue}");
     }
 }

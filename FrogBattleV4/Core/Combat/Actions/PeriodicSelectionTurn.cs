@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat.Selections;
+using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Combat.Actions;
 

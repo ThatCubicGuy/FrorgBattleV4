@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Combat;
 

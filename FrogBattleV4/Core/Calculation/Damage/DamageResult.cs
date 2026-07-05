@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using FrogBattleV4.Core.Contexts;
+using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Calculation.Damage;
 
@@ -17,27 +18,3 @@ public record DamageResult(
     [NotNull] IBattleMember ResultTarget,
     DamageType Type,
     bool IsCrit) : IResultContext<IBattleMember>;
-
-/// <summary>
-/// A fully calculated instance of damage. The raw value of <see cref="Amount"/>
-/// is deducted from the HP of the target.<br/>This record is mostly used for displays.
-/// </summary>
-file readonly struct OldDamageResult : IResultContext<IBattleMember>
-{
-    /// <summary>
-    /// The amount of damage taken.
-    /// </summary>
-    public required double Amount { get; init; }
-    /// <summary>
-    /// The target of the damage.
-    /// </summary>
-    [NotNull] public required IBattleMember ResultTarget { get; init; }
-    /// <summary>
-    /// The type of the damage dealt.
-    /// </summary>
-    public required DamageType Type { get; init; }
-    /// <summary>
-    /// Whether this damage instance is a critical hit.
-    /// </summary>
-    public required bool IsCrit { get; init; }
-}

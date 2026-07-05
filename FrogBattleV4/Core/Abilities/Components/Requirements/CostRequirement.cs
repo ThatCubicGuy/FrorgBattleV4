@@ -21,7 +21,7 @@ public class CostRequirement : CostComponent, IAbilityRequirementComponent
             Ability = ctx.Definition,
             Rng = ctx.Rng,
         };
-        return Cost.GetCostRequests(ctx).All(mc => mc.PreviewMutation(modCtx).Satisfiable);
+        return Cost.GetCostRequests(ctx).All(mc => mc.PreviewMutation(modCtx).FinalDeltaValue <= mc.Target.Pools[mc.TargetPool]);
     }
 
     // CostComponent is inherited to avoid writing costs twice - you just create a new

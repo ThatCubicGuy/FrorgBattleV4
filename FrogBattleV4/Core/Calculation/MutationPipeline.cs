@@ -18,10 +18,8 @@ public static class MutationPipeline
         {
             PoolId = cmd.TargetPool,
             Channel = cmd.BaseAmount > 0 ? PoolMutChannel.Regen : PoolMutChannel.Cost,
-        }.ComputeMut(cmd.BaseAmount, ctx);
-        return new MutationResult(cmd.TargetPool, finalAmount, ctx.Actor is { } actor &&
-            !(actor.Pools[cmd.TargetPool].MaxValue < actor.Pools[cmd.TargetPool].CurrentValue + finalAmount ||
-              actor.Pools[cmd.TargetPool].MinValue > actor.Pools[cmd.TargetPool].CurrentValue + finalAmount));
-        // Inverted greater/lesser than since MaxValue can be null
+            Ctx = ctx
+        }.ComputeMut(cmd.BaseAmount);
+        return new MutationResult(cmd.TargetPool, finalAmount);
     }
 }

@@ -6,19 +6,24 @@ using System.Linq;
 using FrogBattleV4.Core.Effects;
 using FrogBattleV4.Core.Effects.Components;
 using FrogBattleV4.Core.Effects.Modifiers;
+using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Combat;
 
-public class HumanoidHitbox : ITargetable
+public class HumanoidHitbox : IHitbox
 {
     /// <summary>
     /// If the character is floating, they will be immune to ground attacks.
     /// </summary>
     public bool Floating { get; set; }
 
-    public required IEnumerable<DamageMutModifier> HeadshotModifiers { get; init; }
+    public required IEnumerable<DamageMutModifier> HeadshotModifiers
+    {
+        get => throw new NotImplementedException();
+        init => throw new NotImplementedException();
+    }
 
-    public IEnumerable<DamageMutModifier> NormalModifiers { get; init; } = [];
+    public IEnumerable<DamageMutModifier> DamageModifiers { get; init; } = [];
 
     [Pure]
     private HitboxRegion? GetRegionAtHeight(int height) => height switch
@@ -32,7 +37,7 @@ public class HumanoidHitbox : ITargetable
     [Pure]
     private ModifierCollection GetModifiers(HitboxRegion region) => new((region switch
     {
-        HitboxRegion.Body => NormalModifiers,
+        HitboxRegion.Body => DamageModifiers,
         HitboxRegion.WeakPoint => HeadshotModifiers,
         _ => []
     }).ToArray<ModifierRule>());
@@ -45,7 +50,7 @@ public class HumanoidHitbox : ITargetable
             TargetingType.Height h => GetRegionAtHeight(h.Value) is not { } region
                 ? TargetingResult.Miss
                 : new TargetingResult(GetModifiers(region)),
-            _ => throw new NotSupportedException("Unknown targeting type: " + targeting)
+            _ => throw new NotSupportedException("Unknown targeting type: " + targeting.GetType().Name)
         };
     }
 }

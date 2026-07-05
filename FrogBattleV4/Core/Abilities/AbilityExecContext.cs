@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Abilities;
 

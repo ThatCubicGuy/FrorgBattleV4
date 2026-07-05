@@ -3,9 +3,15 @@ namespace FrogBattleV4.Core.Calculation;
 /// <summary>
 /// Mutation query classifying a pool mutation (e.g. healing, spending mana).
 /// </summary>
-public readonly struct PoolMutQuery
+public record PoolMutQuery : QueryBase
 {
+    /// <summary>
+    /// ID of the pool.
+    /// </summary>
     public required PoolId PoolId { get; init; }
+    /// <summary>
+    /// Channel on which this mutation will be registered (Cost/Regen)
+    /// </summary>
     public required PoolMutChannel Channel { get; init; }
 }
 

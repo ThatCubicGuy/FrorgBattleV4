@@ -1,7 +1,9 @@
 #nullable enable
 using FrogBattleV4.Core.Abilities;
+using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Effects.Modifiers;
+using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core;
 
@@ -20,7 +22,7 @@ public readonly record struct ModifierContext(
     // Rng for those who need it.
     System.Random? Rng = null);
 
-public record ModifierQuery<TQuery>(TQuery Query, CalcDirection Direction) where TQuery : struct;
+public record ModifierQuery(QueryBase Query, CalcDirection Direction);
 
-public record MutModifierQuery<TQuery>(TQuery Query, CalcDirection Direction, MutModifierDirection MutModifierDirection)
-    : ModifierQuery<TQuery>(Query, Direction) where TQuery : struct;
+public record MutModifierQuery(QueryBase Query, CalcDirection Direction, MutModifierDirection MutModifierDirection)
+    : ModifierQuery(Query, Direction);

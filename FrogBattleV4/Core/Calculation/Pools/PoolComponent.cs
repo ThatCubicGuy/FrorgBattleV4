@@ -1,26 +1,21 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace FrogBattleV4.Core.Calculation.Pools;
 
-public sealed class PoolComponent
+public class PoolComponent(PoolInitContext ctx)
 {
-    private double _currentValue;
+    private double _currentValue = ctx.Definition.GetInitialValue(new ModifierContext(ctx.Target));
     // Context for calculating capacity is always identical
-    private readonly ModifierContext _ctx;
-
-    public PoolComponent(PoolInitContext ctx)
-    {
-        Definition = ctx.Definition;
-        _ctx = new ModifierContext(ctx.Target);
-        _currentValue = ctx.Definition.GetInitialValue(_ctx);
-    }
 
     public event Action<PoolComponent, double, double>? ValueChanged;
+    public event Action<PoolComponent, double>? MinReached;
+    public event Action<PoolComponent, double>? MaxReached;
 
-    public IPoolDefinition Definition { get; }
+    public HashSet<PoolTag> Tags { get; } = [..ctx.Definition.Tags];
 
     public double CurrentValue
     {
@@ -28,15 +23,23 @@ public sealed class PoolComponent
         set
         {
             var old = _currentValue;
-            _currentValue = Math.Clamp(value,
-                MinValue ?? double.MinValue,
-                MaxValue ?? double.MaxValue);
+            _currentValue = value;
+            if (_currentValue <= MinValue)
+            {
+                MinReached?.Invoke(this, MinValue - _currentValue);
+                _currentValue = Math.Max(_currentValue, MinValue);
+            }
+            if (_currentValue >= MaxValue)
+            {
+                MaxReached?.Invoke(this, _currentValue - MaxValue);
+                _currentValue = Math.Min(_currentValue, MaxValue);
+            }
             if (!old.Equals(_currentValue)) ValueChanged?.Invoke(this, old, _currentValue);
         }
     }
 
-    public double? MaxValue => Definition.GetMaxValue(_ctx);
-    public double? MinValue => Definition.GetMinValue(_ctx);
+    public double MaxValue { get; } = ctx.Definition.MaxValue;
+    public double MinValue { get; } = ctx.Definition.MinValue;
 
     // I like having both '?' and [NotNull] tags in my code, so in
     // this context where I only have one nullable reference field
@@ -45,16 +48,16 @@ public sealed class PoolComponent
 #nullable disable
     public bool HasTag(PoolTag tag)
     {
-        return Definition.Tags.Contains(tag);
+        return Tags.Contains(tag);
     }
 
     public bool HasAllTags([NotNull] params PoolTag[] tags)
     {
-        return tags.All(Definition.Tags.Contains);
+        return Tags.IsSupersetOf(tags);
     }
 
     public bool HasAnyTags([NotNull] params PoolTag[] tags)
     {
-        return tags.Any(tag => Definition.Tags.Contains(tag));
+        return tags.Any(tag => Tags.Contains(tag));
     }
 }

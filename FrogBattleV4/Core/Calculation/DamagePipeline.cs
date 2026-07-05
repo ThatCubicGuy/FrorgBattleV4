@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.Calculation.Damage;
 
 namespace FrogBattleV4.Core.Calculation;
@@ -7,32 +6,6 @@ namespace FrogBattleV4.Core.Calculation;
 public static class DamagePipeline
 {
     // Separate context input because DamageCommand supplies target and targeting.
-    [Pure]
-    public static DamagePreview PreviewDamage(this DamageCommand cmd, ModifierContext ctx)
-    {
-        ctx = ctx with
-        {
-            Other = cmd.Target,
-            Aiming = cmd.Targeting,
-        };
-
-        var normalDamage = new DamageQuery
-        {
-            Type = cmd.Type,
-            Source = DamageSource.Ability,
-            Crit = false,
-        }.ComputeMut(cmd.BaseAmount, ctx);
-
-        var critDamage = new DamageQuery
-        {
-            Type = cmd.Type,
-            Source = DamageSource.Ability,
-            Crit = true,
-        }.ComputeMut(cmd.BaseAmount, ctx);
-
-        return new DamagePreview(cmd.Target, normalDamage + (critDamage - normalDamage) *
-            Math.Clamp(ctx.ComputeStat(StatId.CritRate), 0, 1));
-    }
 
     public static void ExecuteDamage(this DamageCommand cmd, ModifierContext ctx)
     {

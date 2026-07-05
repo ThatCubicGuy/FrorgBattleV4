@@ -5,9 +5,9 @@ namespace FrogBattleV4.Core.Calculation;
 /// <summary>
 /// Value query classifying a stat.
 /// </summary>
-/// <param name="stat"></param>
 [method: SetsRequiredMembers]
-public readonly struct StatQuery(StatId stat)
+public record StatQuery : QueryBase
 {
-    public required StatId Stat { get; init; } = stat;
+    /// <summary>ID of the stat to query.</summary>
+    public required StatId Stat { get; init; }
 }

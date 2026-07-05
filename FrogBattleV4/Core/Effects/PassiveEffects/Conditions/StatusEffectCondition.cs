@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using FrogBattleV4.Core.Effects.Modifiers;
 using FrogBattleV4.Core.Effects.StatusEffects;
 

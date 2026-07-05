@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
-using FrogBattleV4.Core.Abilities;
+using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Effects;
 
-public record RemoveEffectCommand : IBattleCommand
+public record RemoveEffectCommand
 {
     [NotNull] public required System.Func<StatusEffects.StatusEffectInstance, bool> Query { get; init; }
     [NotNull] public required IBattleMember Target { get; init; }

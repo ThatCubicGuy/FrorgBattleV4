@@ -1,10 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
-using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Effects.StatusEffects;
+using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Effects;
 
-public record ApplyEffectCommand : IBattleCommand
+public record ApplyEffectCommand
 {
     [NotNull] public required StatusEffectDefinition Definition { get; init; }
     [NotNull] public required IBattleMember Target { get; init; }

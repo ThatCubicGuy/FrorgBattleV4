@@ -11,8 +11,7 @@ public interface ITargetable
     /// </summary>
     /// <param name="targeting"></param>
     /// <returns>The result of being targeted in this way.</returns>
-    [Pure]
-    TargetingResult Resolve(TargetingType targeting);
+    [Pure] TargetingResult Resolve(TargetingType targeting);
 }
 
 public readonly record struct TargetingResult([NotNull] IModifierProvider Modifier)

@@ -1,4 +1,5 @@
 using System.Diagnostics.Contracts;
+using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.Effects.Modifiers;
 
@@ -16,6 +17,5 @@ public interface IModifierProvider
     /// <typeparam name="TQuery">Type of query to handle.</typeparam>
     /// <returns>A modifier stack revealing the final contribution.</returns>
     [Pure]
-    ModifierStack GetContributingModifiers<TQuery>(ModifierQuery<TQuery> query, ModifierContext ctx)
-        where TQuery : struct;
+    ModifierStack GetContributingModifiers(ModifierQuery query, ModifierContext ctx);
 }
