@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text.Json;
@@ -30,7 +29,7 @@ public static class Localization
     /// <param name="key">Key to search in the dictionary.</param>
     /// <returns>The translated key, or the key if it does not appear in the dictionary.</returns>
     /// <exception cref="InvalidOperationException">No translation file loaded.</exception>
-    [Pure] public static string GetTranslation([NotNull] string key)
+    [Pure] public static string GetTranslation(string key)
     {
         return _translationFile is null
             ? throw new InvalidOperationException("Translation file not loaded.")
@@ -44,7 +43,7 @@ public static class Localization
     /// <param name="args">Format arguments.</param>
     /// <returns>Formatted translation.</returns>
     /// <exception cref="InvalidOperationException">No translation file loaded.</exception>
-    [Pure] public static string GetTranslationFormatted([NotNull] string formatKey, [NotNull] params object[] args)
+    [Pure] public static string GetTranslationFormatted(string formatKey, params object[] args)
     {
         return string.Format(GetTranslation(formatKey), args);
     }

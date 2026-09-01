@@ -1,8 +1,7 @@
-#nullable enable
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using FrogBattleV4.Core.Calculation.Damage;
+using FrogBattleV4.Core.Abilities.Components.Actions;
 using FrogBattleV4.Core.Calculation.Pools;
 using FrogBattleV4.Core.Effects.StatusEffects;
 
@@ -31,28 +30,28 @@ public class PoolContainer
         }
     }
 
-    public void TakeDamage(DamageResult result)
+    public void TakeDamage(DealDamage damage)
     {
         var pool = LastWithTag(PoolTag.AbsorbsDamage) ??
                    LastWithTag(PoolTag.UsedForLife);
         if (pool is null)
         {
-            System.Diagnostics.Debug.WriteLine("WARNING: Attempt to damage member with no health!");
+            System.Diagnostics.Trace.WriteLine("WARNING: Attempt to damage member with no health!");
             return;
         }
 
-        pool.CurrentValue -= result.Amount;
+        pool.CurrentValue -= damage.TotalAmount;
     }
 
-    public void Mutate(MutationResult result)
+    public void Mutate(Mutate result)
     {
-        if (_pools.GetValueOrDefault(result.ResultTarget) is not { } pool)
+        if (_pools.GetValueOrDefault(result.TargetPool) is not { } pool)
         {
             System.Diagnostics.Debug.WriteLine("WARNING: Attempt to mutate absent pool in member!");
             return;
         }
 
-        pool.CurrentValue += result.FinalDeltaValue;
+        pool.CurrentValue += result.TotalAmount;
     }
 
     public bool Add(PoolInitContext pool) => _pools.TryAdd(pool.Definition.Id, new PoolComponent(pool));

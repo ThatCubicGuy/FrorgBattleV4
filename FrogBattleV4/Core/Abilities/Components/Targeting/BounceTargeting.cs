@@ -1,31 +1,28 @@
 using System.Collections.Generic;
 using System.Linq;
-using FrogBattleV4.Core.Combat;
-using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
 
-public class BounceTargeting(TargetingType type) : ITargetingComponent
+public class BounceTargeting : IShardTargeting
 {
-    public required int Count { get; init; }
-
-    public IEnumerable<AbilityTargetingContext> SelectTargets(AbilityExecContext ctx)
+    public required int Count { get; set; }
+    public int RankPenaltyPerBounce { get; set; } = 0;
+    public IEnumerable<AbilityTargetingContext> SelectTargets(ShardLinkContext ctx)
     {
-        var targets = Enumerable.Empty<IBattleMember>();
+        var targets = new List<AbilityTargetingContext>();
         for (var i = 0; i < Count; i++)
         {
-            targets = targets.Append(ctx.ValidTargets.MinBy(_ => ctx.Rng.NextDouble()));
+            var next = ctx.State.AlliedTeamOf(ctx.SelectedTarget).Members.MinBy(_ => ctx.Rng.NextDouble());
+            if (next is not null) targets.Add(new AbilityTargetingContext
+            {
+                Target = next,
+                Rank = i * RankPenaltyPerBounce,
+            });
         }
 
-        return targets.Select(bm => new AbilityTargetingContext
+        return targets.Prepend(new AbilityTargetingContext
         {
-            Target = bm,
-            Aiming = type,
-            Rank = 1,
-        }).Prepend(new AbilityTargetingContext
-        {
-            Target = ctx.MainTarget,
-            Aiming = type,
+            Target = ctx.SelectedTarget,
             Rank = 0,
         });
     }

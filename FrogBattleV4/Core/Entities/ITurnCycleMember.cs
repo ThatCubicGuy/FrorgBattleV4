@@ -1,5 +1,3 @@
-using FrogBattleV4.Core.Combat;
-
 namespace FrogBattleV4.Core.Entities;
 
 public interface ITurnCycleMember
@@ -14,12 +12,10 @@ public interface ITurnCycleMember
     /// Gets the next turn of this TurnCycleMember.
     /// </summary>
     /// <returns>A turn to be added to the action bar.</returns>
-    ITurn GetNextTurn();
+    Turn GetNextTurn();
 }
 
-public interface ITurn
+public abstract class Turn
 {
-    IBattleMember User { get; }
-    double BaseActionValue { get; }
-    void PlayTurn(BattleContext ctx);
+    // TODO !!!
 }

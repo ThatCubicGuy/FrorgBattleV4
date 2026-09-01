@@ -1,20 +1,22 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.Calculation.Pools;
+using FrogBattleV4.Core.Abilities.Components.Actions;
+using FrogBattleV4.Core.Abilities.Components.Requirements;
+using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.Abilities.Components.Costs;
 
-public class ConditionalCost : CostComponent
+public class ConditionalCost(AbilityShard shard) : CostRequirement(shard)
 {
-    [NotNull] public required Func<AbilityExecContext, bool> Predicate { get; init; }
-    [NotNull] public required CostComponent CostIfTrue { get; init; }
-    public CostComponent CostIfFalse { get; init; }
+    public required Func<ShardLinkContext, bool> Predicate { get; init; }
+    public required CostRequirement CostIfTrue { get; init; }
+
+    public CostRequirement CostIfFalse { get; init; } = new FixedCost(shard) { BaseAmount = 0, Pool = PoolId.Mana };
 
     [Pure]
-    public override IEnumerable<MutationCommand> GetCostRequests(AbilityExecContext ctx)
+    public override IEnumerable<Mutate> GetCost(ShardLinkContext ctx)
     {
-        return Predicate(ctx) ? CostIfTrue.GetCostRequests(ctx) : CostIfFalse?.GetCostRequests(ctx) ?? [];
+        return Predicate(ctx) ? CostIfTrue.GetCost(ctx) : CostIfFalse.GetCost(ctx);
     }
 }

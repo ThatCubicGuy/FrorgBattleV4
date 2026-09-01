@@ -3,51 +3,27 @@ using System.Diagnostics.Contracts;
 
 namespace FrogBattleV4.Core;
 
-// BAHHAHAHA THIS IS LITERALLY A VECTOR
-// YOU CAN ADD IT TO ANOTHER
-// YOU CAN MULTIPLY BY SCALAR
-// DUDE I CAN MAKE
-// VECTOR SPACES
-// OUT OF MODIFIER STACKS
-// AND COMPUTE THE BEST POSSIBLE COMBINATION OF THEM ???
-// I CAN * APPLY * LINEAR ALGEBRA ???
+/// <summary>
+/// Represents a combined collection of modifiers for a certain value.
+/// </summary>
+/// <param name="AddValue">Adds this value to the total, first step.</param>
+/// <param name="AddBasePercent">Adds this value multiplied by the base value, second step.</param>
+/// <param name="MultiplyTotal">Multiplies the total by this value, third step.</param>
+/// <param name="FinalAddValue">Adds this value to the total, fourth step.</param>
 public record ModifierStack(
     double AddValue = 0,
     double AddBasePercent = 0,
     double MultiplyTotal = 1,
-    double Minimum = double.MinValue,
-    double Maximum = double.MaxValue)
+    double FinalAddValue = 0)
 {
-    public double this[ModifierOperation operation]
+    public double this[ModifierOperation operation] => operation switch
     {
-        get => this[(int)operation];
-        init => this[(int)operation] = value;
-    }
-
-    private double this[int index]
-    {
-        get => index switch
-        {
-            0 => AddValue,
-            1 => AddBasePercent,
-            2 => MultiplyTotal,
-            3 => Minimum,
-            4 => Maximum,
-            _ => throw new IndexOutOfRangeException($"Invalid ModifierOperation! ({index})")
-        };
-        init
-        {
-            switch (index)
-            {
-                case 0: AddValue = value; break;
-                case 1: AddBasePercent = value; break;
-                case 2: MultiplyTotal = value; break;
-                case 3: Minimum = value; break;
-                case 4: Maximum = value; break;
-                default: throw new IndexOutOfRangeException($"Invalid ModifierOperation! ({index})");
-            }
-        }
-    }
+        ModifierOperation.AddValue => AddValue,
+        ModifierOperation.AddBasePercent => AddBasePercent,
+        ModifierOperation.MultiplyTotal => MultiplyTotal,
+        ModifierOperation.FinalAddValue => FinalAddValue,
+        _ => throw new ArgumentOutOfRangeException(nameof(operation), $"Invalid ModifierOperation! ({operation})")
+    };
 
     /// <summary>
     /// Applies these modifiers to a value.
@@ -61,15 +37,13 @@ public record ModifierStack(
         total += this[ModifierOperation.AddValue];
         total += this[ModifierOperation.AddBasePercent] * baseAmount;
         total *= this[ModifierOperation.MultiplyTotal];
-        total = Math.Clamp(total,
-            this[ModifierOperation.Minimum],
-            this[ModifierOperation.Maximum]);
+        total += this[ModifierOperation.FinalAddValue];
         return total;
     }
 
     /// <summary>
-    /// Returns a copy of this ModifierStack where
-    /// all fields have a positive or neutral effect.
+    /// Returns a copy of this ModifierStack that
+    /// retains only the positive or neutral effects.
     /// </summary>
     /// <returns>A new ModifierStack.</returns>
     [Pure]
@@ -78,13 +52,12 @@ public record ModifierStack(
         AddValue = Math.Max(0, AddValue),
         AddBasePercent = Math.Max(0, AddBasePercent),
         MultiplyTotal = Math.Max(1, MultiplyTotal),
-        Minimum = Minimum,
-        Maximum = Maximum,
+        FinalAddValue = Math.Max(0, AddValue),
     };
 
     /// <summary>
-    /// Returns a copy of this ModifierStack where
-    /// all fields have a negative or neutral effect.
+    /// Returns a copy of this ModifierStack that
+    /// retains only the negative or neutral effects.
     /// </summary>
     /// <returns>A new ModifierStack.</returns>
     [Pure]
@@ -93,8 +66,7 @@ public record ModifierStack(
         AddValue = Math.Min(0, AddValue),
         AddBasePercent = Math.Min(0, AddBasePercent),
         MultiplyTotal = Math.Min(1, MultiplyTotal),
-        Minimum = Minimum,
-        Maximum = Maximum,
+        FinalAddValue = Math.Min(0, AddValue),
     };
 
     public override string ToString()
@@ -102,8 +74,7 @@ public record ModifierStack(
         return $"Additive: {AddValue}," +
                $" BasePercent: {AddBasePercent}," +
                $" MultiplyTotal: {MultiplyTotal}," +
-               $" Minimum: {Minimum}," +
-               $" Maximum: {Maximum}";
+               $" FinalAdditive: {FinalAddValue}";
     }
 
     /// <summary>
@@ -118,8 +89,7 @@ public record ModifierStack(
         AddValue = left.AddValue + right.AddValue,
         AddBasePercent = left.AddBasePercent + right.AddBasePercent,
         MultiplyTotal = left.MultiplyTotal * right.MultiplyTotal,
-        Minimum = Math.Max(left.Minimum, right.Minimum),
-        Maximum = Math.Min(left.Maximum, right.Maximum),
+        FinalAddValue = left.FinalAddValue + right.FinalAddValue,
     };
 
     /// <summary>
@@ -134,7 +104,7 @@ public record ModifierStack(
         AddValue = mod.AddValue * scalar,
         AddBasePercent = mod.AddBasePercent * scalar,
         MultiplyTotal = Math.Pow(mod.MultiplyTotal, scalar),
-        // Completely clueless as to how I'd modify min/max by a scalar... 
+        FinalAddValue = mod.FinalAddValue * scalar,
     };
 
     /// <summary>
@@ -149,9 +119,8 @@ public record ModifierStack(
 
 public enum ModifierOperation
 {
-    AddValue = 0,
-    AddBasePercent = 1,
-    MultiplyTotal = 2,
-    Minimum = 3,
-    Maximum = 4,
+    AddValue,
+    AddBasePercent,
+    MultiplyTotal,
+    FinalAddValue,
 }

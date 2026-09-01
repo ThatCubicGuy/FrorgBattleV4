@@ -1,17 +1,15 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace FrogBattleV4.Core.Calculation;
 
-public readonly record struct StatId([NotNull] string Id)
+public readonly record struct StatId(string Id)
 {
     /// <summary>
     /// Unique ID of the stat. Automatically converted into pascal case.
     /// </summary>
-    [NotNull] public string Id { get; } = Id.ToPascalCase();
+    public string Id { get; } = Id.ToPascalCase();
 
     public override string ToString() => Id;
 
-    public static implicit operator StatId([NotNull] string id) => new(id);
+    public static implicit operator StatId(string id) => new(id);
 
     #region Common Stats
 

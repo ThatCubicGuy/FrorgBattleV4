@@ -1,21 +1,19 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace FrogBattleV4.Core.Calculation;
 
-public readonly record struct DamageSource([NotNull] string Source)
+public readonly record struct DamageSource(string Source)
 {
     /// <summary>
-    /// Unique ID of the damage type. Automatically converted into pascal case.
+    /// Unique ID of the damage type. Automatically converted into snake case.
     /// </summary>
-    [NotNull] public string Source { get; } = Source.ToPascalCase();
+    public string Source { get; } = Source.ToSnakeCase();
 
     public override string ToString() => Source;
 
-    public static implicit operator DamageSource([NotNull] string source) => new(source);
+    public static implicit operator DamageSource(string source) => new(source);
 
     #region Common Sources
 
-    public static readonly DamageSource None = default;
+    public static readonly DamageSource All = default;
     public static readonly DamageSource Ability = nameof(Ability);
     public static readonly DamageSource FollowUp = nameof(FollowUp);
     public static readonly DamageSource Ultimate = nameof(Ultimate);
@@ -23,5 +21,5 @@ public readonly record struct DamageSource([NotNull] string Source)
 
     #endregion
 
-    public bool Matches(DamageSource other) => this == None || other == None || this == other;
+    public bool Matches(DamageSource other) => this == All || other == All || this == other;
 }

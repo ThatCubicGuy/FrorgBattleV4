@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
-using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat.Actions;
 using FrogBattleV4.Core.Entities;
@@ -12,11 +10,11 @@ namespace FrogBattleV4.Core.Combat;
 
 public class BattleManager
 {
-    private readonly Dictionary<IBattleMember, IScheduledAction> _turns;
+    private readonly Dictionary<GameEntity, IScheduledAction> _turns;
     private readonly Random _rng = new();
     public List<Team> AllTeams { get; }
 
-    public BattleManager([NotNull] params Team[] teams)
+    public BattleManager(params Team[] teams)
     {
         AllTeams = teams.ToList();
 
@@ -66,48 +64,5 @@ public class BattleManager
             TurnEnd?.Invoke(this, ctx);
         }
         // TODO: Win logic lmao
-    }
-
-    private bool ExecuteAbility(AbilityExecContext ctx)
-    {
-        var preview = ctx.PreviewAbility();
-        if (!preview.CanUse) return false;
-
-        foreach (var command in preview.Commands)
-        {
-            ExecuteCommand(command, new ModifierContext
-            {
-                Actor = ctx.User,
-                Other = ctx.MainTarget,
-                Ability = ctx.Definition,
-                Rng = ctx.Rng,
-            });
-        }
-
-        return true;
-    }
-
-    private void ExecuteCommand(IBattleCommand cmd, ModifierContext ctx)
-    {
-        switch (cmd)
-        {
-            case Calculation.Damage.DamageCommand dc:
-                dc.ExecuteDamage(ctx);
-                break;
-            case Calculation.Pools.MutationCommand mc:
-                mc.Target.Pools.Mutate(mc.PreviewMutation(ctx));
-                break;
-            case Effects.ApplyEffectCommand aec:
-                aec.Target.Effects.Apply(aec);
-                break;
-            case ActionAdvanceCommand aac:
-                Scheduler.AdvancePercent(_turns[aac.Target], aac.AdvancePercent);
-                break;
-            case QueueActionCommand qac:
-                Scheduler.Schedule(qac.Action);
-                break;
-            default:
-                throw new NotSupportedException();
-        }
     }
 }

@@ -8,5 +8,5 @@ public interface IPoolDefinition
     public PoolId Id { get; }
     double MaxValue { get; }
     public FrozenSet<PoolTag> Tags { get; }
-    double GetInitialValue(ModifierContext ctx);
+    double GetInitialValue(InteractionContext ctx);
 }

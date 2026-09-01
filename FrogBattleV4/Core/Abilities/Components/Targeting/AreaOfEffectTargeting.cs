@@ -1,18 +1,29 @@
 using System.Collections.Generic;
 using System.Linq;
-using FrogBattleV4.Core.Combat;
 
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
 
-public class AreaOfEffectTargeting(TargetingType type) : ITargetingComponent
+/// <summary>
+/// Selects an entire team.
+/// </summary>
+public class AreaOfEffectTargeting : IShardTargeting
 {
-    public IEnumerable<AbilityTargetingContext> SelectTargets(AbilityExecContext ctx)
+    public required int RankPenalty { get; set; }
+
+    public IEnumerable<AbilityTargetingContext> SelectTargets(ShardLinkContext ctx)
     {
-        return ctx.ValidTargets.Select(bm => new AbilityTargetingContext
+        var result = new List<AbilityTargetingContext>();
+        foreach (var (target, rank) in ctx.Targets)
         {
-            Target = bm,
-            Aiming = type,
-            Rank = 0,
-        });
+            result.AddRange(ctx.State
+                .AlliedTeamOf(target).Members
+                .Select(entity => new AbilityTargetingContext
+                {
+                    Target = entity,
+                    Rank = rank + RankPenalty,
+                }));
+        }
+
+        return result;
     }
 }

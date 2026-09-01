@@ -1,21 +1,19 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace FrogBattleV4.Core.Calculation;
 
-public readonly record struct DamageType([NotNull] string Type)
+public readonly record struct DamageType(string Type)
 {
     /// <summary>
-    /// Unique ID of the damage type. Automatically converted into pascal case.
+    /// Unique ID of the damage type. Automatically converted into snake case.
     /// </summary>
-    [NotNull] public string Type { get; } = Type.ToPascalCase();
+    public string Type { get; } = Type.ToSnakeCase();
 
     public override string ToString() => Type;
 
-    public static implicit operator DamageType([NotNull] string type) => new(type);
+    public static implicit operator DamageType(string type) => new(type);
 
     #region Common Types
 
-    public static readonly DamageType None = default;
+    public static readonly DamageType All = default;
     public static readonly DamageType True = nameof(True);
     public static readonly DamageType Blunt = nameof(Blunt);
     public static readonly DamageType Slash = nameof(Slash);
@@ -26,5 +24,5 @@ public readonly record struct DamageType([NotNull] string Type)
 
     #endregion
 
-    public bool Matches(DamageType other) => this == None || other == None || this == other;
+    public bool Matches(DamageType other) => this == All || other == All || this == other;
 }

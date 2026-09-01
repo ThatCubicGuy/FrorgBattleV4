@@ -1,4 +1,3 @@
-#nullable enable
 using System.Linq;
 using System.Threading.Tasks;
 using FrogBattleV4.Core.Abilities;
@@ -16,10 +15,10 @@ public interface IScheduledAction : IBattleAction
 
 public class CharacterTurn : IScheduledAction
 {
-    public required IBattleMember Actor { get; init; }
+    public required GameEntity Actor { get; init; }
     public required ISelectionProvider SelectionProvider { get; init; }
 
-    public async Task<AbilityExecContext> PlayTurn(BattleContext ctx)
+    public async Task<ShardLinkContext> PlayTurn(BattleContext ctx)
     {
         var defResult = await SelectionProvider.GetSelectionAsync(
             new AbilitySelectionRequest(ctx.ActiveMember,
@@ -36,21 +35,20 @@ public class CharacterTurn : IScheduledAction
                     TargetingPool.Arena => null,
                     _ => throw new System.NotSupportedException()
                 }));
-        return new AbilityExecContext
+        return new ShardLinkContext
         {
             User = ctx.ActiveMember,
-            Definition = defResult.Choices.Single(),
-            MainTarget = tgResult.Choices.Single(),
-            ValidTargets = ctx.Enemies,
+            CurrentLink = defResult.Choices.Single(),
+            SelectedTarget = tgResult.Choices.Single(),
             Rng = ctx.Rng,
         };
     }
 
-    public double BaseActionValue => 10000 / new ModifierContext(Actor).ComputeStat(StatId.Spd);
+    public double BaseActionValue => 10000 / new InteractionContext(Actor).ComputeStat(StatId.Spd);
 }
 
 public interface IBattleAction
 {
-    IBattleMember Actor { get; }
-    Task<AbilityExecContext> PlayTurn(BattleContext ctx);
+    GameEntity Actor { get; }
+    Task<ShardLinkContext> PlayTurn(BattleContext ctx);
 }

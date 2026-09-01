@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -8,8 +7,7 @@ namespace FrogBattleV4.Core.Calculation.Pools;
 
 public class PoolComponent(PoolInitContext ctx)
 {
-    private double _currentValue = ctx.Definition.GetInitialValue(new ModifierContext(ctx.Target));
-    // Context for calculating capacity is always identical
+    private double _currentValue = ctx.Definition.GetInitialValue(new InteractionContext(ctx.Target));
 
     public event Action<PoolComponent, double, double>? ValueChanged;
     public event Action<PoolComponent, double>? MinReached;
@@ -24,10 +22,10 @@ public class PoolComponent(PoolInitContext ctx)
         {
             var old = _currentValue;
             _currentValue = value;
-            if (_currentValue <= MinValue)
+            if (_currentValue <= 0)
             {
-                MinReached?.Invoke(this, MinValue - _currentValue);
-                _currentValue = Math.Max(_currentValue, MinValue);
+                MinReached?.Invoke(this, -1 * _currentValue);
+                _currentValue = Math.Max(_currentValue, 0);
             }
             if (_currentValue >= MaxValue)
             {
@@ -39,13 +37,7 @@ public class PoolComponent(PoolInitContext ctx)
     }
 
     public double MaxValue { get; } = ctx.Definition.MaxValue;
-    public double MinValue { get; } = ctx.Definition.MinValue;
 
-    // I like having both '?' and [NotNull] tags in my code, so in
-    // this context where I only have one nullable reference field
-    // I won't enable file-wide nullable annotations because Rider
-    // will give me warnings about redundant [NotNull] attributes.
-#nullable disable
     public bool HasTag(PoolTag tag)
     {
         return Tags.Contains(tag);

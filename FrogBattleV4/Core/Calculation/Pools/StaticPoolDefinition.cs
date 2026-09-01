@@ -18,5 +18,5 @@ public class StaticPoolDefinition : IPoolDefinition
     public double InitialValue { get; init; } = 0;
     public double MaxValue { get; init; }
 
-    public double GetInitialValue(ModifierContext ctx) => InitialValue;
+    public double GetInitialValue(InteractionContext ctx) => InitialValue;
 }

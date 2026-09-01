@@ -9,7 +9,7 @@ namespace FrogBattleV4.Core.Entities;
 
 // Think "Ethereal support character that exists in your team,
 // but not on the field, and can just attack at will"
-public class BackgroundFighter : IBattleMember
+public class BackgroundFighter : GameEntity
 {
     public required string Name { get; set; }
 
@@ -23,7 +23,7 @@ public class BackgroundFighter : IBattleMember
         return BaseStats[query.Stat];
     }
 
-    public IEnumerable<IModifierProvider> GetAllModifiers(ModifierContext ctx)
+    public IEnumerable<IModifierProvider> GetAllModifiers(InteractionContext ctx)
     {
         return StatusEffects;
     }

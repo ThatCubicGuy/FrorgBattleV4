@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
@@ -8,20 +7,13 @@ namespace FrogBattleV4.Core.Abilities.Components.Requirements;
 /// <summary>
 /// Logical OR operator between the given requirements.
 /// </summary>
-public class AnyRequirement : IAbilityRequirementComponent
+public class AnyRequirement : IShardRequirement
 {
-    private readonly List<IAbilityRequirementComponent> _requirements;
-
-    [NotNull]
-    public required IEnumerable<IAbilityRequirementComponent> Requirements
-    {
-        get => _requirements;
-        init => _requirements = value.ToList();
-    }
+    public required ImmutableList<IShardRequirement> Terms { get; init; }
 
     [Pure]
-    public bool IsFulfilled(AbilityExecContext ctx)
+    public virtual bool IsFulfilled(ShardLinkContext ctx)
     {
-        return Requirements.Any(rc => rc.IsFulfilled(ctx));
+        return Terms.Any(requirement => requirement.IsFulfilled(ctx));
     }
 }

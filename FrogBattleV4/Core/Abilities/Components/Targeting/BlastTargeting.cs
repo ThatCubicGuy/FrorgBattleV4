@@ -1,29 +1,45 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FrogBattleV4.Core.Combat;
 
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
 
-public class BlastTargeting(TargetingType type) : ITargetingComponent
+/// <summary>
+/// Selects targets adjacent to other selected ones
+/// below a maximum rank.
+/// </summary>
+public class BlastTargeting : IShardTargeting
 {
-    public required int Radius { get; init; }
+    // Select targets up to Radius slots away from the main target.
+    public int Radius { get; set; } = 1;
 
-    public IEnumerable<AbilityTargetingContext> SelectTargets(AbilityExecContext ctx)
+    /// <summary>
+    /// How much the rank increases for each slot away from the main target.
+    /// </summary>
+    public int RankPenaltyPerSlot { get; set; } = 1;
+
+    /// <summary>
+    /// The maximum rank that targets can have to be eligible for adjacent selection.
+    /// </summary>
+    public int MaximumRank { get; set; } = 99;
+
+    public IEnumerable<AbilityTargetingContext> SelectTargets(ShardLinkContext ctx)
     {
-        var validTargetsList = ctx.ValidTargets.ToList();
-        var idx = validTargetsList.IndexOf(ctx.MainTarget);
-        if (idx == -1) throw new InvalidOperationException("MainTarget is not among ValidTargets");
-
-        // Project each target in the list into an AbilityTargetingContext with rank being the distance
-        // of this target from the main target (horizontally). Then, skip anything below idx-Radius and
-        // take every element within the radius from there.
-        return validTargetsList.Select((bm, i) => new AbilityTargetingContext
+        var result = new List<AbilityTargetingContext>();
+        foreach (var (target, rank) in ctx.Targets.Where(atc => atc.Rank <= MaximumRank))
         {
-            Target = bm,
-            Aiming = type,
-            Rank = Math.Abs(idx - i),
-        }).Skip(idx - Radius).Take(2 * Radius + 1);
+            var team = ctx.State.AlliedTeamOf(target).Members;
+            var idx = team.IndexOf(target);
+            result.AddRange(team
+                .Skip(Math.Max(0, idx - Radius))
+                .Take(2 * Radius + 1)
+                .Select((entity, i) => new AbilityTargetingContext
+                {
+                    Target = entity,
+                    Rank = rank + Math.Abs(idx - i) * RankPenaltyPerSlot,
+                }));
+        }
+
+        return result;
     }
 }

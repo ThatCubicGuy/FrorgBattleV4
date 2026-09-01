@@ -1,13 +1,12 @@
-using System.Diagnostics.CodeAnalysis;
 using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Calculation.Pools;
 
 public struct PoolInitContext
 {
-    [NotNull] public required IPoolDefinition Definition { get; init; }
-    [NotNull] public IBattleMember Target { get; init; }
+    public required IPoolDefinition Definition { get; init; }
+    public GameEntity Target { get; init; }
     // how to be an ABSOLUTE rat bastard.
 #nullable enable
-    public IBattleMember? Source { get; init; }
+    public GameEntity? Source { get; init; }
 }

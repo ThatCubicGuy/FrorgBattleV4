@@ -1,13 +1,12 @@
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Combat;
 
 public class Team
 {
-    public Team([NotNull] Selections.ISelectionProvider playerSelectionProvider,
-        [NotNull] params IBattleMember[] battleMembers)
+    public Team(Selections.ISelectionProvider playerSelectionProvider,
+        params GameEntity[] battleMembers)
     {
         System.ArgumentNullException.ThrowIfNull(playerSelectionProvider);
         System.ArgumentNullException.ThrowIfNull(battleMembers);
@@ -15,6 +14,6 @@ public class Team
         Members = battleMembers.ToImmutableList();
     }
 
-    [NotNull] public Selections.ISelectionProvider Provider { get; }
-    [NotNull] public ImmutableList<IBattleMember> Members { get; }
+    public Selections.ISelectionProvider Provider { get; }
+    public ImmutableList<GameEntity> Members { get; }
 }
