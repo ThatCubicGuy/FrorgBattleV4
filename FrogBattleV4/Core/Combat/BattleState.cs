@@ -3,7 +3,7 @@ using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Combat;
 
-public struct BattleContext
+public struct BattleState
 {
     public required BattleManager Manager { get; init; }
     public required GameEntity ActiveMember { get; init; }

@@ -11,35 +11,35 @@ namespace FrogBattleV4.Core.Abilities.Components.Targeting;
 public class BlastTargeting : IShardTargeting
 {
     // Select targets up to Radius slots away from the main target.
-    public int Radius { get; set; } = 1;
+    public int Radius { get; init; } = 1;
 
     /// <summary>
     /// How much the rank increases for each slot away from the main target.
     /// </summary>
-    public int RankPenaltyPerSlot { get; set; } = 1;
+    public int RankPenaltyPerSlot { get; init; } = 1;
 
     /// <summary>
     /// The maximum rank that targets can have to be eligible for adjacent selection.
     /// </summary>
-    public int MaximumRank { get; set; } = 99;
+    public int MaximumRank { get; init; } = 99;
 
-    public IEnumerable<AbilityTargetingContext> SelectTargets(ShardLinkContext ctx)
+    public TargetingSelection SelectTargets(LinkResolutionState state, BattleEnvironment env)
     {
         var result = new List<AbilityTargetingContext>();
-        foreach (var (target, rank) in ctx.Targets.Where(atc => atc.Rank <= MaximumRank))
+        foreach (var (target, rank) in state.Selections.Where(atc => atc.Rank <= MaximumRank))
         {
-            var team = ctx.State.AlliedTeamOf(target).Members;
-            var idx = team.IndexOf(target);
-            result.AddRange(team
+            var allies = env.GetNeighbors(target);
+            var idx = allies.IndexOf(target);
+            result.AddRange(allies
                 .Skip(Math.Max(0, idx - Radius))
                 .Take(2 * Radius + 1)
-                .Select((entity, i) => new AbilityTargetingContext
+                .Select((member, i) => new AbilityTargetingContext
                 {
-                    Target = entity,
+                    Target = member,
                     Rank = rank + Math.Abs(idx - i) * RankPenaltyPerSlot,
                 }));
         }
 
-        return result;
+        return new TargetingSelection(result);
     }
 }

@@ -96,10 +96,34 @@ public record ModifierStack(
     /// Multiplies a modifier stack by a scalar.
     /// </summary>
     /// <param name="mod">Modifier to scale.</param>
-    /// <param name="scalar">Real value to scale by.</param>
+    /// <param name="scalar">Integer to scale by.</param>
     /// <returns>A scaled modifier result.</returns>
     [Pure]
     public static ModifierStack operator *(ModifierStack mod, int scalar) => new()
+    {
+        AddValue = mod.AddValue * scalar,
+        AddBasePercent = mod.AddBasePercent * scalar,
+        MultiplyTotal = Math.Pow(mod.MultiplyTotal, scalar),
+        FinalAddValue = mod.FinalAddValue * scalar,
+    };
+
+    /// <summary>
+    /// Multiplies a modifier stack by a scalar.
+    /// </summary>
+    /// <param name="scalar">Integer to scale by.</param>
+    /// <param name="mod">Modifier to scale.</param>
+    /// <returns>A scaled modifier result.</returns>
+    [Pure]
+    public static ModifierStack operator *(int scalar, ModifierStack mod) => mod * scalar;
+    
+    /// <summary>
+    /// Multiplies a modifier stack by a scalar.
+    /// </summary>
+    /// <param name="mod">Modifier to scale.</param>
+    /// <param name="scalar">Real value to scale by.</param>
+    /// <returns>A scaled modifier result.</returns>
+    [Pure]
+    public static ModifierStack operator *(ModifierStack mod, double scalar) => new()
     {
         AddValue = mod.AddValue * scalar,
         AddBasePercent = mod.AddBasePercent * scalar,
@@ -114,7 +138,7 @@ public record ModifierStack(
     /// <param name="mod">Modifier to scale.</param>
     /// <returns>A scaled modifier result.</returns>
     [Pure]
-    public static ModifierStack operator *(int scalar, ModifierStack mod) => mod * scalar;
+    public static ModifierStack operator *(double scalar, ModifierStack mod) => mod * scalar;
 }
 
 public enum ModifierOperation

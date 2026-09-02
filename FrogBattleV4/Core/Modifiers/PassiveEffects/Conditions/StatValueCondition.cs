@@ -40,9 +40,13 @@ public class StatValueCondition : IConditionComponent
     }
 
     [Pure]
-    public int GetContribution(RelationContext ctx)
+    public int GetContribution(EntityUid subject, EntityUid? reference, BattleEnvironment env)
     {
-        if (ctx.Actor is not { } actor) return 0;
-        return (int)Math.Floor((Math.Clamp(ctx.ComputeStat(Stat), MinValue, MaxValue) - MinValue) / Step);
+        return (int)Math.Floor((Math.Clamp(new StatQuery
+        {
+            Stat = Stat,
+            Subject = subject,
+            Reference = reference,
+        }.Calculate(env), MinValue, MaxValue) - MinValue) / Step);
     }
 }

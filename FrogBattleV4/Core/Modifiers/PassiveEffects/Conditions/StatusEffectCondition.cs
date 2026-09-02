@@ -1,22 +1,31 @@
+using System;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Modifiers.PassiveEffects.Conditions;
 
 public class StatusEffectCondition : IConditionComponent
 {
-    public required System.Func<StatusEffectInstance, bool> Query { get; init; }
+    public required Func<StatusEffectInstance, bool> Query { get; init; }
     public required AffectedSide Side { get; init; }
     public bool SumStacks { get; init; }
 
     [Pure]
-    public int GetContribution(RelationContext ctx)
+    public int GetContribution(EntityUid subject, EntityUid? reference, BattleEnvironment env)
     {
-        return (Side switch
+        try
         {
-            AffectedSide.Self => ctx.Actor,
-            AffectedSide.Other => ctx.Target,
-            _ => null
-        })?.Effects.StatusEffects.Where(Query).Sum(sei => SumStacks? sei.Stacks : 1) ?? 0;
+            return env.GetFighter(Side switch
+            {
+                AffectedSide.Self => subject,
+                AffectedSide.Other => reference ?? throw new InvalidOperationException(),
+                _ => throw new NotSupportedException($"Side {Side} not supported")
+            }).StatusEffects.Where(Query).Sum(sei => SumStacks ? sei.Stacks : 1);
+        }
+        catch(InvalidOperationException)
+        {
+            return 0;
+        }
     }
 }

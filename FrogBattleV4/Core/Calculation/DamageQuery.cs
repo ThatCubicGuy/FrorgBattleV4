@@ -1,13 +1,17 @@
-using FrogBattleV4.Core.Effects.Modifiers;
-
 namespace FrogBattleV4.Core.Calculation;
 
 /// <summary>
 /// Mutation query classifying damage.
 /// </summary>
-public record DamageQuery(CalcDirection Direction, MutModifierDirection MutModifierDirection) : MutModifierQuery(Direction, MutModifierDirection)
+public sealed record DamageQuery : DynamicQuery
 {
-    public DamageType Type { get; init; }
-    public DamageSource Source { get; init; }
-    public required bool Crit { get; init; }
+    public required DamageData Data { get; init; }
+    public required CritResolution CritData { get; init; }
+    public bool IsCrit => CritData.Outcome == CritStatus.Critical;
+}
+
+public sealed record DamageStatQuery : StaticQuery
+{
+    public required DamageData Data { get; init; }
+    public required DamageStatChannel Channel { get; init; }
 }

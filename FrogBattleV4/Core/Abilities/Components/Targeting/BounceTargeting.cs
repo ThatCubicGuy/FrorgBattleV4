@@ -5,25 +5,29 @@ namespace FrogBattleV4.Core.Abilities.Components.Targeting;
 
 public class BounceTargeting : IShardTargeting
 {
-    public required int Count { get; set; }
-    public int RankPenaltyPerBounce { get; set; } = 0;
-    public IEnumerable<AbilityTargetingContext> SelectTargets(ShardLinkContext ctx)
+    public required int Count { get; init; }
+    public int RankPenaltyPerBounce { get; init; } = 0;
+    public TargetingSelection SelectTargets(LinkResolutionState state, BattleEnvironment env)
     {
         var targets = new List<AbilityTargetingContext>();
-        for (var i = 0; i < Count; i++)
+        foreach (var (target, rank) in state.Selections)
         {
-            var next = ctx.State.AlliedTeamOf(ctx.SelectedTarget).Members.MinBy(_ => ctx.Rng.NextDouble());
-            if (next is not null) targets.Add(new AbilityTargetingContext
+            targets.Add(new AbilityTargetingContext
             {
-                Target = next,
-                Rank = i * RankPenaltyPerBounce,
+                Target = target,
+                Rank = rank,
             });
+            for (var i = 0; i < Count; i++)
+            {
+                var next = env.GetNeighbors(target).MinBy(_ => env.NextRoll());
+                targets.Add(new AbilityTargetingContext
+                {
+                    Target = next,
+                    Rank = rank + i * RankPenaltyPerBounce,
+                });
+            }
         }
 
-        return targets.Prepend(new AbilityTargetingContext
-        {
-            Target = ctx.SelectedTarget,
-            Rank = 0,
-        });
+        return new TargetingSelection(targets);
     }
 }

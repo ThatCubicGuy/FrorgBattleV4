@@ -1,4 +1,8 @@
-using FrogBattleV4.Core.Entities;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 
 namespace FrogBattleV4.Core.Abilities.Components;
 
@@ -7,7 +11,7 @@ public record AbilityTargetingContext
     /// <summary>
     /// The target of this hit.
     /// </summary>
-    public required GameEntity Target { get; init; }
+    public required EntityUid Target { get; init; }
 
     /// <summary>
     /// The rank of the target signifies whether it
@@ -16,9 +20,19 @@ public record AbilityTargetingContext
     /// </summary>
     public required int Rank { get; init; }
 
-    public void Deconstruct(out GameEntity target, out int rank)
+    [Pure]
+    public void Deconstruct(out EntityUid target, out int rank)
     {
         target = Target;
         rank = Rank;
     }
+}
+
+public class TargetingSelection(IEnumerable<AbilityTargetingContext> selections)
+    : IEnumerable<AbilityTargetingContext>
+{
+    private ImmutableList<AbilityTargetingContext> Targets { get; } = selections.ToImmutableList();
+
+    public IEnumerator<AbilityTargetingContext> GetEnumerator() => Targets.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Targets).GetEnumerator();
 }

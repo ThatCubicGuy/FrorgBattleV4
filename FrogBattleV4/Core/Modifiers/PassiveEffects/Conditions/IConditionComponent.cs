@@ -8,8 +8,10 @@ public interface IConditionComponent
     /// Gets the value that this condition is fulfilled by.
     /// This value may be negative.
     /// </summary>
-    /// <param name="ctx">The context for which to check the contribution.</param>
+    /// <param name="subject"></param>
+    /// <param name="reference"></param>
+    /// <param name="env"></param>
     /// <returns>The fulfillment value.</returns>
     [Pure]
-    int GetContribution(RelationContext ctx);
+    int GetContribution(EntityUid subject, EntityUid? reference, BattleEnvironment env);
 }

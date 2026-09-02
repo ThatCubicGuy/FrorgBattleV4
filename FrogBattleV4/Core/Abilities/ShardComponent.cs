@@ -1,6 +1,6 @@
 namespace FrogBattleV4.Core.Abilities;
 
-public abstract class ShardComponent(AbilityShard shard)
+public abstract class ShardComponent(IShard parentShard)
 {
-    public AbilityShard ParentShard { get; init; } = shard;
+    public IShard ParentShard { get; init; } = parentShard;
 }

@@ -1,68 +1,47 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.Abilities.Components;
-using FrogBattleV4.Core.Entities;
+using FrogBattleV4.Core.Combat.Actions;
+using FrogBattleV4.Core.Modifiers;
 
 namespace FrogBattleV4.Core.Abilities;
 
 /// <summary>
-/// A mutable context describing the current, unresolved state of linking.
+/// A mutable context describing the current state of resolution.
 /// </summary>
-public class ShardLinkContext
+/// <param name="User">Entity using this link.</param>
+/// <param name="Selections">Currently selected targets.</param>
+/// <param name="Modifiers">Currently active modifiers.</param>
+/// <param name="CurrentShardIndex">Index of the currently resolving shard</param>
+public sealed record LinkResolutionState(
+    EntityUid User,
+    TargetingSelection Selections,
+    ModifierCollection Modifiers,
+    int CurrentShardIndex);
+
+/// <summary>
+/// Small scope object for a single shard command's resolution.
+/// </summary>
+/// <param name="User">User of the shard.</param>
+/// <param name="Targeting">Target of the shard.</param>
+/// <param name="Modifiers">Modifiers owned by the user at time of resolution.</param>
+public sealed record ShardResolutionScope(
+    EntityUid User,
+    AbilityTargetingContext Targeting,
+    IModifierProvider Modifiers);
+
+public sealed class LinkResolutionBuilder
 {
-    public required FighterBase User { get; init; }
-    public required BattleState State { get; init; }
-    /// <summary>
-    /// The currently selected shards.
-    /// </summary>
-    public ImmutableList<IShard> CurrentLink { get; private set; } = [];
+    private readonly List<ShardAction> _shardActions = [];
 
-    /// <summary>
-    /// Target the user's crosshair is aiming at.
-    /// </summary>
-    public required GameEntity SelectedTarget { get; init; }
+    public void Emit(ShardAction shardAction) => _shardActions.Add(shardAction);
 
-    public ImmutableList<AbilityTargetingContext> Targets { get; private set; } = [];
-
-    public required Random Rng { get; init; }
-
-    public void Link(IShard shard)
-    {
-        CurrentLink = CurrentLink.Add(shard);
-    }
-    public void SetTargets(IEnumerable<AbilityTargetingContext> targets)
-    {
-        Targets = [.. targets];
-    }
+    [Pure]
+    public LinkResolution Build() => new(_shardActions);
 }
 
-public class LinkResolutionBuilder
+public class LinkResolution(IEnumerable<ShardAction> actions)
 {
-    private readonly List<IShardAction> _shardActions = [];
-
-    public void Add(IShardAction shardAction)
-    {
-        _shardActions.Add(shardAction);
-    }
-
-    public void Remove(IShardAction shardAction)
-    {
-        _shardActions.Remove(shardAction);
-    }
-
-    public void Undo()
-    {
-        _shardActions.RemoveAt(_shardActions.Count - 1);
-    }
-
-    public LinkResolution Build()
-    {
-        return new LinkResolution(_shardActions);
-    }
-}
-
-public class LinkResolution(IEnumerable<IShardAction> actions)
-{
-    public ImmutableList<IShardAction> ShardActions { get; init; } = [.. actions];
+    public ImmutableList<ShardAction> ShardActions { get; init; } = [.. actions];
 }

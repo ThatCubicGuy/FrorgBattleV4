@@ -24,5 +24,6 @@ public readonly record struct DamageType(string Type)
 
     #endregion
 
-    public bool Matches(DamageType other) => this == All || other == All || this == other;
+    public bool Matches(DamageType other) =>
+        Type == other.Type || Type == All.Type || other.Type == All.Type;
 }

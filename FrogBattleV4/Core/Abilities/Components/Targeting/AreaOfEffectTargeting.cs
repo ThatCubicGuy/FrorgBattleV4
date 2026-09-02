@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
@@ -8,15 +9,14 @@ namespace FrogBattleV4.Core.Abilities.Components.Targeting;
 /// </summary>
 public class AreaOfEffectTargeting : IShardTargeting
 {
-    public required int RankPenalty { get; set; }
+    public required int RankPenalty { get; init; }
 
-    public IEnumerable<AbilityTargetingContext> SelectTargets(ShardLinkContext ctx)
+    public TargetingSelection SelectTargets(LinkResolutionState state, BattleEnvironment env)
     {
         var result = new List<AbilityTargetingContext>();
-        foreach (var (target, rank) in ctx.Targets)
+        foreach (var (target, rank) in state.Selections)
         {
-            result.AddRange(ctx.State
-                .AlliedTeamOf(target).Members
+            result.AddRange(env.GetNeighbors(target)
                 .Select(entity => new AbilityTargetingContext
                 {
                     Target = entity,
@@ -24,6 +24,6 @@ public class AreaOfEffectTargeting : IShardTargeting
                 }));
         }
 
-        return result;
+        return new TargetingSelection(result);
     }
 }

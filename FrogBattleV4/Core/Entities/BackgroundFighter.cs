@@ -2,8 +2,8 @@ using System.Collections.Frozen;
 using System.Collections.Generic;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
-using FrogBattleV4.Core.Effects.Modifiers;
-using FrogBattleV4.Core.Effects.StatusEffects;
+using FrogBattleV4.Core.Modifiers;
+using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Entities;
 
@@ -23,7 +23,7 @@ public class BackgroundFighter : GameEntity
         return BaseStats[query.Stat];
     }
 
-    public IEnumerable<IModifierProvider> GetAllModifiers(InteractionContext ctx)
+    public IEnumerable<IModifierProvider> GetAllModifiers(RelationContext ctx)
     {
         return StatusEffects;
     }

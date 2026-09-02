@@ -1,6 +1,6 @@
-using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.Modifiers.StatusEffects;
 
-namespace FrogBattleV4.Core.Abilities.Components.Actions;
+namespace FrogBattleV4.Core.Combat.Actions;
 
 /// <summary>
 /// Represents a command for applying an effect to a target.

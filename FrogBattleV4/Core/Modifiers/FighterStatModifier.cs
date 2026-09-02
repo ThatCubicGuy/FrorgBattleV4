@@ -1,6 +1,6 @@
 using FrogBattleV4.Core.Calculation;
 
-namespace FrogBattleV4.Core.Modifiers.Components;
+namespace FrogBattleV4.Core.Modifiers;
 
 public class FighterStatModifier : StatModifier<StatQuery>
 {

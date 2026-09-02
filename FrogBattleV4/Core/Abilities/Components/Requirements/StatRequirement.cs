@@ -4,19 +4,21 @@ namespace FrogBattleV4.Core.Abilities.Components.Requirements;
 
 public class StatRequirement : IShardRequirement
 {
-    public required AbilityShard ParentShard { get; init; }
+    public required IShard ParentShard { get; init; }
     public required StatId Stat { get; init; }
     public double? MinValue { get; init; } = null;
     public double? MaxValue { get; init; } = null;
 
-    public virtual bool IsFulfilled(ShardLinkContext ctx)
+    public virtual bool IsFulfilled(LinkResolutionState state, BattleEnvironment env)
     {
-        return new InteractionContext
+        return new StatQuery
         {
-            Actor = ctx.User,
-            Other = ctx.SelectedTarget,
-            Ability = ParentShard,
-            Rng = ctx.Rng,
-        }.ComputeStat(Stat).IsWithinRange(MinValue, MaxValue);
+            Stat = Stat,
+            Subject = state.User,
+        }.Calculate(env).IsWithinRange(MinValue, MaxValue);
+    }
+
+    public void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
+    {
     }
 }

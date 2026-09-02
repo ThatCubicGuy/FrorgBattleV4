@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FrogBattleV4.Core.Combat.Selections;
+using FrogBattleV4.Core.Selections;
 
 namespace FrogBattleV4.ConsoleBattle;
 
@@ -25,7 +25,7 @@ public class ConsoleSelectionProvider(CancellationToken cancellationToken) : ISe
             try
             {
                 var selection = 0;
-                await Console.Out.WriteAsync($"Select ability for {request.Requestor.Name}: ");
+                await Console.Out.WriteAsync($"Select ability for {request.Requestor}: ");
                 try
                 {
                     selection = int.Parse(await Task.Run(Console.ReadLine, cancel) ?? string.Empty);
@@ -56,7 +56,7 @@ public class ConsoleSelectionProvider(CancellationToken cancellationToken) : ISe
         {
             try
             {
-                await Console.Out.WriteLineAsync($"Select target for {request.Requestor.Name}: ");
+                await Console.Out.WriteLineAsync($"Select target for {request.Requestor}: ");
                 if (int.TryParse(await Task.Run(Console.ReadLine, cancel), out var selection) &&
                     selection >= 0 && selection < request.ValidOptions.Count())
                 {

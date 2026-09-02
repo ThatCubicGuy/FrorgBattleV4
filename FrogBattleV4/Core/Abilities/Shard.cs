@@ -6,7 +6,7 @@ namespace FrogBattleV4.Core.Abilities;
 /// <summary>
 /// Represents a single component of a link.
 /// </summary>
-public abstract class AbilityShard : IShard
+public abstract class Shard : IShard
 {
     #region Metadata
 
@@ -59,15 +59,15 @@ public abstract class AbilityShard : IShard
 
     public required IShardRequirement Condition { get; init; }
 
-    public bool IsUsable(LinkResolutionState state, BattleContext env)
-    {
-        return Condition.IsFulfilled(state, env);
-    }
-    public abstract void Resolve(ref LinkResolutionState state, LinkResolutionBuilder builder);
+    public bool IsUsable(LinkResolutionState state, BattleEnvironment env) => Condition.IsFulfilled(state, env);
+    public abstract void Resolve(ref LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder);
 }
 
+/// <summary>
+/// A part of a shard link, exposing methods for usability and resolution.
+/// </summary>
 public interface IShard
 {
-    bool IsUsable(LinkResolutionState state, BattleContext env);
-    void Resolve(ref LinkResolutionState state, LinkResolutionBuilder builder);
+    bool IsUsable(LinkResolutionState state, BattleEnvironment env);
+    void Resolve(ref LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder);
 }

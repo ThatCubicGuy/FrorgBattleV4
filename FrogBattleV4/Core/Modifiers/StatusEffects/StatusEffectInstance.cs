@@ -1,21 +1,20 @@
 using System;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.Abilities.Components.Actions;
+using FrogBattleV4.Core.Combat.Actions;
 
 namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 
-public class StatusEffectInstance(ApplyEffectAction ctx) : ApplicableEffect
+public class StatusEffectInstance(ApplyEffect ctx) : ApplicableEffect
 {
-    public StatusEffectDefinition Definition { get; } = ctx.Definition;
-    public int Turns { get; set; } = ctx.InitialTurns;
-    public int Stacks { get; set; } = ctx.AddedStacks;
+    public StatusEffectDefinition Definition { get; } = ctx.Data.Effect;
+    public int Turns { get; set; } = ctx.Data.InitialTurns;
+    public int Stacks { get; set; } = ctx.Data.AddedStacks;
     public EffectFlags Props { get; init; } = EffectFlags.None;
 
     [Pure]
     public bool ShouldRemove() => Stacks <= 0 || Turns <= 0;
 
-    protected override ModifierRuleCollection ModifierRuleCollection => Definition.ModifierRules;
-    protected override int GetStacks(RelationContext ctx) => Stacks;
+    protected override int GetStacks(EntityUid subject, EntityUid? reference, BattleEnvironment env) => Stacks;
 }
 
 [Flags]

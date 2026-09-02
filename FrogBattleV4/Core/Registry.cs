@@ -1,8 +1,6 @@
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using FrogBattleV4.Core.Calculation;
-using FrogBattleV4.Core.Calculation.Pools;
-using FrogBattleV4.Core.CharacterSystem;
 
 namespace FrogBattleV4.Core;
 
@@ -29,28 +27,4 @@ public static class Registry
         { StatId.OutgoingHealing, 1 },
         { StatId.ShieldToughness, 1 },
     }.ToFrozenDictionary();
-
-    public static readonly FrozenDictionary<PoolId, IPoolDefinition> BaseCharacterPools = new List<IPoolDefinition>
-    {
-        new CharacterPoolDefinition
-        {
-            Id = PoolId.Hp,
-            Tags = [PoolTag.UsedForLife],
-            MaxValueStat = StatId.MaxHp,
-            InitialPercent = 1,
-        },
-        new CharacterPoolDefinition
-        {
-            Id = PoolId.Mana,
-            Tags = [PoolTag.UsedForSpells],
-            MaxValueStat = StatId.MaxMana,
-            InitialPercent = 0.5,
-        },
-        new CharacterPoolDefinition
-        {
-            Id = PoolId.Energy,
-            Tags = [PoolTag.UsedForBurst],
-            MaxValueStat = StatId.MaxEnergy,
-        },
-    }.ToFrozenDictionary(pd => pd.Id);
 }

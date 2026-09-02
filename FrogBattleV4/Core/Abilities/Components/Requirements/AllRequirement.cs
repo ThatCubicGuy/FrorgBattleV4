@@ -12,8 +12,16 @@ public class AllRequirement : IShardRequirement
     public required ImmutableList<IShardRequirement> Terms { get; init; }
 
     [Pure]
-    public virtual bool IsFulfilled(ShardLinkContext ctx)
+    public virtual bool IsFulfilled(LinkResolutionState state, BattleEnvironment env)
     {
-        return Terms.All(requirement => requirement.IsFulfilled(ctx));
+        return Terms.All(requirement => requirement.IsFulfilled(state, env));
+    }
+
+    public void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
+    {
+        foreach (var requirement in Terms)
+        {
+            requirement.GenerateFulfill(state, env, builder);
+        }
     }
 }

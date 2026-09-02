@@ -1,4 +1,5 @@
 using System.Diagnostics.Contracts;
+using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.Modifiers;
 
@@ -8,14 +9,14 @@ namespace FrogBattleV4.Core.Modifiers;
 /// </summary>
 public abstract class ApplicableEffect : IModifierProvider
 {
-    protected abstract ModifierRuleCollection ModifierRuleCollection { get; }
+    protected ModifierRuleCollection ModifierRules { get; }
 
     [Pure]
-    protected abstract int GetStacks(RelationContext ctx);
+    protected abstract int GetStacks(EntityUid subject, EntityUid? reference, BattleEnvironment env);
 
     [Pure]
-    public ModifierStack GetContributingModifiers(Query query, ModifierContext ctx)
+    public ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx)
     {
-        return ModifierRuleCollection.GetContributingModifiers(query, ctx) * GetStacks(query.Context);
+        return ModifierRules.GetContributingModifiers(query, env, ctx) * GetStacks(query.Main, query.Other, env);
     }
 }

@@ -10,7 +10,7 @@ public class PoolValueCondition : IConditionComponent
 
     #region Metadata
 
-    public required PoolId PoolId { get; init; }
+    public required PoolId Pool { get; init; }
     public required AffectedSide Direction { get; init; }
 
     /// <summary>
@@ -22,7 +22,7 @@ public class PoolValueCondition : IConditionComponent
     /// <summary>
     /// The final value at which the interval stops being calculated.
     /// </summary>
-    public required double? MaxValue { get; init; }
+    public required double MaxValue { get; init; }
 
     /// <summary>
     /// The step by which the contribution is calculated.
@@ -43,7 +43,7 @@ public class PoolValueCondition : IConditionComponent
     }
 
     /// <summary>
-    /// Specifies whether the MinValue and MaxValue properties should be treated
+    /// Specifies whether the MinValue, MaxValue and Step properties should be treated
     /// as a percentage of the pool's MaxValue instead of flat values.
     /// </summary>
     public bool Percent { get; init; } = false;
@@ -51,20 +51,21 @@ public class PoolValueCondition : IConditionComponent
     #endregion
 
     [Pure]
-    public int GetContribution(RelationContext ctx)
+    public int GetContribution(EntityUid subject, EntityUid? reference, BattleEnvironment env)
     {
-        // Funny ahh type check
-        if ((Direction == AffectedSide.Self ? ctx.Actor : ctx.Target)?.Pools[PoolId] is not { } pool) return 0;
+        var value = env.GetPoolValue(subject, Pool);
+
         if (Percent)
         {
-            return pool.MaxValue.HasValue
-                ? (int)Math.Floor((Math.Clamp(pool.CurrentValue / pool.MaxValue.Value,
-                    MinValue, MaxValue ?? double.MaxValue) - MinValue) * pool.MaxValue.Value / Step)
-                : throw new InvalidOperationException(
-                    $"Percentage type specified for a pool with no MaxValue! ({PoolId})");
+            value /= new PoolStatQuery
+            {
+                PoolId = Pool,
+                Channel = PoolValueChannel.Max,
+                Subject = subject
+            }.Calculate(env);
         }
 
         return (int)Math.Floor(
-            (Math.Clamp(pool.CurrentValue, MinValue, MaxValue ?? double.MaxValue) - MinValue) / Step);
+            (Math.Clamp(value, MinValue, MaxValue) - MinValue) / Step);
     }
 }

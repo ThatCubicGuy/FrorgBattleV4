@@ -1,22 +1,18 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.Abilities.Components.Actions;
 using FrogBattleV4.Core.Abilities.Components.Requirements;
 using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.Combat.Actions;
 
 namespace FrogBattleV4.Core.Abilities.Components.Costs;
 
-public class ConditionalCost(AbilityShard shard) : CostRequirement(shard)
+public class ConditionalCost(IShard parentShard) : CostComponent(parentShard)
 {
-    public required Func<ShardLinkContext, bool> Predicate { get; init; }
-    public required CostRequirement CostIfTrue { get; init; }
+    public required System.Func<LinkResolutionState, BattleEnvironment, bool> Predicate { get; init; }
+    public required CostComponent CostIfTrue { get; init; }
+    public CostComponent CostIfFalse { get; init; } = new SingleCost(parentShard) { Formula = new CostFormula.Flat(0), Pool = PoolId.Mana };
 
-    public CostRequirement CostIfFalse { get; init; } = new FixedCost(shard) { BaseAmount = 0, Pool = PoolId.Mana };
-
-    [Pure]
-    public override IEnumerable<Mutate> GetCost(ShardLinkContext ctx)
+    public override IEnumerable<Mutate> GetCost(LinkResolutionState state, BattleEnvironment env)
     {
-        return Predicate(ctx) ? CostIfTrue.GetCost(ctx) : CostIfFalse.GetCost(ctx);
+        return (Predicate(state, env) ? CostIfTrue : CostIfFalse).GetCost(state, env);
     }
 }

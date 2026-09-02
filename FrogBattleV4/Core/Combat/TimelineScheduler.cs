@@ -2,18 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FrogBattleV4.Core.Combat.Actions;
+namespace FrogBattleV4.Core.Combat;
 
 public class TimelineScheduler
 {
-    private readonly PriorityQueue<IScheduledAction, PriorityKey> _queue = new();
+    private readonly PriorityQueue<IScheduledTurn, PriorityKey> _queue = new();
     private long _globalSequence;
     private double _now;
 
     /// <summary>
     /// The last dequeued action of the scheduler.
     /// </summary>
-    public IScheduledAction Current { get; private set; }
+    public IScheduledTurn Current { get; private set; }
 
     /// <summary>
     /// Advance an action in the timeline by a flat amount.
@@ -21,7 +21,7 @@ public class TimelineScheduler
     /// <param name="action">Action to advance. Must be part of the timeline.</param>
     /// <param name="flatValue">Value to advance by.</param>
     /// <exception cref="ArgumentException">Action is not part of the timeline.</exception>
-    public void Advance(IScheduledAction action, double flatValue)
+    public void Advance(IScheduledTurn action, double flatValue)
     {
         // Non-exception throwing guard against null actions
         if (action is null) return;
@@ -36,22 +36,22 @@ public class TimelineScheduler
     /// <param name="action">Action to advance. Must be part of the timeline.</param>
     /// <param name="percentValue">Percentage to advance by.</param>
     /// <exception cref="ArgumentException">Action is not part of the timeline.</exception>
-    public void AdvancePercent(IScheduledAction action, double percentValue)
+    public void AdvancePercent(IScheduledTurn action, double percentValue)
     {
         Advance(action, action.BaseActionValue * percentValue);
     }
 
-    public void Schedule(IScheduledAction action)
+    public void Schedule(IScheduledTurn action)
     {
         _queue.Enqueue(action, new PriorityKey(false, _now + action.BaseActionValue, _globalSequence++));
     }
 
-    public void ScheduleInstant(IScheduledAction action)
+    public void ScheduleInstant(IScheduledTurn action)
     {
         _queue.Enqueue(action, new PriorityKey(true, _now, _globalSequence++));
     }
 
-    public void ScheduleRange(IEnumerable<IScheduledAction> actions)
+    public void ScheduleRange(IEnumerable<IScheduledTurn> actions)
     {
         foreach (var action in actions)
         {
@@ -79,7 +79,7 @@ public class TimelineScheduler
             .OrderBy(ti => ti.CurrentActionValue);
     }
 
-    public readonly record struct TimelineItem(IScheduledAction Action, double CurrentActionValue);
+    public readonly record struct TimelineItem(IScheduledTurn Action, double CurrentActionValue);
 
     private readonly record struct PriorityKey(bool IsInstant, double Time, long Sequence) : IComparable<PriorityKey>
     {

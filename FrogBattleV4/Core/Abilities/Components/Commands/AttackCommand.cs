@@ -1,56 +1,86 @@
-using System.Linq;
-using FrogBattleV4.Core.Abilities.Components.Actions;
+using System;
 using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.Combat.Actions;
 
-namespace FrogBattleV4.Core.Abilities.Components;
+namespace FrogBattleV4.Core.Abilities.Components.Commands;
 
-public class AttackCommand(AbilityShard parentShard) : ShardComponent(parentShard), IShardCommand
+public class AttackCommand(IShard parentShard) : ShardComponent(parentShard), IShardCommand
 {
     public required DamageFormula Formula { get; init; }
-    public required DamageType Type { get; init; }
-    public required AttackProperties AttackProperties { get; init; }
+    public required DamageData Data { get; init; }
+    public bool CanCrit { get; init; } = true;
 
-    /// <summary>
-    /// A number between 0 and 1 that determines damage falloff for subsequent targets hit by a blast attack.
-    /// </summary>
-    public double Falloff { get; init; }
-
-    public void Resolve(AbilityTargetingContext targeting, LinkResolutionBuilder builder)
+    public void Generate(ShardResolutionScope scope, BattleEnvironment env, LinkResolutionBuilder builder)
     {
-        builder.Add(new DealDamage
+        var ctx = new RelationContext
         {
-            TotalAmount = Formula.Resolve(),
-            Target = targeting.Target,
-            Type = Type,
-            Source = AttackProperties.AttackType,
-            Crit = ???,
+            Actor = scope.User,
+            Target = scope.Targeting.Target
+        };
+        var res = CanCrit ? new CritResolution(new DamageStatQuery
+        {
+            Data = Data,
+            Channel = DamageStatChannel.CritRate,
+            Subject = scope.User,
+            Reference = scope.Targeting.Target
+        }.Calculate(env), env.NextRoll()) : new CritResolution(0, 0);
+        builder.Emit(new Damage
+        {
+            TotalAmount = new DamageQuery
+            {
+                BaseValue = Formula.Resolve(scope, env),
+                Data = Data,
+                CritData = res,
+                Context = ctx
+            }.Calculate(env),
+            Data = Data,
+            CritData = res,
+            Relation = ctx
         });
     }
 }
 
 public abstract record DamageFormula
 {
-    public abstract double Resolve(ShardLinkContext context, AbilityTargetingContext targeting);
-
-    public record Flat(double Amount) : DamageFormula
+    private DamageFormula()
     {
-        public override double Resolve(ShardLinkContext context, AbilityTargetingContext targeting)
+    }
+
+    /// <summary>
+    /// A number between 0 and 1 that determines damage falloff per target rank.
+    /// A higher number means lower damage to higher rank targets, down to zero.
+    /// </summary>
+    public required double Falloff { get; init; }
+
+    private double GetFalloffModifier(ShardResolutionScope scope) => Math.Pow(1 - Falloff, scope.Targeting.Rank);
+    public abstract double Resolve(ShardResolutionScope scope, BattleEnvironment env);
+
+    public sealed record Flat(double Amount) : DamageFormula
+    {
+        public override double Resolve(ShardResolutionScope scope, BattleEnvironment env)
         {
-            return Amount;
+            return Amount * GetFalloffModifier(scope);
         }
     }
 
-    public record StatPercentage(StatId Scalar, double Ratio) : DamageFormula
+    public sealed record StatPercentage(StatId Scalar, double Ratio) : DamageFormula
     {
-        public override double Resolve(ShardLinkContext context, AbilityTargetingContext targeting)
+        public override double Resolve(ShardResolutionScope scope, BattleEnvironment env)
         {
-            context.Calculate
+            return new StatQuery
+            {
+                Stat = Scalar,
+                Subject = scope.User,
+                Reference = scope.Targeting.Target,
+            }.Calculate(env) * Ratio * GetFalloffModifier(scope);
+        }
+    }
+
+    public sealed record PoolValuePercentage(PoolId Pool, double Ratio) : DamageFormula
+    {
+        public override double Resolve(ShardResolutionScope scope, BattleEnvironment env)
+        {
+            return env.GetPoolValue(scope.User, Pool) * Ratio * GetFalloffModifier(scope);
         }
     }
 }
-
-/// <summary>
-/// Lightweight record for storing properties related to attacks.
-/// </summary>
-/// <param name="CanCrit">Whether this attack can generate critical hits.</param>
-public record AttackProperties(bool CanCrit, DamageSource AttackType);

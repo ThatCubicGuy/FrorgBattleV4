@@ -1,15 +1,7 @@
 ﻿// using var game = new FrogBattleV4.FrogBattle();
 // game.Run();
 
-using System.Threading;
-using FrogBattleV4.ConsoleBattle;
-using FrogBattleV4.Core.Combat;
+using System;
 
-var provider = new ConsoleSelectionProvider(CancellationToken.None);
-var game = new BattleManager(new Team(provider), new Team(provider));
-var runningTask = game.RunAsync();
-while (true)
-{
-    // Avoid public execution with this one simple trick:
-    // TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-}
+// TODO: Everything lmao
+Console.WriteLine("Nothing here yet!");

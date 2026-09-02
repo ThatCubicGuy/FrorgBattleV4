@@ -1,4 +1,6 @@
-namespace FrogBattleV4.Core.Effects;
+using FrogBattleV4.Core.Calculation;
+
+namespace FrogBattleV4.Core.Modifiers;
 
 /// <summary>
 /// Represents a smarter ModifierStack that determines to which kind of queries to apply.
@@ -14,7 +16,7 @@ public abstract class ModifierRule
     /// <param name="query">Query to check application for.</param>
     /// <param name="ctx">Data containing the modifier holder and the subject we're calculating for.</param>
     /// <returns></returns>
-    public abstract bool Applies(Query query, in ModifierContext ctx);
+    public abstract bool Applies(IQuery query, in ModifierContext ctx);
 }
 
 /// <summary>
@@ -22,9 +24,9 @@ public abstract class ModifierRule
 /// <br/>Base generic class for common code.
 /// </summary>
 /// <typeparam name="TQuery">Type of the query this modifier applies to.</typeparam>
-public abstract class ModifierRule<TQuery> : ModifierRule where TQuery : Query
+public abstract class ModifierRule<TQuery> : ModifierRule where TQuery : IQuery
 {
-    public sealed override bool Applies(Query query, in ModifierContext ctx)
+    public sealed override bool Applies(IQuery query, in ModifierContext ctx)
     {
         return query is TQuery q && MatchesRelationship(q, ctx) && AppliesTo(q);
     }
@@ -61,7 +63,7 @@ public abstract class StatModifier<TQuery> : ModifierRule<TQuery> where TQuery :
 /// <br/>Inherit for mutation-type modifiers.
 /// </summary>
 /// <typeparam name="TQuery">Type of the query this modifier applies to.</typeparam>
-public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQuery : RelationQuery
+public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQuery : DynamicQuery
 {
     public required AffectedSide AffectedSide { get; init; }
     public required MutationDirection Direction { get; init; }
@@ -89,7 +91,7 @@ public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQue
     }
 
     [System.Obsolete] // Kept here because I like the switch. Also, it explains each case better.
-    private bool MatchesRelationshipSwitch(RelationQuery query, in ModifierContext ctx)
+    private bool MatchesRelationshipSwitch(DynamicQuery query, in ModifierContext ctx)
     {
         var actor = query.Context.Actor;
         var target = query.Context.Target;
@@ -114,7 +116,7 @@ public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQue
 /// </summary>
 /// <param name="Holder">Holder of the modifier.</param>
 /// <param name="Subject">Entity whose value is being modified.</param>
-public readonly record struct ModifierContext(EntityId Holder, EntityId Subject);
+public readonly record struct ModifierContext(EntityUid Holder, EntityUid Subject);
 
 /// <summary>
 /// Represents which character's stats get modified (holder or target)

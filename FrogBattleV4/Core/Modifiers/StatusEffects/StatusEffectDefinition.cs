@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace FrogBattleV4.Core.Effects.StatusEffects;
+namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 
 public class StatusEffectDefinition
 {

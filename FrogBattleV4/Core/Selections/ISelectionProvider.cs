@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace FrogBattleV4.Core.Combat.Selections;
+namespace FrogBattleV4.Core.Selections;
 
 public interface ISelectionProvider
 {

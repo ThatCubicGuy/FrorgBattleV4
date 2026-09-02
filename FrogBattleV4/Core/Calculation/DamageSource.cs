@@ -14,12 +14,13 @@ public readonly record struct DamageSource(string Source)
     #region Common Sources
 
     public static readonly DamageSource All = default;
-    public static readonly DamageSource Ability = nameof(Ability);
+    public static readonly DamageSource Link = nameof(Link);
     public static readonly DamageSource FollowUp = nameof(FollowUp);
-    public static readonly DamageSource Ultimate = nameof(Ultimate);
+    public static readonly DamageSource Soullink = nameof(Soullink);
     public static readonly DamageSource DamageOverTime = nameof(DamageOverTime);
 
     #endregion
 
-    public bool Matches(DamageSource other) => this == All || other == All || this == other;
+    public bool Matches(DamageSource other) =>
+        Source == other.Source || Source == All.Source || other.Source == All.Source;
 }

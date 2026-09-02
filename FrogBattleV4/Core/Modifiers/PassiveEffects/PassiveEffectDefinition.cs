@@ -1,9 +1,7 @@
-#nullable enable
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Modifiers.PassiveEffects.Conditions;
 
 namespace FrogBattleV4.Core.Modifiers.PassiveEffects;
@@ -13,25 +11,21 @@ namespace FrogBattleV4.Core.Modifiers.PassiveEffects;
 /// </summary>
 public class PassiveEffectDefinition : ApplicableEffect
 {
-    public required string Id { get; init; }
-    public required ModifierRuleCollection ModifierRules { get; init; }
-
     /// <summary>
     /// List of conditions that enable the PassiveEffect's stacks.
     /// </summary>
-    public List<IConditionComponent> Conditions { get; } = [];
+    public ImmutableList<IConditionComponent> Conditions { get; } = [];
 
     public AccumulationType ConditionAccumulationType { get; set; } = AccumulationType.And;
 
-    protected override ModifierRuleCollection ModifierRuleCollection => ModifierRules;
     [Pure]
-    protected override int GetStacks(RelationContext ctx)
+    protected override int GetStacks(EntityUid subject, EntityUid? reference, BattleEnvironment env)
     {
         return Math.Max(0, ConditionAccumulationType switch
         {
-            AccumulationType.And => Conditions.Select(cc => cc.GetContribution(ctx)).Min(),
-            AccumulationType.Or => Conditions.Select(cc => cc.GetContribution(ctx)).Max(),
-            AccumulationType.Accumulate => Conditions.Select(cc => cc.GetContribution(ctx)).Sum(),
+            AccumulationType.And => Conditions.Select(cc => cc.GetContribution(subject, reference, env)).Min(),
+            AccumulationType.Or => Conditions.Select(cc => cc.GetContribution(subject, reference, env)).Max(),
+            AccumulationType.Accumulate => Conditions.Select(cc => cc.GetContribution(subject, reference, env)).Sum(),
             _ => throw new System.ComponentModel.InvalidEnumArgumentException(nameof(ConditionAccumulationType),
                 (int)ConditionAccumulationType, typeof(AccumulationType))
         });

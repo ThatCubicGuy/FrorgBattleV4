@@ -1,32 +1,38 @@
 using System.Collections.Immutable;
 using System.Collections.Generic;
 using System.Linq;
+using FrogBattleV4.Core.Abilities.Components;
+using FrogBattleV4.Core.Modifiers;
 
 namespace FrogBattleV4.Core.Abilities;
 
-
-public class ShardLink
+public class ShardLink(IEnumerable<IShard> definitions)
 {
-    public ShardLink(IEnumerable<AbilityShard> definitions)
-    {
-        Shards = [.. definitions];
-        GenerateCommands();
-    }
+    public ImmutableList<IShard> Shards { get; } = [.. definitions];
 
-    public ImmutableList<AbilityShard> Shards { get; }
-
-    public AbilityShard? this[string name] => Shards.SingleOrDefault(shard => shard.Name.Equals(name));
-
-    public ShardLink Add(AbilityShard shard)
+    public ShardLink Link(IShard shard)
     {
         return new ShardLink(Shards.Append(shard));
     }
 
-    private void GenerateCommands()
+    private LinkResolution GenerateCommands(EntityUid user, EntityUid selectedTarget, BattleEnvironment env)
     {
+        var state = new LinkResolutionState(user, new TargetingSelection([new AbilityTargetingContext
+        {
+            Target = selectedTarget,
+            Rank = 0,
+        }]), ModifierCollection.Empty, -1);
+        var builder = new LinkResolutionBuilder();
+
         foreach (var shard in Shards)
         {
-            shard.Components
+            state = state with
+            {
+                CurrentShardIndex = state.CurrentShardIndex + 1,
+            };
+            shard.Resolve(ref state, env, builder);
         }
+
+        return builder.Build();
     }
 }

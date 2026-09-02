@@ -1,19 +1,18 @@
-using System.Collections.Immutable;
-using FrogBattleV4.Core.Entities;
+using System.Collections.Generic;
+using FrogBattleV4.Core.Modifiers;
+using FrogBattleV4.Core.Selections;
 
 namespace FrogBattleV4.Core.Combat;
 
-public class Team
+public class Team : Identifiable<TeamUid>
 {
-    public Team(Selections.ISelectionProvider playerSelectionProvider,
-        params GameEntity[] battleMembers)
+    public Team(ISelectionProvider playerSelectionProvider, IEnumerable<IModifierProvider>? modifiers = null)
     {
         System.ArgumentNullException.ThrowIfNull(playerSelectionProvider);
-        System.ArgumentNullException.ThrowIfNull(battleMembers);
         Provider = playerSelectionProvider;
-        Members = battleMembers.ToImmutableList();
+        Modifiers = modifiers is not null ? new ModifierCollection(modifiers) : ModifierCollection.Empty;
     }
 
-    public Selections.ISelectionProvider Provider { get; }
-    public ImmutableList<GameEntity> Members { get; }
+    public ISelectionProvider Provider { get; }
+    public ModifierCollection Modifiers { get; }
 }
