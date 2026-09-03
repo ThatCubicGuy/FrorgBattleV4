@@ -25,11 +25,11 @@ public sealed record LinkResolutionState(
 /// </summary>
 /// <param name="User">User of the shard.</param>
 /// <param name="Targeting">Target of the shard.</param>
-/// <param name="Modifiers">Modifiers owned by the user at time of resolution.</param>
-public sealed record ShardResolutionScope(
+/// <param name="Modifier">Modifiers owned by the user at time of resolution.</param>
+public record ShardResolutionScope(
     EntityUid User,
     AbilityTargetingContext Targeting,
-    IModifierProvider Modifiers);
+    IModifierProvider Modifier);
 
 public sealed class LinkResolutionBuilder
 {

@@ -8,37 +8,43 @@ public class AttackCommand(IShard parentShard) : ShardComponent(parentShard), IS
 {
     public required DamageFormula Formula { get; init; }
     public required DamageData Data { get; init; }
-    public bool CanCrit { get; init; } = true;
+    public AttackProperties Properties { get; init; } = new();
 
-    public void Generate(ShardResolutionScope scope, BattleEnvironment env, LinkResolutionBuilder builder)
+    public void Generate(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
     {
-        var ctx = new RelationContext
+        var split = Properties.SplitDamageEvenly ? state.Selections.Count : 1;
+        foreach (var targeting in state.Selections)
         {
-            Actor = scope.User,
-            Target = scope.Targeting.Target
-        };
-        var res = CanCrit ? new CritResolution(new DamageStatQuery
-        {
-            Data = Data,
-            Channel = DamageStatChannel.CritRate,
-            Subject = scope.User,
-            Reference = scope.Targeting.Target
-        }.Calculate(env), env.NextRoll()) : new CritResolution(0, 0);
-        builder.Emit(new Damage
-        {
-            TotalAmount = new DamageQuery
+            var ctx = new RelationContext
             {
-                BaseValue = Formula.Resolve(scope, env),
+                Actor = state.User,
+                Target = targeting.Target
+            };
+            var res = Properties.CanCrit ? new CritResolution(new DamageStatQuery
+            {
+                Data = Data,
+                Channel = DamageStatChannel.CritRate,
+                Subject = state.User,
+                Reference = targeting.Target
+            }.Calculate(env), env.NextRoll()) : new CritResolution(0, 0);
+            builder.Emit(new Damage
+            {
+                TotalAmount = new DamageQuery
+                {
+                    BaseValue = Formula.Resolve(new ShardResolutionScope(state.User, targeting, state.Modifiers), env) / split,
+                    Data = Data,
+                    CritData = res,
+                    Context = ctx
+                }.Calculate(env),
                 Data = Data,
                 CritData = res,
-                Context = ctx
-            }.Calculate(env),
-            Data = Data,
-            CritData = res,
-            Relation = ctx
-        });
+                Relation = ctx
+            });
+        }
     }
 }
+
+public sealed record AttackProperties(bool CanCrit = true, bool SplitDamageEvenly = false);
 
 public abstract record DamageFormula
 {
@@ -50,9 +56,9 @@ public abstract record DamageFormula
     /// A number between 0 and 1 that determines damage falloff per target rank.
     /// A higher number means lower damage to higher rank targets, down to zero.
     /// </summary>
-    public required double Falloff { get; init; }
+    public required double RankFalloff { get; init; }
 
-    private double GetFalloffModifier(ShardResolutionScope scope) => Math.Pow(1 - Falloff, scope.Targeting.Rank);
+    private double GetFalloffModifier(ShardResolutionScope scope) => Math.Pow(1 - RankFalloff, scope.Targeting.Rank);
     public abstract double Resolve(ShardResolutionScope scope, BattleEnvironment env);
 
     public sealed record Flat(double Amount) : DamageFormula

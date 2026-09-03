@@ -6,7 +6,6 @@ namespace FrogBattleV4.Core.Abilities.ShardClasses;
 
 /// <summary>
 /// Affect shards do something to the selected targets.
-/// They require at least one targeting shard before them.
 /// </summary>
 public class AffectShard : Shard
 {
@@ -15,9 +14,10 @@ public class AffectShard : Shard
     public ModifierCollection Modifiers { get; init; } = ModifierCollection.Empty;
     public override void Resolve(ref LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
     {
-        foreach (var targeting in Targeting.SelectTargets(state, env))
+        Commands.Generate(state with
         {
-            Commands.Generate(new ShardResolutionScope(state.User, targeting, Modifiers), env, builder);
-        }
+            Selections = Targeting.SelectTargets(state, env),
+            Modifiers = Modifiers.With(Modifiers)
+        }, env, builder);
     }
 }

@@ -17,9 +17,10 @@ public class BounceTargeting : IShardTargeting
                 Target = target,
                 Rank = rank,
             });
+            var neighbors = env.GetNeighbors(target);
             for (var i = 0; i < Count; i++)
             {
-                var next = env.GetNeighbors(target).MinBy(_ => env.NextRoll());
+                var next = neighbors.MinBy(_ => env.NextRoll());
                 targets.Add(new AbilityTargetingContext
                 {
                     Target = next,

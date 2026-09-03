@@ -29,10 +29,11 @@ public record AbilityTargetingContext
 }
 
 public class TargetingSelection(IEnumerable<AbilityTargetingContext> selections)
-    : IEnumerable<AbilityTargetingContext>
+    : IReadOnlyCollection<AbilityTargetingContext>
 {
     private ImmutableList<AbilityTargetingContext> Targets { get; } = selections.ToImmutableList();
 
+    public int Count => Targets.Count;
     public IEnumerator<AbilityTargetingContext> GetEnumerator() => Targets.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Targets).GetEnumerator();
 }

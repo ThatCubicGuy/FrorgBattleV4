@@ -5,5 +5,5 @@ namespace FrogBattleV4.Core.Abilities.Components;
 /// </summary>
 public interface IShardCommand
 {
-    void Generate(ShardResolutionScope scope, BattleEnvironment env, LinkResolutionBuilder builder);
+    void Generate(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder);
 }
