@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://text-translatable",
+  "$comment": "Schema used for various translatable text within other definitions.",
+  "type": [
+    "object",
+    "array",
+    "string"
+  ],
+  "properties": {
+    "text": {
+      "description": "Text field for the name. Can be a translation key if `name.translatable` is set to `true`.",
+      "type": "string",
+      "maxLength": 255
+    },
+    "translatable": {
+      "description": "Whether the text field represents a translation key. Defaults to `true`.",
+      "type": "boolean",
+      "default": true
+    },
+    "insert": {
+      "description": "Parameters for subtituting into the text field after translation (if necessary).",
+      "type": "array",
+      "items": {
+        "$comment": "Array items should be property names of the object owning the name.",
+        "description": "A property of the object to get the value of.",
+        "type": "string"
+      }
+    },
+    "extra": {
+      "description": "Extra text to append to this instance.",
+      "$ref": "schema://text-translatable"
+    }
+  },
+  "required": ["text"],
+  "items": {
+    "$ref": "schema://text-translatable"
+  },
+  "maxLength": 255
+}

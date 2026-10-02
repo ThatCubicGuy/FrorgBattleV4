@@ -2,7 +2,7 @@ using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.Modifiers;
 
-public class FighterStatModifier : StatModifier<StatQuery>
+public class StatModifier : AttributeModifier<StatQuery>
 {
     public required StatId Stat { get; init; }
 

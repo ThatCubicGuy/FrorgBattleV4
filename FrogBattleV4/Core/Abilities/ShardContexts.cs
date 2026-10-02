@@ -29,6 +29,7 @@ public sealed record LinkResolutionState(
 public record ShardResolutionScope(
     EntityUid User,
     AbilityTargetingContext Targeting,
+    // TODO (Nova): actually use bonus modifiers lmao
     IModifierProvider Modifier);
 
 public sealed class LinkResolutionBuilder

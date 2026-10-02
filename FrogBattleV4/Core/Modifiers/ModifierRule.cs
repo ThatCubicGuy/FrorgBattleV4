@@ -36,11 +36,11 @@ public abstract class ModifierRule<TQuery> : ModifierRule where TQuery : IQuery
 }
 
 /// <summary>
-/// Stat modifier that only affects values inherent to a single entity.
+/// Modifier that only affects values inherent to a single entity.
 /// <br/>Inherit for non-mutation-type modifiers.
 /// </summary>
 /// <typeparam name="TQuery">Type of the query this modifier applies to.</typeparam>
-public abstract class StatModifier<TQuery> : ModifierRule<TQuery> where TQuery : StaticQuery
+public abstract class AttributeModifier<TQuery> : ModifierRule<TQuery> where TQuery : StaticQuery
 {
     public required AffectedSide AffectedSide { get; init; }
 
@@ -50,7 +50,7 @@ public abstract class StatModifier<TQuery> : ModifierRule<TQuery> where TQuery :
         var target = query.Reference;
         return AffectedSide switch
         {
-            AffectedSide.Self => ctx.Holder == actor,
+            AffectedSide.This => ctx.Holder == actor,
             AffectedSide.Other => ctx.Holder == target,
             _ => throw new System.NotSupportedException($"{AffectedSide} not supported")
         } && ctx.Subject == actor;
@@ -58,7 +58,7 @@ public abstract class StatModifier<TQuery> : ModifierRule<TQuery> where TQuery :
 }
 
 /// <summary>
-/// Mutation modifier that affects values meaningful in a relation between
+/// Modifier that affects values meaningful in a relation between
 /// two entities, such as damage dealt, or mana restored by another character.
 /// <br/>Inherit for mutation-type modifiers.
 /// </summary>
@@ -81,7 +81,7 @@ public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQue
         var expectedHolder = AffectedSide switch
         {
             // Holder's stats are modified
-            AffectedSide.Self => affected,
+            AffectedSide.This => affected,
             // Other's stats are modified
             AffectedSide.Other => other,
             _ => throw new System.NotSupportedException($"{AffectedSide} not supported")
@@ -97,11 +97,11 @@ public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQue
         var target = query.Context.Target;
         return (AffectedSide, Direction) switch
         {
-            (AffectedSide.Self, MutationDirection.Outgoing) // Attacker's outgoing modifiers
+            (AffectedSide.This, MutationDirection.Outgoing) // Attacker's outgoing modifiers
                 => ctx.Holder == actor && ctx.Subject == actor,
             (AffectedSide.Other, MutationDirection.Outgoing) // Target's outgoing penalty modifiers
                 => ctx.Holder == target && ctx.Subject == actor,
-            (AffectedSide.Self, MutationDirection.Incoming) // Target's incoming modifiers
+            (AffectedSide.This, MutationDirection.Incoming) // Target's incoming modifiers
                 => ctx.Holder == target && ctx.Subject == target,
             (AffectedSide.Other, MutationDirection.Incoming) // Attacker's incoming penalty modifiers
                 => ctx.Holder == actor && ctx.Subject == target,
@@ -126,7 +126,7 @@ public enum AffectedSide
     /// <summary>
     /// The effects of this modifier will affect the holder. (e.g. holder's DamageRes)
     /// </summary>
-    Self,
+    This,
     /// <summary>
     /// The effects of this modifier will affect the other. (e.g. holder's DamageRes PENALTY)
     /// </summary>

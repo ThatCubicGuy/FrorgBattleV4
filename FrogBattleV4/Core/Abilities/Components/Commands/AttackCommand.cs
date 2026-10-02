@@ -31,7 +31,10 @@ public class AttackCommand(IShard parentShard) : ShardComponent(parentShard), IS
             {
                 TotalAmount = new DamageQuery
                 {
-                    BaseValue = Formula.Resolve(new ShardResolutionScope(state.User, targeting, state.Modifiers), env) / split,
+                    BaseValue = Formula.Resolve(new ShardResolutionScope(
+                        state.User,
+                        targeting,
+                        state.Modifiers), env) / split,
                     Data = Data,
                     CritData = res,
                     Context = ctx

@@ -13,7 +13,7 @@ public class DamageModifier : MutationModifier<DamageQuery>
     }
 }
 
-public class CritModifier : StatModifier<DamageStatQuery>
+public class DamageStatModifier : AttributeModifier<DamageStatQuery>
 {
     public required DamageData Data { get; init; }
     public required DamageStatChannel Channel { get; init; }

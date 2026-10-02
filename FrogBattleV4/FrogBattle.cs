@@ -28,6 +28,8 @@ public class FrogBattle : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         // TODO: use this.Content to load your game content here
+        
+        base.LoadContent();
     }
 
     protected override void Update(GameTime gameTime)

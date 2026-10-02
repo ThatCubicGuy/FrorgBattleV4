@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://components/targeting",
+  "title": "Targeting component",
+  "description": "A component that selects targets for shards.",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "filtered",
+        "blast",
+        "bounce",
+        "area_of_effect"
+      ]
+    }
+  },
+  "required": ["type"],
+  "oneOf": [
+    {
+      "properties": {
+        "type": {
+          "const": "filtered"
+        }
+      },
+      "$ref": "schema://components/targeting/filtered"
+    },
+    {
+      "properties": {
+        "type": {
+          "const": "blast"
+        }
+      },
+      "$ref": "schema://components/targeting/blast"
+    },
+    {
+      "properties": {
+        "type": {
+          "const": "bounce"
+        }
+      },
+      "$ref": "schema://components/targeting/bounce"
+    },
+    {
+      "properties": {
+        "type": {
+          "const": "area_of_effect"
+        }
+      },
+      "$ref": "schema://components/targeting/area-of-effect"
+    }
+  ]
+}

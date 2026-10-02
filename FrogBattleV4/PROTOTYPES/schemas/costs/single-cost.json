@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://costs/single-cost",
+  "title": "Shard cost",
+  "description": "A cost that must be paid to use a shard as part of a link.",
+  "type": "object",
+  "properties": {
+    "resource": {
+      "description": "Resource that the cost consumes.",
+      "$ref": "schema://ids/pools"
+    },
+    "formula": {
+      "description": "Formula for calculating the cost.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "Type of the formula. One of \"flat\", \"percent\", \"stat_value\".",
+          "type": "string",
+          "enum": [
+            "flat",
+            "percent",
+            "stat_value"
+          ]
+        },
+        "amount": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": ["amount"],
+      "oneOf": [
+        {
+          "properties": {
+            "type": {
+              "enum": [
+                "flat",
+                "percent"
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "stat_value"
+            },
+            "stat": {
+              "description": "Stat to scale by.",
+              "$ref": "schema://ids/stats"
+            }
+          },
+          "required": ["amount", "stat"]
+        }
+      ]
+    }
+  }
+}

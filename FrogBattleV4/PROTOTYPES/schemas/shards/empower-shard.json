@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://shards/target-shard",
+  "title": "Target shard",
+  "description": "A shard which adds modifiers for the rest of the link.",
+  "type": "object",
+  "properties": {
+    "modifier": {
+      "description": "Modifier component to alter this link's calculations by.",
+      "$ref": "schema://components/modifier-collection"
+    }
+  },
+  "required": ["modifier"]
+}

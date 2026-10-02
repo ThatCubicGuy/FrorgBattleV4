@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://effect",
+  "title": "Status Effect",
+  "description": "A status effect that can be applied to fighters in battle.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "Name of the status effect.",
+      "$ref": "schema://text-translatable"
+    },
+    "duration": {
+      "description": "Turns until this status effect is removed.",
+      "type": "number",
+      "multipleOf": 1,
+      "exclusiveMinimum": 1
+    },
+    "max_stacks": {
+      "description": "Maximum amount of stacks that can be applied at once.",
+      "type": "number",
+      "multipleOf": 1,
+      "exclusiveMinimum": 1
+    },
+    "modifiers": {
+      "description": "Array of modifier rules for this status effect.",
+      "type": "array",
+      "$ref": "schema://components/modifier-collection"
+    }
+  },
+  "required": ["name", "duration", "max_stacks", "modifiers"]
+}

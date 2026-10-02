@@ -18,7 +18,7 @@ public class StatusEffectCondition : IConditionComponent
         {
             return env.GetFighter(Side switch
             {
-                AffectedSide.Self => subject,
+                AffectedSide.This => subject,
                 AffectedSide.Other => reference ?? throw new InvalidOperationException(),
                 _ => throw new NotSupportedException($"Side {Side} not supported")
             }).StatusEffects.Where(Query).Sum(sei => SumStacks ? sei.Stacks : 1);

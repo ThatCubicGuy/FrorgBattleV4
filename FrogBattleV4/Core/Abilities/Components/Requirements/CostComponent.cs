@@ -8,10 +8,12 @@ namespace FrogBattleV4.Core.Abilities.Components.Requirements;
 // TODO (Nova): massive rework lmao i'm so bad at this
 public abstract class CostComponent(IShard parentShard) : ShardComponent(parentShard), IShardRequirement
 {
+    public CostType Type { get; init; } = CostType.None;
     public abstract IEnumerable<Mutate> GetCost(LinkResolutionState state, BattleEnvironment env);
 
     public void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
     {
+        if (Type == CostType.Check) return;
         foreach (var cost in GetCost(state, env))
         {
             builder.Emit(cost);
@@ -20,9 +22,18 @@ public abstract class CostComponent(IShard parentShard) : ShardComponent(parentS
 
     public bool IsFulfilled(LinkResolutionState state, BattleEnvironment env)
     {
-        return GetCost(state, env).All(cost =>
+        return Type == CostType.Soft || GetCost(state, env).All(cost =>
             !(cost.TotalAmount > env.GetPoolValue(cost.Relation.Target, cost.Data.TargetPool)));
     }
+}
+
+public enum CostType
+{
+    None,
+    // Does not require the resource to be above the threshold, consumes it anyway.
+    Soft,
+    // Only requires the used resource to pass the threshold, does not consume it.
+    Check,
 }
 
 public abstract record CostFormula
@@ -52,7 +63,7 @@ public abstract record CostFormula
         }
     }
 
-    public sealed record PoolMaxValuePercentage(PoolId Pool, double Percentage) : CostFormula
+    public sealed record Percentage(PoolId Pool, double Ratio) : CostFormula
     {
         public override double Resolve(EntityUid user, BattleEnvironment env)
         {
@@ -61,7 +72,7 @@ public abstract record CostFormula
                 PoolId = Pool,
                 Channel = PoolValueChannel.Max,
                 Subject = user,
-            }.Calculate(env) * Percentage;
+            }.Calculate(env) * Ratio;
         }
     }
 }

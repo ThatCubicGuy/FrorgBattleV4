@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://shards/target-shard",
+  "title": "Target shard",
+  "description": "A shard which selects the targets that other components will act upon.",
+  "type": "object",
+  "properties": {
+    "targeting": {
+      "description": "Targeting component to transform current target selection by.",
+      "$ref": "schema://components/targeting"
+    }
+  },
+  "required": ["targeting"]
+}

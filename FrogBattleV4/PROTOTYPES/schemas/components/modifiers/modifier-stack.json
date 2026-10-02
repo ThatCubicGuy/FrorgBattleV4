@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://components/modifiers/modifier-stack",
+  "title": "Modifer stack",
+  "description": "Describes a set of operations to apply in order: add_value -> add_base -> multiply -> final_add.",
+  "type": "object",
+  "properties": {
+    "add_value": {
+      "type": "number",
+      "description": "Adds the given value to the total. First step.",
+      "default": 0
+    },
+    "add_base": {
+      "type": "number",
+      "description": "Adds this fraction of the base value (starting value + add_value modifiers) to the total. Second step.",
+      "default": 0
+    },
+    "multiply": {
+      "type": "number",
+      "description": "Multiplies the total by the given value. Third step.",
+      "default": 1
+    },
+    "final_add": {
+      "type": "number",
+      "description": "Adds the given value to the total. Final step.",
+      "default": 0
+    }
+  },
+  "additionalProperties": false
+}

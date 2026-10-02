@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://components/modifiers/modifier-rule",
+  "title": "Modifier rule",
+  "description": "A single ModifierRule for applying a modification to stats, damage, etc.",
+  "type": "object",
+  "properties": {
+    "values": {
+      "description": "Modifier stack to apply.",
+      "$ref": "schema://components/modifier-stack"
+    },
+    "entity": {
+      "description": "Whose properties this modifier affects. `this` modifies the holder of the modifier, `other` modifies anybody calculating against it.",
+      "type": "string",
+      "enum": [
+        "this",
+        "other"
+      ],
+      "default": "this"
+    },
+    "modifier_type": {
+      "type": "string",
+      "enum": [
+        "stat",
+        "damage_property",
+        "pool_property",
+        "damage",
+        "mutation"
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "title": "Attribute modifier",
+      "oneOf": [
+        {
+          "properties": {
+            "type": {
+              "const": "stat"
+            }
+          },
+          "$ref": "schema://components/modifiers/stat-mod"
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "damage_property"
+            }
+          },
+          "$ref": "schema://components/modifiers/damage-property-mod"
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "pool_property"
+            }
+          },
+          "$ref": "schema://components/modifiers/pool-property-mod"
+        }
+      ]
+    },
+    {
+      "title": "Mutation modifier",
+      "required": ["direction"],
+      "properties": {
+        "direction": {
+          "description": "Whether this modifier applies to incoming or outgoing mutations.",
+          "type": "string",
+          "enum": [
+            "incoming",
+            "outgoing"
+          ]
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "type": {
+              "const": "damage"
+            }
+          },
+          "$ref": "schema://components/modifiers/damage-mod"
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "mutation"
+            }
+          },
+          "$ref": "schema://components/modifiers/mutation-mod"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://components/modifiers/stat-mod",
+  "title": "Stat modifier",
+  "description": "A modifier that affects the value of a certain stat.",
+  "type": "object",
+  "properties": {
+    "stat": {
+      "description": "The stat whose value to modify.",
+      "$ref": "schema://ids/stats"
+    }
+  },
+  "required": ["stat"]
+}

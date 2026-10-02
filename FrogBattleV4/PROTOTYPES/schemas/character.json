@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://character",
+  "title": "Character",
+  "description": "A character that will fight in battles.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "Name of the character.",
+      "$ref": "schema://text-translatable"
+    }
+  }
+}

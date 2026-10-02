@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://shards/components/modifier",
+  "title": "Modifier collection",
+  "description": "A collection of ModifierRules.",
+  "type": "array",
+  "items": {
+    "$ref": "schema://components/modifiers/modifier-rule"
+  }
+}

@@ -73,7 +73,7 @@ public record BattleEnvironment
     }
 
     /// <summary>
-    /// Returns every member from the same field (on the same "line") as <paramref name="entity"/>
+    /// Returns every member from the same field (on the same "line") as <paramref name="entity"/>.
     /// </summary>
     /// <param name="entity">Entity UID.</param>
     /// <returns>Every member from the same field as the given entity.</returns>
@@ -159,7 +159,7 @@ public record BattleEnvironment
     /// <summary>
     /// The exception that is thrown when an entity ID does not match any known entity.
     /// </summary>
-    /// <param name="entity"></param>
+    /// <param name="entity">The EntityUid that didn't match any entity in the current context.</param>
     public class EntityMissingException(EntityUid entity) : Exception
     {
         public EntityUid Entity { get; } = entity;
@@ -167,9 +167,9 @@ public record BattleEnvironment
     }
 
     /// <summary>
-    /// The exception that is thrown when trying to add an entity
+    /// The exception that is thrown when trying to add an entity beyond an accepted limit.
     /// </summary>
-    /// <param name="limit"></param>
+    /// <param name="limit">The limit that was exceeded.</param>
     public class EntityLimitException(EntityUid entity, long limit) : Exception
     {
         public EntityUid Entity { get; } = entity;

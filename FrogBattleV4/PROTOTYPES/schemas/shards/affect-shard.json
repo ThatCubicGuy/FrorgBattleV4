@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://shards/target-shard",
+  "title": "Target shard",
+  "description": "A shard which adds modifiers for the rest of the link.",
+  "type": "object",
+  "properties": {
+    "targeting": {
+      "description": "Targeting component to transform this shard's target selection by.",
+      "$ref": "schema://components/targeting"
+    },
+    "modifier": {
+      "description": "Modifier component to alter this shard's calculations by.",
+      "$ref": "schema://components/modifier"
+    },
+    "commands": {
+      "description": "List of commands to generate during this shard.",
+      "type": "array",
+      "items": {
+        "description": "A command component for the shard that generates upon usage.",
+        "$ref": "schema://command"
+      }
+    }
+  },
+  "required": ["commands"]
+}

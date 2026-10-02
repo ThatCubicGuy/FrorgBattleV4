@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://shard",
+  "title": "Ability",
+  "description": "An ability shard for a character to use in battle.",
+  "type": "object",
+  "required": ["name", "description", "type"],
+  "properties": {
+    "condition": {
+      "$ref": "schema://shards/condition"
+    },
+    "name": {
+      "description": "Name of the shard.",
+      "$ref": "schema://text-translatable"
+    },
+    "description": {
+      "description": "Description of what the shard does.",
+      "$ref": "schema://text-translatable"
+    },
+    "type": {
+      "description": "Type of the shard. One of \"target\", \"empower\", \"affect\".",
+      "type": "string",
+      "enum": [
+        "target",
+        "empower",
+        "affect"
+      ]
+    }
+  },
+  "$comment": "Switch based on shard type that determines which schema to reference.",
+  "oneOf": [
+    {
+      "properties": {
+        "type": {
+          "const": "target"
+        }
+      },
+      "$ref": "schema://shards/target-shard"
+    },
+    {
+      "properties": {
+        "type": {
+          "const": "empower"
+        }
+      },
+      "$ref": "schema://shards/empower-shard"
+    },
+    {
+      "properties": {
+        "type": {
+          "const": "affect"
+        }
+      },
+      "$ref": "schema://shards/affect-shard"
+    }
+  ]
+}
