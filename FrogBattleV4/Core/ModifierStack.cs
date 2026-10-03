@@ -6,19 +6,19 @@ namespace FrogBattleV4.Core;
 /// <summary>
 /// Represents a combined collection of modifiers for a certain value.
 /// </summary>
-/// <param name="AddValue">Adds this value to the total, first step.</param>
+/// <param name="BaseAddValue">Adds this value to the total, first step.</param>
 /// <param name="AddBasePercent">Adds this value multiplied by the base value, second step.</param>
 /// <param name="MultiplyTotal">Multiplies the total by this value, third step.</param>
 /// <param name="FinalAddValue">Adds this value to the total, fourth step.</param>
 public record ModifierStack(
-    double AddValue = 0,
+    double BaseAddValue = 0,
     double AddBasePercent = 0,
     double MultiplyTotal = 1,
     double FinalAddValue = 0)
 {
     public double this[ModifierOperation operation] => operation switch
     {
-        ModifierOperation.AddValue => AddValue,
+        ModifierOperation.BaseAddValue => BaseAddValue,
         ModifierOperation.AddBasePercent => AddBasePercent,
         ModifierOperation.MultiplyTotal => MultiplyTotal,
         ModifierOperation.FinalAddValue => FinalAddValue,
@@ -34,7 +34,7 @@ public record ModifierStack(
     public double ApplyTo(double baseAmount)
     {
         var total = baseAmount;
-        total += this[ModifierOperation.AddValue];
+        total += this[ModifierOperation.BaseAddValue];
         total += this[ModifierOperation.AddBasePercent] * baseAmount;
         total *= this[ModifierOperation.MultiplyTotal];
         total += this[ModifierOperation.FinalAddValue];
@@ -49,10 +49,10 @@ public record ModifierStack(
     [Pure]
     public ModifierStack AsPositive() => new()
     {
-        AddValue = Math.Max(0, AddValue),
+        BaseAddValue = Math.Max(0, BaseAddValue),
         AddBasePercent = Math.Max(0, AddBasePercent),
         MultiplyTotal = Math.Max(1, MultiplyTotal),
-        FinalAddValue = Math.Max(0, AddValue),
+        FinalAddValue = Math.Max(0, BaseAddValue),
     };
 
     /// <summary>
@@ -63,15 +63,15 @@ public record ModifierStack(
     [Pure]
     public ModifierStack AsNegative() => new()
     {
-        AddValue = Math.Min(0, AddValue),
+        BaseAddValue = Math.Min(0, BaseAddValue),
         AddBasePercent = Math.Min(0, AddBasePercent),
         MultiplyTotal = Math.Min(1, MultiplyTotal),
-        FinalAddValue = Math.Min(0, AddValue),
+        FinalAddValue = Math.Min(0, BaseAddValue),
     };
 
     public override string ToString()
     {
-        return $"Additive: {AddValue}," +
+        return $"Additive: {BaseAddValue}," +
                $" BasePercent: {AddBasePercent}," +
                $" MultiplyTotal: {MultiplyTotal}," +
                $" FinalAdditive: {FinalAddValue}";
@@ -86,7 +86,7 @@ public record ModifierStack(
     [Pure]
     public static ModifierStack operator +(ModifierStack left, ModifierStack right) => new()
     {
-        AddValue = left.AddValue + right.AddValue,
+        BaseAddValue = left.BaseAddValue + right.BaseAddValue,
         AddBasePercent = left.AddBasePercent + right.AddBasePercent,
         MultiplyTotal = left.MultiplyTotal * right.MultiplyTotal,
         FinalAddValue = left.FinalAddValue + right.FinalAddValue,
@@ -101,7 +101,7 @@ public record ModifierStack(
     [Pure]
     public static ModifierStack operator *(ModifierStack mod, int scalar) => new()
     {
-        AddValue = mod.AddValue * scalar,
+        BaseAddValue = mod.BaseAddValue * scalar,
         AddBasePercent = mod.AddBasePercent * scalar,
         MultiplyTotal = Math.Pow(mod.MultiplyTotal, scalar),
         FinalAddValue = mod.FinalAddValue * scalar,
@@ -125,7 +125,7 @@ public record ModifierStack(
     [Pure]
     public static ModifierStack operator *(ModifierStack mod, double scalar) => new()
     {
-        AddValue = mod.AddValue * scalar,
+        BaseAddValue = mod.BaseAddValue * scalar,
         AddBasePercent = mod.AddBasePercent * scalar,
         MultiplyTotal = Math.Pow(mod.MultiplyTotal, scalar),
         FinalAddValue = mod.FinalAddValue * scalar,
@@ -143,7 +143,7 @@ public record ModifierStack(
 
 public enum ModifierOperation
 {
-    AddValue,
+    BaseAddValue,
     AddBasePercent,
     MultiplyTotal,
     FinalAddValue,

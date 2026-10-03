@@ -67,7 +67,7 @@ public static class ModifierPipeline
         return totalStack.ApplyTo(0);
         // Stats as a separate value do not need to exist. In fact, they really mess with our systems,
         // because not all battle members would have a giant dictionary of stats.
-        // Thus, the base stats for characters are just going to be AddValue modifiers for that stat.
+        // Thus, the base stats for characters are just going to be BaseAddValue modifiers for that stat.
         // That's it. Nothing special. It works perfectly, and now we just need to expose
         // a GetModifiers() method or something for each battle member.
     }
