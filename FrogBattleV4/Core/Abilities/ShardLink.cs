@@ -17,11 +17,11 @@ public class ShardLink(IEnumerable<IShard> definitions)
 
     private LinkResolution GenerateCommands(EntityUid user, EntityUid selectedTarget, BattleEnvironment env)
     {
-        var state = new LinkResolutionState(user, new TargetingSelection([new AbilityTargetingContext
+        var state = new LinkResolutionState(user, [new AbilityTargetingContext
         {
             Target = selectedTarget,
             Rank = 0,
-        }]), ModifierCollection.Empty, -1);
+        }], ModifierCollection.Empty, -1);
         var builder = new LinkResolutionBuilder();
 
         foreach (var shard in Shards)

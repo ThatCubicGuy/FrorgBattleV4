@@ -19,11 +19,21 @@ public record ModifierCollection : IModifierProvider
 
     public ImmutableList<IModifierProvider> Modifiers { get; init; }
 
+    /// <summary>
+    /// Returns a new ModifierCollection with the added modifier.
+    /// </summary>
+    /// <param name="modifier">Modifier to append to the collection.</param>
+    /// <returns>A new ModifierCollection.</returns>
     public ModifierCollection With(IModifierProvider modifier)
     {
         return new ModifierCollection(Modifiers.Append(modifier));
     }
 
+    /// <summary>
+    /// Returns a new ModifierCollection with the added modifiers.
+    /// </summary>
+    /// <param name="modifiers">Modifiers to append to the collection.</param>
+    /// <returns>A new ModifierCollection.</returns>
     public ModifierCollection With(IEnumerable<IModifierProvider> modifiers)
     {
         return new ModifierCollection(Modifiers.Concat(modifiers));

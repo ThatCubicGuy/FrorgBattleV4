@@ -1,9 +1,9 @@
 namespace FrogBattleV4.Core.Abilities.Components;
 
 /// <summary>
-/// A command component 
+/// A command component generates shard actions to the builder.
 /// </summary>
 public interface IShardCommand
 {
-    void Generate(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder);
+    void GenerateActions(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder);
 }

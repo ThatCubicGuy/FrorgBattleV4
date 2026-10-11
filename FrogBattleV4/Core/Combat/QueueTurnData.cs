@@ -1,4 +1,3 @@
 namespace FrogBattleV4.Core.Combat;
 
-public record QueueTurnData(
-    IScheduledTurn Turn);
+public record QueueTurnData(ScheduledTurn Turn);

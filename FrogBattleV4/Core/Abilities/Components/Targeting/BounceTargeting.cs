@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
@@ -7,7 +8,7 @@ public class BounceTargeting : IShardTargeting
 {
     public required int Count { get; init; }
     public int RankPenaltyPerBounce { get; init; } = 0;
-    public TargetingSelection SelectTargets(LinkResolutionState state, BattleEnvironment env)
+    public ImmutableList<AbilityTargetingContext> SelectTargets(LinkResolutionState state, BattleEnvironment env)
     {
         var targets = new List<AbilityTargetingContext>();
         foreach (var (target, rank) in state.Selections)
@@ -29,6 +30,6 @@ public class BounceTargeting : IShardTargeting
             }
         }
 
-        return new TargetingSelection(targets);
+        return targets.ToImmutableList();
     }
 }

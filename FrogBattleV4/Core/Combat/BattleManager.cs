@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FrogBattleV4.Core.Combat.Actions;
-using FrogBattleV4.Core.Entities;
 
 namespace FrogBattleV4.Core.Combat;
 
 // TODO: Full revamp
-public class BattleManager
+public class BattleManager : IActionVisitor
 {
     private Random Random { get; }
     private long StartTime { get; }
@@ -23,6 +21,36 @@ public class BattleManager
 
     public async Task RunAsync()
     {
-        // todo
+        throw new NotImplementedException();
+    }
+
+    public void Visit(Damage action)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(Mutate action)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(ApplyEffect action)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(RemoveEffect action)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(AdvanceTurn action)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(QueueTurn action)
+    {
+        throw new NotImplementedException();
     }
 }

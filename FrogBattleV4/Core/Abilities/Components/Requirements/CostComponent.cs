@@ -43,6 +43,7 @@ public abstract record CostFormula
     }
 
     public abstract double Resolve(EntityUid user, BattleEnvironment env);
+
     public sealed record Flat(double Amount) : CostFormula
     {
         public override double Resolve(EntityUid user, BattleEnvironment env)

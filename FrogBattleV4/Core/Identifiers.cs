@@ -10,16 +10,21 @@ public abstract class Identifiable<TUid> where TUid : struct, IUniqueIdentifier<
     public sealed override bool Equals(object? obj) => obj is Identifiable<TUid> id && Id.Equals(id.Id);
 }
 
+/// <summary>
+/// An object that uniquely identifies an instance from a collection
+/// of other instances identified by the same type of identifier.
+/// </summary>
+/// <typeparam name="T">The type implementing this interface.</typeparam>
 public interface IUniqueIdentifier<T> : IEquatable<T> where T : struct, IUniqueIdentifier<T>;
 
 public readonly record struct EntityUid() : IUniqueIdentifier<EntityUid>
 {
     private static long _idCounter;
-    private long Id { get; } = ++_idCounter;
+    private long Id { get; } = _idCounter++;
 }
 
 public readonly record struct TeamUid() : IUniqueIdentifier<TeamUid>
 {
     private static long _idCounter;
-    private long Id { get; } = ++_idCounter;
+    private long Id { get; } = _idCounter++;
 }

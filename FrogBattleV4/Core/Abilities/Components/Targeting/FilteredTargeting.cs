@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
@@ -30,10 +31,10 @@ public class FilteredTargeting : IShardTargeting
     /// </summary>
     public System.Func<AbilityTargetingContext, BattleEnvironment, bool> TargetFilter { get; init; } = (_, _) => true;
 
-    public TargetingSelection SelectTargets(LinkResolutionState state, BattleEnvironment env)
+    public ImmutableList<AbilityTargetingContext> SelectTargets(LinkResolutionState state, BattleEnvironment env)
     {
-        return new TargetingSelection(state.Selections
+        return state.Selections
             .Where(atc => atc.Rank <= MaximumRank && TargetFilter(atc, env))
-            .Select(atc => atc with { Rank = atc.Rank + RankPenalty }));
+            .Select(atc => atc with { Rank = atc.Rank + RankPenalty }).ToImmutableList();
     }
 }

@@ -46,6 +46,11 @@ public record BattleEnvironment
 
     #region Methods
 
+    private void EnsureExists(EntityUid entity)
+    {
+        if (!MemberData.ContainsKey(entity)) throw new EntityMissingException(entity);
+    }
+
     /// <summary>
     /// Returns a random number provided by Rng.
     /// </summary>
@@ -145,11 +150,6 @@ public record BattleEnvironment
     {
         EnsureExists(entity);
         return MemberData[entity].PoolValues[pool];
-    }
-
-    private void EnsureExists(EntityUid entity)
-    {
-        if (!MemberData.ContainsKey(entity)) throw new EntityMissingException(entity);
     }
 
     #endregion

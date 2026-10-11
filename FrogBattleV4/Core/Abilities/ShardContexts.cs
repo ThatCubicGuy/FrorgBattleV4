@@ -8,7 +8,7 @@ using FrogBattleV4.Core.Modifiers;
 namespace FrogBattleV4.Core.Abilities;
 
 /// <summary>
-/// A mutable context describing the current state of resolution.
+/// A context describing the current state of resolution.
 /// </summary>
 /// <param name="User">Entity using this link.</param>
 /// <param name="Selections">Currently selected targets.</param>
@@ -16,7 +16,7 @@ namespace FrogBattleV4.Core.Abilities;
 /// <param name="CurrentShardIndex">Index of the currently resolving shard</param>
 public sealed record LinkResolutionState(
     EntityUid User,
-    TargetingSelection Selections,
+    ImmutableList<AbilityTargetingContext> Selections,
     ModifierCollection Modifiers,
     int CurrentShardIndex);
 

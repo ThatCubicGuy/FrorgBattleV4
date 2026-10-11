@@ -7,9 +7,9 @@ namespace FrogBattleV4.Core.Abilities.Components.Requirements;
 /// <summary>
 /// Logical AND operator between the given requirements.
 /// </summary>
-public class AllRequirement : IShardRequirement
+public class AllRequirement(ImmutableList<IShardRequirement> terms) : IShardRequirement
 {
-    public required ImmutableList<IShardRequirement> Terms { get; init; }
+    public required ImmutableList<IShardRequirement> Terms { get; init; } = terms;
 
     [Pure]
     public virtual bool IsFulfilled(LinkResolutionState state, BattleEnvironment env)

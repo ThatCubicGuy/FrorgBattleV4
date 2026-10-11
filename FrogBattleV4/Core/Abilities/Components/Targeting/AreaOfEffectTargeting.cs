@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
@@ -10,7 +11,7 @@ public class AreaOfEffectTargeting : IShardTargeting
 {
     public required int RankPenalty { get; init; }
 
-    public TargetingSelection SelectTargets(LinkResolutionState state, BattleEnvironment env)
+    public ImmutableList<AbilityTargetingContext> SelectTargets(LinkResolutionState state, BattleEnvironment env)
     {
         var result = new List<AbilityTargetingContext>();
         foreach (var (target, rank) in state.Selections)
@@ -23,6 +24,6 @@ public class AreaOfEffectTargeting : IShardTargeting
                 }));
         }
 
-        return new TargetingSelection(result);
+        return result.ToImmutableList();
     }
 }

@@ -14,7 +14,7 @@ public class AffectShard : Shard
     public ModifierCollection Modifiers { get; init; } = ModifierCollection.Empty;
     public override void Resolve(ref LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
     {
-        Commands.Generate(state with
+        Commands.GenerateActions(state with
         {
             Selections = Targeting.SelectTargets(state, env),
             Modifiers = Modifiers.With(Modifiers)

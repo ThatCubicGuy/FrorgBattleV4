@@ -10,7 +10,7 @@ public class AttackCommand(IShard parentShard) : ShardComponent(parentShard), IS
     public required DamageData Data { get; init; }
     public AttackProperties Properties { get; init; } = new();
 
-    public void Generate(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
+    public void GenerateActions(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
     {
         var split = Properties.SplitDamageEvenly ? state.Selections.Count : 1;
         foreach (var targeting in state.Selections)

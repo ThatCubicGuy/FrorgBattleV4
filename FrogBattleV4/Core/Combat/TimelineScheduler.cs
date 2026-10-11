@@ -6,52 +6,50 @@ namespace FrogBattleV4.Core.Combat;
 
 public class TimelineScheduler
 {
-    private readonly PriorityQueue<IScheduledTurn, PriorityKey> _queue = new();
+    private readonly PriorityQueue<ScheduledTurn, PriorityKey> _queue = new();
     private long _globalSequence;
     private double _now;
 
     /// <summary>
     /// The last dequeued action of the scheduler.
     /// </summary>
-    public IScheduledTurn Current { get; private set; }
+    public ScheduledTurn Current { get; private set; }
 
     /// <summary>
-    /// Advance an action in the timeline by a flat amount.
+    /// Advance a turn in the timeline by a flat amount.
     /// </summary>
-    /// <param name="action">Action to advance. Must be part of the timeline.</param>
+    /// <param name="turn">Turn to advance. Must be part of the timeline.</param>
     /// <param name="flatValue">Value to advance by.</param>
-    /// <exception cref="ArgumentException">Action is not part of the timeline.</exception>
-    public void Advance(IScheduledTurn action, double flatValue)
+    /// <exception cref="ArgumentException">Turn is not part of the timeline.</exception>
+    public void Advance(ScheduledTurn turn, double flatValue)
     {
-        // Non-exception throwing guard against null actions
-        if (action is null) return;
-        if (!_queue.Remove(action, out action, out var currentPriority))
-            throw new ArgumentException("Action does not exist!", nameof(action));
-        _queue.Enqueue(action, currentPriority with { Time = Math.Max(_now, currentPriority.Time - flatValue) });
+        if (!_queue.Remove(turn, out turn!, out var currentPriority))
+            throw new ArgumentException("Turn does not exist!", nameof(turn));
+        _queue.Enqueue(turn, currentPriority with { Time = Math.Max(_now, currentPriority.Time - flatValue) });
     }
 
     /// <summary>
-    /// Advance an action in the timeline by a percentage of its base action value.
+    /// Advance a turn in the timeline by a percentage of its base turn value.
     /// </summary>
-    /// <param name="action">Action to advance. Must be part of the timeline.</param>
+    /// <param name="turn">Turn to advance. Must be part of the timeline.</param>
     /// <param name="percentValue">Percentage to advance by.</param>
-    /// <exception cref="ArgumentException">Action is not part of the timeline.</exception>
-    public void AdvancePercent(IScheduledTurn action, double percentValue)
+    /// <exception cref="ArgumentException">Turn is not part of the timeline.</exception>
+    public void AdvancePercent(ScheduledTurn turn, double percentValue)
     {
-        Advance(action, action.BaseActionValue * percentValue);
+        Advance(turn, turn.BaseActionValue * percentValue);
     }
 
-    public void Schedule(IScheduledTurn action)
+    public void Schedule(ScheduledTurn action)
     {
-        _queue.Enqueue(action, new PriorityKey(false, _now + action.BaseActionValue, _globalSequence++));
+        _queue.Enqueue(action, new PriorityKey(_now + action.BaseActionValue, _globalSequence++));
     }
 
-    public void ScheduleInstant(IScheduledTurn action)
+    public void ScheduleInstant(ScheduledTurn action)
     {
-        _queue.Enqueue(action, new PriorityKey(true, _now, _globalSequence++));
+        _queue.Enqueue(action, new PriorityKey(_now, _globalSequence++));
     }
 
-    public void ScheduleRange(IEnumerable<IScheduledTurn> actions)
+    public void ScheduleRange(IEnumerable<ScheduledTurn> actions)
     {
         foreach (var action in actions)
         {
@@ -60,14 +58,14 @@ public class TimelineScheduler
     }
 
     /// <summary>
-    /// Dequeues an action from the actionbar and sets it as the current action.
+    /// Dequeues a turn from the timeline and sets it as the current turn.
     /// </summary>
-    /// <returns>True if there are still actions remaining, false if there is nothing left.</returns>
+    /// <returns>True if there are still turns remaining, false if there is nothing left.</returns>
     public bool MoveNext()
     {
-        if (!_queue.TryDequeue(out var action, out var priority))
+        if (!_queue.TryDequeue(out var turn, out var priority))
             return false;
-        Current = action;
+        Current = turn;
         _now = priority.Time;
         return true;
     }
@@ -76,19 +74,15 @@ public class TimelineScheduler
     {
         return _queue.UnorderedItems
             .Select(tuple => new TimelineItem(tuple.Element, tuple.Priority.Time - _now))
-            .OrderBy(ti => ti.CurrentActionValue);
+            .OrderBy(item => item.CurrentActionValue);
     }
 
-    public readonly record struct TimelineItem(IScheduledTurn Action, double CurrentActionValue);
+    public readonly record struct TimelineItem(ScheduledTurn Turn, double CurrentActionValue);
 
-    private readonly record struct PriorityKey(bool IsInstant, double Time, long Sequence) : IComparable<PriorityKey>
+    private readonly record struct PriorityKey(double Time, long Sequence) : IComparable<PriorityKey>
     {
         public int CompareTo(PriorityKey other)
         {
-            
-            // If IsInstant is true, we want this instance to be considered earlier than the other.
-            var isInstantComparison = -IsInstant.CompareTo(other.IsInstant);
-            if (isInstantComparison != 0) return isInstantComparison;
             var timeComparison = Time.CompareTo(other.Time);
             if (timeComparison != 0) return timeComparison;
             var sequenceComparison = Sequence.CompareTo(other.Sequence);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
@@ -23,7 +24,7 @@ public class BlastTargeting : IShardTargeting
     /// </summary>
     public int MaximumRank { get; init; } = 99;
 
-    public TargetingSelection SelectTargets(LinkResolutionState state, BattleEnvironment env)
+    public ImmutableList<AbilityTargetingContext> SelectTargets(LinkResolutionState state, BattleEnvironment env)
     {
         var result = new List<AbilityTargetingContext>();
         foreach (var (target, rank) in state.Selections.Where(atc => atc.Rank <= MaximumRank))
@@ -40,6 +41,6 @@ public class BlastTargeting : IShardTargeting
                 }));
         }
 
-        return new TargetingSelection(result);
+        return result.ToImmutableList();
     }
 }

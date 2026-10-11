@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrogBattleV4", "FrogBattleV4\FrogBattleV4.csproj", "{96A86BAE-0B54-4EB1-810F-0B6017B9F067}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrogBattleV4.Tests", "FrogBattleV4.Tests\FrogBattleV4.Tests.csproj", "{99C2BC0E-D4D7-4B07-BDD8-32E581CF2E1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{96A86BAE-0B54-4EB1-810F-0B6017B9F067}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96A86BAE-0B54-4EB1-810F-0B6017B9F067}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96A86BAE-0B54-4EB1-810F-0B6017B9F067}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99C2BC0E-D4D7-4B07-BDD8-32E581CF2E1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99C2BC0E-D4D7-4B07-BDD8-32E581CF2E1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99C2BC0E-D4D7-4B07-BDD8-32E581CF2E1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99C2BC0E-D4D7-4B07-BDD8-32E581CF2E1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
