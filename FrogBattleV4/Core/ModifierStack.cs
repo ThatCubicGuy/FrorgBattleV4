@@ -18,7 +18,7 @@ public record ModifierStack(
 {
     public double this[ModifierOperation operation] => operation switch
     {
-        ModifierOperation.AddValue => BaseAddValue,
+        ModifierOperation.BaseAddValue => BaseAddValue,
         ModifierOperation.AddBasePercent => AddBasePercent,
         ModifierOperation.MultiplyTotal => MultiplyTotal,
         ModifierOperation.FinalAddValue => FinalAddValue,
@@ -34,7 +34,7 @@ public record ModifierStack(
     public double ApplyTo(double baseAmount)
     {
         var total = baseAmount;
-        total += this[ModifierOperation.AddValue];
+        total += this[ModifierOperation.BaseAddValue];
         total += this[ModifierOperation.AddBasePercent] * baseAmount;
         total *= this[ModifierOperation.MultiplyTotal];
         total += this[ModifierOperation.FinalAddValue];
@@ -66,7 +66,7 @@ public record ModifierStack(
         BaseAddValue = Math.Min(0, BaseAddValue),
         AddBasePercent = Math.Min(0, AddBasePercent),
         MultiplyTotal = Math.Min(1, MultiplyTotal),
-        FinalAddValue = Math.Min(0, BaseAddValue),
+        FinalAddValue = Math.Min(0, FinalAddValue),
     };
 
     public override string ToString()
@@ -143,7 +143,7 @@ public record ModifierStack(
 
 public enum ModifierOperation
 {
-    AddValue,
+    BaseAddValue,
     AddBasePercent,
     MultiplyTotal,
     FinalAddValue,
