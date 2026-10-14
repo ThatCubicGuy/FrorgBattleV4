@@ -18,10 +18,10 @@ public class SingleCost(IShard parentShard) : CostComponent(parentShard)
 
     public required CostFormula Formula { get; init; }
 
-    public override IEnumerable<Mutate> GetCost(LinkResolutionState state, BattleEnvironment env)
+    public override IEnumerable<MutateAction> GetCost(LinkResolutionState state, BattleEnvironment env)
     {
         var ctx = new RelationContext { Actor = state.User, Target = state.User };
-        yield return new Mutate
+        yield return new MutateAction
         {
             TotalAmount = new MutateQuery
             {

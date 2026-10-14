@@ -29,7 +29,7 @@ public class BlastTargeting : IShardTargeting
         var result = new List<AbilityTargetingContext>();
         foreach (var (target, rank) in state.Selections.Where(atc => atc.Rank <= MaximumRank))
         {
-            var allies = env.GetNeighbors(target);
+            var allies = env.GetNeighbors(target).ToList();
             var idx = allies.IndexOf(target);
             result.AddRange(allies
                 .Skip(Math.Max(0, idx - Radius))

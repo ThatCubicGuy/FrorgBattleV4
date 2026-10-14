@@ -39,10 +39,7 @@ public sealed class LinkResolutionBuilder
     public void Emit(ShardAction shardAction) => _shardActions.Add(shardAction);
 
     [Pure]
-    public LinkResolution Build() => new(_shardActions);
+    public LinkResolution Build() => new([.. _shardActions]);
 }
 
-public class LinkResolution(IEnumerable<ShardAction> actions)
-{
-    public ImmutableList<ShardAction> ShardActions { get; init; } = [.. actions];
-}
+public record LinkResolution(ImmutableList<ShardAction> ShardActions);

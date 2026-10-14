@@ -22,7 +22,7 @@ public class EffectCommand(IShard parentShard) : ShardComponent(parentShard), IS
         var res = new EffectChanceResolution(Formula.Resolve(scope, env), env.NextRoll());
         if (res.CanApply)
         {
-            builder.Emit(new ApplyEffect
+            builder.Emit(new ApplyEffectAction
             {
                 Data = Data,
                 Relation = new RelationContext

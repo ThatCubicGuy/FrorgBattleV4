@@ -27,7 +27,7 @@ public class AttackCommand(IShard parentShard) : ShardComponent(parentShard), IS
                 Subject = state.User,
                 Reference = targeting.Target
             }.Calculate(env), env.NextRoll()) : new CritResolution(0, 0);
-            builder.Emit(new Damage
+            builder.Emit(new DamageAction
             {
                 TotalAmount = new DamageQuery
                 {

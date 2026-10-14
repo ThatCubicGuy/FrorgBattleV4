@@ -9,7 +9,7 @@ namespace FrogBattleV4.Core.Abilities.Components.Requirements;
 public abstract class CostComponent(IShard parentShard) : ShardComponent(parentShard), IShardRequirement
 {
     public CostType Type { get; init; } = CostType.None;
-    public abstract IEnumerable<Mutate> GetCost(LinkResolutionState state, BattleEnvironment env);
+    public abstract IEnumerable<MutateAction> GetCost(LinkResolutionState state, BattleEnvironment env);
 
     public void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
     {

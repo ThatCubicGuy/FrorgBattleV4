@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics.Contracts;
 
 namespace FrogBattleV4.Core.Abilities.Components;

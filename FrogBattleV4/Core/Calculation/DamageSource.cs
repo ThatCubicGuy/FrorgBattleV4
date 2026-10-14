@@ -9,15 +9,13 @@ public readonly record struct DamageSource(string Source)
 
     public override string ToString() => Source;
 
-    public static implicit operator DamageSource(string source) => new(source);
-
     #region Common Sources
 
     public static readonly DamageSource All = default;
-    public static readonly DamageSource Link = nameof(Link);
-    public static readonly DamageSource FollowUp = nameof(FollowUp);
-    public static readonly DamageSource Soullink = nameof(Soullink);
-    public static readonly DamageSource DamageOverTime = nameof(DamageOverTime);
+    public static readonly DamageSource Link = new(nameof(Link).ToSnakeCase());
+    public static readonly DamageSource FollowUp = new(nameof(FollowUp).ToSnakeCase());
+    public static readonly DamageSource SoulLink = new(nameof(SoulLink).ToSnakeCase());
+    public static readonly DamageSource DamageOverTime = new(nameof(DamageOverTime).ToSnakeCase());
 
     #endregion
 

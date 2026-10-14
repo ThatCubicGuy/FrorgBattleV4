@@ -14,18 +14,6 @@ public class StatusEffectCondition : IConditionComponent
     [Pure]
     public int GetContribution(EntityUid subject, EntityUid? reference, BattleEnvironment env)
     {
-        try
-        {
-            return env.GetFighter(Side switch
-            {
-                AffectedSide.This => subject,
-                AffectedSide.Other => reference ?? throw new InvalidOperationException(),
-                _ => throw new NotSupportedException($"Side {Side} not supported")
-            }).StatusEffects.Where(Query).Sum(sei => SumStacks ? sei.Stacks : 1);
-        }
-        catch(InvalidOperationException)
-        {
-            return 0;
-        }
+        return env.GetStatusEffects(subject).Where(Query).Count();
     }
 }

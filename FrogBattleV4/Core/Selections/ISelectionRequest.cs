@@ -1,32 +1,19 @@
-using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
-using System.Linq;
 
 namespace FrogBattleV4.Core.Selections;
 
-public interface ISelectionRequest<out TResult>
+public interface ISelectionRequest<TResult>
 {
-    IReadOnlyList<TResult> ValidOptions { get; }
+    IImmutableList<TResult> ValidOptions { get; }
 }
 
 public static class SelectionRequestExtensions
 {
     [Pure]
-    public static ISelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, int selection)
+    public static SelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request,
+        params int[] selections)
     {
-        return request.Select(new Range(selection, selection + 1));
-    }
-
-    [Pure]
-    public static ISelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, int start, int end)
-    {
-        return request.Select(new Range(start, end));
-    }
-
-    [Pure]
-    public static ISelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request, Range range)
-    {
-        return new SelectionResult<TResult>(request.ValidOptions.Take(range));
+        return new SelectionResult<TResult>(request, selections);
     }
 }

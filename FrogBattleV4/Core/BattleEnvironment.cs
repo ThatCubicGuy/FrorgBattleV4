@@ -1,43 +1,29 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Modifiers;
 using FrogBattleV4.Core.Entities;
+using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core;
 
-public record BattleEnvironment
+public class BattleEnvironment
 {
     #region Properties
 
     private static long MaxPlayersPerTeam => 4;
-    private ImmutableDictionary<EntityUid, TeamUid> MemberAffiliations { get; }
-    private ImmutableDictionary<TeamUid, ImmutableList<EntityUid>> TeamMembers { get; }
-    private ImmutableDictionary<EntityUid, BattleMemberData> MemberData { get; }
-    private ImmutableDictionary<TeamUid, Team> Teams { get; }
+    private ReadOnlyDictionary<EntityUid, FighterData> MemberData { get; }
+    private ReadOnlyDictionary<TeamUid, Team> Teams { get; }
     private Random Rng { get; }
 
-    public BattleEnvironment(IEnumerable<Team> teams, IEnumerable<BattleMemberData> memberData,
-        IEnumerable<KeyValuePair<EntityUid, TeamUid>> relations, Random random)
+    public BattleEnvironment(IDictionary<EntityUid, FighterData> memberData,
+        IDictionary<TeamUid, Team> teams, Random random)
     {
-        Teams = teams.ToImmutableDictionary(team => team.Id);
-        MemberData = memberData.ToImmutableDictionary(data => data.Member.Id);
+        MemberData = new ReadOnlyDictionary<EntityUid, FighterData>(memberData);
+        Teams = new ReadOnlyDictionary<TeamUid, Team>(teams);
         Rng = random;
-        MemberAffiliations = relations.ToImmutableDictionary();
-        // smth sth horrible optimization. yes i'll fix it
-        var teamMembers = new Dictionary<TeamUid, EntityUid[]>();
-        teamMembers.EnsureCapacity(Teams.Count);
-        foreach (var kvp in MemberAffiliations)
-        {
-            if (!teamMembers.TryGetValue(kvp.Value, out var team))
-                team = teamMembers[kvp.Value] = new EntityUid[MaxPlayersPerTeam];
-            else if (team.Length == MaxPlayersPerTeam)
-                throw new EntityLimitException(kvp.Key, MaxPlayersPerTeam);
-            team[^1] = kvp.Key;
-        }
-        TeamMembers = teamMembers.ToImmutableDictionary(kvp => kvp.Key, kvp => kvp.Value.ToImmutableList());
     }
 
     public ModifierCollection ArenaModifiers { get; init; } = ModifierCollection.Empty;
@@ -45,11 +31,6 @@ public record BattleEnvironment
     #endregion
 
     #region Methods
-
-    private void EnsureExists(EntityUid entity)
-    {
-        if (!MemberData.ContainsKey(entity)) throw new EntityMissingException(entity);
-    }
 
     /// <summary>
     /// Returns a random number provided by Rng.
@@ -63,60 +44,14 @@ public record BattleEnvironment
     }
 
     /// <summary>
-    /// Returns the allied team of the given entity.
-    /// </summary>
-    /// <param name="entity">Entity whose team to find.</param>
-    /// <returns>The allied team of this entity.</returns>
-    /// <exception cref="InvalidOperationException">
-    /// There exists no entity with ID <paramref name="entity"/>
-    /// in the current context.
-    /// </exception>
-    public Team GetAlliedTeam(EntityUid entity)
-    {
-        EnsureExists(entity);
-        return Teams[MemberAffiliations[entity]];
-    }
-
-    /// <summary>
     /// Returns every member from the same field (on the same "line") as <paramref name="entity"/>.
     /// </summary>
     /// <param name="entity">Entity UID.</param>
     /// <returns>Every member from the same field as the given entity.</returns>
-    public ImmutableList<EntityUid> GetNeighbors(EntityUid entity)
+    public IEnumerable<EntityUid> GetNeighbors(EntityUid entity)
     {
         EnsureExists(entity);
-        return TeamMembers[MemberAffiliations[entity]];
-    }
-
-    /// <summary>
-    /// Gets the entity with this ID in the current battle.
-    /// </summary>
-    /// <param name="uid">ID to look up.</param>
-    /// <returns>The battle member with this ID.</returns>
-    /// <exception cref="InvalidOperationException">
-    /// There exists no entity with ID <paramref name="uid"/>
-    /// in the current context.
-    /// </exception>
-    public BattleMemberData GetEntity(EntityUid uid)
-    {
-        EnsureExists(uid);
-        return MemberData[uid];
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="uid"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException">
-    /// There exists no entity with ID <paramref name="uid"/>
-    /// in the current context. -or- The entity is not a fighter.</exception>
-    public FighterBase GetFighter(EntityUid uid)
-    {
-        EnsureExists(uid);
-        var member = MemberData[uid].Member;
-        return member as FighterBase
-               ?? throw new InvalidOperationException($"Entity {uid} is not a fighter!");
+        return Teams[MemberData[entity].Team].GetOnFieldMembers();
     }
 
     /// <summary>
@@ -131,17 +66,18 @@ public record BattleEnvironment
     public ModifierCollection GetModifiers(EntityUid entity)
     {
         EnsureExists(entity);
+        var data = MemberData[entity];
         return ArenaModifiers
-            .With(GetEntity(entity).ProvideModifiers(this))
-            .With(GetAlliedTeam(entity).Modifiers);
+            .With(data.GetAllModifiers())
+            .With(Teams[data.Team].Modifiers);
     }
 
     /// <summary>
-    /// 
+    /// Returns the current value of the given pool for the given entity.
     /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="pool"></param>
-    /// <returns></returns>
+    /// <param name="entity">Entity UID.</param>
+    /// <param name="pool">Pool ID.</param>
+    /// <returns>A double representing the current value of the pool.</returns>
     /// <exception cref="InvalidOperationException">
     /// There exists no entity with ID <paramref name="entity"/>
     /// in the current context.
@@ -149,7 +85,18 @@ public record BattleEnvironment
     public double GetPoolValue(EntityUid entity, PoolId pool)
     {
         EnsureExists(entity);
-        return MemberData[entity].PoolValues[pool];
+        return MemberData[entity].Pools[pool].Value;
+    }
+
+    public IEnumerable<StatusEffectInstance> GetStatusEffects(EntityUid entity)
+    {
+        EnsureExists(entity);
+        return MemberData[entity].StatusEffects;
+    }
+
+    private void EnsureExists(EntityUid entity)
+    {
+        if (!MemberData.ContainsKey(entity)) throw new EntityMissingException(entity);
     }
 
     #endregion

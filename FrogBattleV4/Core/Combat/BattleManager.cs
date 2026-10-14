@@ -1,56 +1,80 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FrogBattleV4.Core.Combat.Actions;
+using FrogBattleV4.Core.Entities;
+using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Combat;
 
 // TODO: Full revamp
 public class BattleManager : IActionVisitor
 {
-    private Random Random { get; }
-    private long StartTime { get; }
+    private readonly Random _random;
+    private readonly Dictionary<EntityUid, Fighter> _battleMembers = [];
 
     public BattleManager()
     {
         StartTime = DateTime.UtcNow.Ticks;
-        Random = new Random(StartTime.GetHashCode());
+        _random = new Random(StartTime.GetHashCode());
         throw new NotImplementedException();
     }
 
+    public long StartTime { get; }
     public TimelineScheduler Scheduler { get; } = new();
+    private Dictionary<EntityUid, FighterData> MemberData { get; } = [];
+    private Dictionary<TeamUid, Team> Teams { get; } = [];
 
     public async Task RunAsync()
     {
         throw new NotImplementedException();
     }
 
-    public void Visit(Damage action)
+    public BattleEnvironment GetEnvironment()
     {
-        throw new NotImplementedException();
+        return new BattleEnvironment(MemberData, Teams, _random);
     }
 
-    public void Visit(Mutate action)
+    public void Visit(DamageAction action)
     {
-        throw new NotImplementedException();
+        MemberData[action.Relation.Target].TakeDamage(action.TotalAmount, action.Data);
     }
 
-    public void Visit(ApplyEffect action)
+    public void Visit(MutateAction action)
     {
-        throw new NotImplementedException();
+        var data = action.Data;
+        MemberData[action.Relation.Target].Pools[data.TargetPool].Value += action.TotalAmount;
     }
 
-    public void Visit(RemoveEffect action)
+    public void Visit(ApplyEffectAction action)
     {
-        throw new NotImplementedException();
+        var data = action.Data;
+        MemberData[action.Relation.Target].AddStatusEffect(new StatusEffectInstance
+        {
+            Definition = data.Effect,
+            Stacks = data.AddedStacks,
+            Turns = data.InitialTurns
+        });
     }
 
-    public void Visit(AdvanceTurn action)
+    public void Visit(RemoveEffectAction action)
     {
-        throw new NotImplementedException();
+        // TODO (Nova)
+        var data = action.Data;
+        foreach (var effect in MemberData[action.Relation.Target].StatusEffects.Where(data.Predicate))
+        {
+            MemberData[action.Relation.Target].RemoveStatusEffect(effect.Definition.Id);
+        }
     }
 
-    public void Visit(QueueTurn action)
+    public void Visit(AdvanceTurnAction action)
     {
-        throw new NotImplementedException();
+        Scheduler.AdvanceEntity(action.Relation.Target, action.Data.AdvancePercent);
+    }
+
+    public void Visit(QueueTurnAction action)
+    {
+        Scheduler.Schedule(action.Relation.Target, action.Data.BaseActionValue);
     }
 }

@@ -3,9 +3,9 @@ namespace FrogBattleV4.Core.Calculation;
 public readonly record struct PoolId(string Id)
 {
     /// <summary>
-    /// Unique ID of the pool. Automatically converted into pascal case.
+    /// Unique ID of the pool. Automatically converted into snake case.
     /// </summary>
-    public string Id { get; } = Id.ToPascalCase();
+    public string Id { get; } = Id.ToSnakeCase();
 
     public override string ToString() => Id;
 
@@ -20,6 +20,7 @@ public readonly record struct PoolId(string Id)
     public static readonly PoolId Shield = nameof(Shield);
     public static readonly PoolId Barrier = nameof(Barrier);
     public static readonly PoolId Special = nameof(Special);
+    public static readonly PoolId Overheal = nameof(Overheal);
 
     #endregion
 }

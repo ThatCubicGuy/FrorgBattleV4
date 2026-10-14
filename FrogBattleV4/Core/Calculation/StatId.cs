@@ -3,9 +3,9 @@ namespace FrogBattleV4.Core.Calculation;
 public readonly record struct StatId(string Id)
 {
     /// <summary>
-    /// Unique ID of the stat. Automatically converted into pascal case.
+    /// Unique ID of the stat. Automatically converted into snake case.
     /// </summary>
-    public string Id { get; } = Id.ToPascalCase();
+    public string Id { get; } = Id.ToSnakeCase();
 
     public override string ToString() => Id;
 

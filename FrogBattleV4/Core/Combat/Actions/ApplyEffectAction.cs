@@ -2,7 +2,10 @@ using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Combat.Actions;
 
-public class RemoveEffect : ShardAction<RemoveEffectData>
+/// <summary>
+/// Represents a command for applying an effect to a target.
+/// </summary>
+public class ApplyEffectAction : ShardAction<ApplyEffectData>
 {
     public override void Accept(IActionVisitor visitor) => visitor.Visit(this);
 }

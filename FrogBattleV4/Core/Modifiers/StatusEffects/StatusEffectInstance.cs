@@ -1,15 +1,14 @@
 using System;
 using System.Diagnostics.Contracts;
-using FrogBattleV4.Core.Combat.Actions;
 
 namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 
-public class StatusEffectInstance(ApplyEffect ctx) : ApplicableEffect
+public class StatusEffectInstance : ApplicableEffect
 {
-    public StatusEffectDefinition Definition { get; } = ctx.Data.Effect;
-    public int Turns { get; set; } = ctx.Data.InitialTurns;
-    public int Stacks { get; set; } = ctx.Data.AddedStacks;
-    public EffectFlags Props { get; init; } = EffectFlags.None;
+    public required StatusEffectDefinition Definition { get; init; }
+    public EffectFlags Properties { get; init; } = EffectFlags.None;
+    public int Turns { get; set; }
+    public int Stacks { get; set; }
 
     [Pure]
     public bool ShouldRemove() => Stacks <= 0 || Turns <= 0;

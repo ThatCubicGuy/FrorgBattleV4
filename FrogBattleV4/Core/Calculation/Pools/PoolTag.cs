@@ -3,9 +3,9 @@ namespace FrogBattleV4.Core.Calculation.Pools;
 public readonly record struct PoolTag(string Name)
 {
     /// <summary>
-    /// Name of the pool tag. Automatically converted into pascal case.
+    /// Name of the pool tag. Automatically converted into snake case.
     /// </summary>
-    public string Name { get; } = Name.ToPascalCase();
+    public string Name { get; } = Name.ToSnakeCase();
 
     public override string ToString() => Name;
 

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core.Selections;
@@ -8,7 +7,7 @@ namespace FrogBattleV4.ConsoleBattle;
 
 public class ConsoleSelectionProvider(CancellationToken cancellationToken) : ISelectionProvider
 {
-    public async Task<ISelectionResult<TResult>> GetSelectionAsync<TResult>(ISelectionRequest<TResult> request)
+    public async Task<SelectionResult<TResult>> GetSelectionAsync<TResult>(ISelectionRequest<TResult> request)
     {
         return request.Select(request switch
         {
@@ -35,7 +34,7 @@ public class ConsoleSelectionProvider(CancellationToken cancellationToken) : ISe
                     await Console.Out.WriteLineAsync(ex.Message);
                 }
 
-                return selection < 0 || selection >= request.ValidOptions.Count()
+                return selection < 0 || selection >= request.ValidOptions.Count
                     ? throw new IndexOutOfRangeException(nameof(selection))
                     : selection;
             }
@@ -58,7 +57,7 @@ public class ConsoleSelectionProvider(CancellationToken cancellationToken) : ISe
             {
                 await Console.Out.WriteLineAsync($"Select target for {request.Requestor}: ");
                 if (int.TryParse(await Task.Run(Console.ReadLine, cancel), out var selection) &&
-                    selection >= 0 && selection < request.ValidOptions.Count())
+                    selection >= 0 && selection < request.ValidOptions.Count)
                 {
                     return selection;
                 }

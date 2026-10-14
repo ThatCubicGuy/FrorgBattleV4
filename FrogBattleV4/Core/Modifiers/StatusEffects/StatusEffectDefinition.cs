@@ -4,10 +4,12 @@ namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 
 public class StatusEffectDefinition
 {
-    public required string Id { get; init; }
-    public ModifierRuleCollection ModifierRules { get; init; } = new();
+    public required StatusEffectId Id { get; init; }
+    public required string Name { get; init; }
+    public string? Description { get; init; }
+    public IEnumerable<ModifierRule> ModifierRules { get; init; } = [];
     public IEnumerable<IMutatorComponent> Mutators { get; init; } = [];
 
     public required uint MaxStacks { get; init; }
-    public required uint MaxDuration { get; init; }
+    public uint MaxDuration { get; init; }
 }

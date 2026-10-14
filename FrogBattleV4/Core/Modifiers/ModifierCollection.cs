@@ -8,16 +8,9 @@ namespace FrogBattleV4.Core.Modifiers;
 /// <summary>
 /// A wrapped list of IModifierProviders that in turn implements IModifierProvider.
 /// </summary>
-public record ModifierCollection : IModifierProvider
+public record ModifierCollection(ImmutableList<IModifierProvider> Modifiers) : IModifierProvider
 {
     public static readonly ModifierCollection Empty = new([]);
-
-    public ModifierCollection(IEnumerable<IModifierProvider> modifiers)
-    {
-        Modifiers = modifiers.ToImmutableList();
-    }
-
-    public ImmutableList<IModifierProvider> Modifiers { get; init; }
 
     /// <summary>
     /// Returns a new ModifierCollection with the added modifier.
@@ -26,7 +19,7 @@ public record ModifierCollection : IModifierProvider
     /// <returns>A new ModifierCollection.</returns>
     public ModifierCollection With(IModifierProvider modifier)
     {
-        return new ModifierCollection(Modifiers.Append(modifier));
+        return new ModifierCollection([.. Modifiers, modifier]);
     }
 
     /// <summary>
@@ -36,7 +29,7 @@ public record ModifierCollection : IModifierProvider
     /// <returns>A new ModifierCollection.</returns>
     public ModifierCollection With(IEnumerable<IModifierProvider> modifiers)
     {
-        return new ModifierCollection(Modifiers.Concat(modifiers));
+        return new ModifierCollection([.. Modifiers.Concat(modifiers)]);
     }
 
     public ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx)

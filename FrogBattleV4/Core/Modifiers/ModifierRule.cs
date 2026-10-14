@@ -46,14 +46,14 @@ public abstract class AttributeModifier<TQuery> : ModifierRule<TQuery> where TQu
 
     protected sealed override bool MatchesRelationship(TQuery query, in ModifierContext ctx)
     {
-        var actor = query.Subject;
-        var target = query.Reference;
+        var subject = query.Subject;
+        var reference = query.Reference;
         return AffectedSide switch
         {
-            AffectedSide.This => ctx.Holder == actor,
-            AffectedSide.Other => ctx.Holder == target,
+            AffectedSide.This => ctx.Holder == subject,
+            AffectedSide.Other => ctx.Holder == reference,
             _ => throw new System.NotSupportedException($"{AffectedSide} not supported")
-        } && ctx.Subject == actor;
+        } && ctx.Subject == subject;
     }
 }
 
