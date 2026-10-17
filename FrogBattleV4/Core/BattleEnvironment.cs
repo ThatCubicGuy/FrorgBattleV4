@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Modifiers;
@@ -9,22 +9,15 @@ using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core;
 
-public class BattleEnvironment
+public class BattleEnvironment(
+    ImmutableDictionary<EntityUid, FighterData> memberData,
+    ImmutableDictionary<TeamUid, Team> teams,
+    Random random)
 {
     #region Properties
 
-    private static long MaxPlayersPerTeam => 4;
-    private ReadOnlyDictionary<EntityUid, FighterData> MemberData { get; }
-    private ReadOnlyDictionary<TeamUid, Team> Teams { get; }
-    private Random Rng { get; }
-
-    public BattleEnvironment(IDictionary<EntityUid, FighterData> memberData,
-        IDictionary<TeamUid, Team> teams, Random random)
-    {
-        MemberData = new ReadOnlyDictionary<EntityUid, FighterData>(memberData);
-        Teams = new ReadOnlyDictionary<TeamUid, Team>(teams);
-        Rng = random;
-    }
+    private ImmutableDictionary<EntityUid, FighterData> MemberData { get; } = memberData;
+    private ImmutableDictionary<TeamUid, Team> Teams { get; } = teams;
 
     public ModifierCollection ArenaModifiers { get; init; } = ModifierCollection.Empty;
 
@@ -38,9 +31,9 @@ public class BattleEnvironment
     /// <returns>
     /// A double-precision floating point number that is greater than or equal to 0.0, and less than 1.0.
     /// </returns>
-    public double NextRoll()
+    internal double NextRoll()
     {
-        return Rng.NextDouble();
+        return random.NextDouble();
     }
 
     /// <summary>

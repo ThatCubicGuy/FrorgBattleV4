@@ -1,16 +1,15 @@
 namespace FrogBattleV4.Core.Calculation;
 
 /// <summary>
-/// Mutation query classifying damage.
+/// Command query classifying damage.
 /// </summary>
-public sealed record DamageQuery : DynamicQuery
+public class DamageQuery : CommandQuery
 {
     public required DamageData Data { get; init; }
-    public required CritResolution CritData { get; init; }
-    public bool IsCrit => CritData.Outcome == CritStatus.Critical;
+    public required bool IsCrit { get; init; }
 }
 
-public sealed record DamageStatQuery : StaticQuery
+public class DamageStatQuery : AttributeQuery
 {
     public required DamageData Data { get; init; }
     public required DamageStatChannel Channel { get; init; }

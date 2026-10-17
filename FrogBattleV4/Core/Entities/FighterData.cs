@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
 using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Modifiers;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 
@@ -12,7 +15,12 @@ public class FighterData
     private readonly List<IModifierProvider> _passiveModifiers = [];
     private readonly List<StatusEffectInstance> _statusEffects = [];
     private readonly Dictionary<PoolId, PoolContainer> _pools = new();
-    public FighterData()
+
+    public event EventHandler<DamageTakenArgs>? TakingDamage;
+    public event EventHandler<DamageTakenArgs>? TookDamage;
+    public event EventHandler<EffectAddedArgs>? EffectAdded;
+
+    public FighterData(Team alliedTeam)
     {
         Pools = new ReadOnlyDictionary<PoolId, PoolContainer>(_pools);
         StatusEffects = new ReadOnlyCollection<StatusEffectInstance>(_statusEffects);
@@ -24,7 +32,8 @@ public class FighterData
     public IEnumerable<IModifierProvider> GetAllModifiers() => _passiveModifiers.Concat(StatusEffects);
 
     // Order in which pools take damage
-    private static readonly PoolId[] DamagePriority =
+    [System.ComponentModel.ReadOnly(true)]
+    private static readonly ImmutableArray<PoolId> DamagePriority =
     [
         PoolId.Shield,
         PoolId.Overheal,
@@ -32,21 +41,44 @@ public class FighterData
     ];
     public void TakeDamage(double damage, DamageData damageData)
     {
+        TakingDamage?.Invoke(this, new DamageTakenArgs { Amount = damage, Data = damageData });
         var poolId = DamagePriority.First(_pools.ContainsKey);
         Pools[poolId].Value -= damage;
+        TookDamage?.Invoke(this, new DamageTakenArgs { Amount = damage, Data = damageData });
     }
+
     public void AddStatusEffect(StatusEffectInstance effect)
     {
         _statusEffects.Add(effect);
+        EffectAdded?.Invoke(this, new EffectAddedArgs
+        {
+            Definition = effect.Definition,
+            Turns = effect.Turns,
+            Stacks = effect.Stacks
+        });
     }
 
     public void RemoveStatusEffect(StatusEffectId effectId)
     {
-        _statusEffects.RemoveAll(sei => sei.Definition.Id == effectId);
+        
+        _statusEffects.RemoveAll(sei => sei.ShouldRemove());
     }
 
     public void AddModifier(IModifierProvider modifier)
     {
         _passiveModifiers.Add(modifier);
     }
+}
+
+public class DamageTakenArgs : EventArgs
+{
+    public required double Amount { get; init; }
+    public required DamageData Data { get; init; }
+}
+
+public class EffectAddedArgs
+{
+    public required StatusEffectDefinition Definition { get; init; }
+    public required int Turns { get; init; }
+    public required int Stacks { get; init; }
 }

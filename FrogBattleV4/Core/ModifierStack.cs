@@ -16,7 +16,7 @@ public record ModifierStack(
     double MultiplyTotal = 1,
     double FinalAddValue = 0)
 {
-    public double this[ModifierOperation operation] => operation switch
+    private double this[ModifierOperation operation] => operation switch
     {
         ModifierOperation.BaseAddValue => BaseAddValue,
         ModifierOperation.AddBasePercent => AddBasePercent,
@@ -82,7 +82,7 @@ public record ModifierStack(
     /// </summary>
     /// <param name="left">The first mod to add.</param>
     /// <param name="right">The second mod to add to the first.</param>
-    /// <returns>A new modifier with the combined values.</returns>
+    /// <returns>A new modifier stack with the combined values.</returns>
     [Pure]
     public static ModifierStack operator +(ModifierStack left, ModifierStack right) => new()
     {
@@ -91,37 +91,13 @@ public record ModifierStack(
         MultiplyTotal = left.MultiplyTotal * right.MultiplyTotal,
         FinalAddValue = left.FinalAddValue + right.FinalAddValue,
     };
-
-    /// <summary>
-    /// Multiplies a modifier stack by a scalar.
-    /// </summary>
-    /// <param name="mod">Modifier to scale.</param>
-    /// <param name="scalar">Integer to scale by.</param>
-    /// <returns>A scaled modifier result.</returns>
-    [Pure]
-    public static ModifierStack operator *(ModifierStack mod, int scalar) => new()
-    {
-        BaseAddValue = mod.BaseAddValue * scalar,
-        AddBasePercent = mod.AddBasePercent * scalar,
-        MultiplyTotal = Math.Pow(mod.MultiplyTotal, scalar),
-        FinalAddValue = mod.FinalAddValue * scalar,
-    };
-
-    /// <summary>
-    /// Multiplies a modifier stack by a scalar.
-    /// </summary>
-    /// <param name="scalar">Integer to scale by.</param>
-    /// <param name="mod">Modifier to scale.</param>
-    /// <returns>A scaled modifier result.</returns>
-    [Pure]
-    public static ModifierStack operator *(int scalar, ModifierStack mod) => mod * scalar;
     
     /// <summary>
     /// Multiplies a modifier stack by a scalar.
     /// </summary>
     /// <param name="mod">Modifier to scale.</param>
     /// <param name="scalar">Real value to scale by.</param>
-    /// <returns>A scaled modifier result.</returns>
+    /// <returns>A scaled modifier stack.</returns>
     [Pure]
     public static ModifierStack operator *(ModifierStack mod, double scalar) => new()
     {
@@ -136,7 +112,7 @@ public record ModifierStack(
     /// </summary>
     /// <param name="scalar">Real value to scale by.</param>
     /// <param name="mod">Modifier to scale.</param>
-    /// <returns>A scaled modifier result.</returns>
+    /// <returns>A scaled modifier stack.</returns>
     [Pure]
     public static ModifierStack operator *(double scalar, ModifierStack mod) => mod * scalar;
 }

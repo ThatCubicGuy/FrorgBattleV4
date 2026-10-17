@@ -15,7 +15,7 @@ public abstract class ModifierRule
     /// </summary>
     /// <param name="query">Query to check application for.</param>
     /// <param name="ctx">Data containing the modifier holder and the subject we're calculating for.</param>
-    /// <returns></returns>
+    /// <returns>True if this modifier applies to the query in this context, false otherwise.</returns>
     public abstract bool Applies(IQuery query, in ModifierContext ctx);
 }
 
@@ -40,7 +40,7 @@ public abstract class ModifierRule<TQuery> : ModifierRule where TQuery : IQuery
 /// <br/>Inherit for non-mutation-type modifiers.
 /// </summary>
 /// <typeparam name="TQuery">Type of the query this modifier applies to.</typeparam>
-public abstract class AttributeModifier<TQuery> : ModifierRule<TQuery> where TQuery : StaticQuery
+public abstract class AttributeModifier<TQuery> : ModifierRule<TQuery> where TQuery : AttributeQuery
 {
     public required AffectedSide AffectedSide { get; init; }
 
@@ -63,7 +63,7 @@ public abstract class AttributeModifier<TQuery> : ModifierRule<TQuery> where TQu
 /// <br/>Inherit for mutation-type modifiers.
 /// </summary>
 /// <typeparam name="TQuery">Type of the query this modifier applies to.</typeparam>
-public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQuery : DynamicQuery
+public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQuery : CommandQuery
 {
     public required AffectedSide AffectedSide { get; init; }
     public required MutationDirection Direction { get; init; }
@@ -91,7 +91,7 @@ public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQue
     }
 
     [System.Obsolete] // Kept here because I like the switch. Also, it explains each case better.
-    private bool MatchesRelationshipSwitch(DynamicQuery query, in ModifierContext ctx)
+    private bool MatchesRelationshipSwitch(CommandQuery query, in ModifierContext ctx)
     {
         var actor = query.Context.Actor;
         var target = query.Context.Target;

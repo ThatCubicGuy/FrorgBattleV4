@@ -19,6 +19,9 @@ public class PassiveModifier : ApplicableEffect
     public AccumulationType ConditionAccumulationType { get; init; } = AccumulationType.Min;
 
     [Pure]
+    public override bool ShouldRemove() => false;
+
+    [Pure]
     protected override int GetStacks(EntityUid subject, EntityUid? reference, BattleEnvironment env)
     {
         return Math.Max(0, ConditionAccumulationType switch

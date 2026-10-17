@@ -19,27 +19,13 @@ public abstract class ApplicableEffect : IModifierProvider
     protected abstract int GetStacks(EntityUid subject, EntityUid? reference, BattleEnvironment env);
 
     [Pure]
+    public abstract bool ShouldRemove();
+
+    [Pure]
     public ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx)
     {
-        return ModifierRules.GetContributingModifiers(query, env, ctx) * GetStacks(query.Main, query.Other, env);
-    }
-}
-
-public static class ModifierRuleExtensions
-{
-    /// <summary>
-    /// Aggregates all contained modifiers that contribute to this query.
-    /// </summary>
-    /// <param name="rules">Enumerable of modifier rules.</param>
-    /// <param name="query">Query to search for.</param>
-    /// <param name="env">Environment to aggregate in.</param>
-    /// <param name="ctx">Modifier context to search in regard to.</param>
-    /// <returns>The aggregated ModifierStack.</returns>
-    [Pure]
-    public static ModifierStack GetContributingModifiers(this IEnumerable<ModifierRule> rules, IQuery query, BattleEnvironment env, ModifierContext ctx)
-    {
-        return rules.Where(mr => mr.Applies(query, ctx))
+        return ModifierRules.Where(mr => mr.Applies(query, ctx))
             .Aggregate(new ModifierStack(), (stack, rule) =>
-                stack + rule.ModifierStack);
+                stack + rule.ModifierStack) * GetStacks(query.Main, query.Other, env);
     }
 }

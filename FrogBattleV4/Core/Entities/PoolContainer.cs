@@ -16,7 +16,6 @@ public class PoolContainer
     }
 
     public event EventHandler<PoolValueChangedArgs>? ValueChanged;
-
     public double Capacity { get; set; }
 
     public double Value
@@ -34,7 +33,7 @@ public class PoolContainer
         }
     }
 
-    public ReadOnlyCollection<IMutatorComponent> Mutators { get; init; }
+    public ReadOnlyCollection<IMutatorComponent> Mutators { get; }
 }
 
 public class PoolValueChangedArgs : EventArgs

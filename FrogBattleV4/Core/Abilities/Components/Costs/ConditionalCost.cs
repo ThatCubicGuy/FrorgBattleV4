@@ -11,7 +11,7 @@ public class ConditionalCost(IShard parentShard) : CostComponent(parentShard)
     public required CostComponent CostIfTrue { get; init; }
     public CostComponent CostIfFalse { get; init; } = new SingleCost(parentShard) { Formula = new CostFormula.Flat(0), Pool = PoolId.Mana };
 
-    public override IEnumerable<MutateAction> GetCost(LinkResolutionState state, BattleEnvironment env)
+    public override IEnumerable<MutateCommand> GetCost(LinkResolutionState state, BattleEnvironment env)
     {
         return (Predicate(state, env) ? CostIfTrue : CostIfFalse).GetCost(state, env);
     }

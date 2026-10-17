@@ -3,8 +3,8 @@ using FrogBattleV4.Core.Abilities;
 
 namespace FrogBattleV4.Core.Selections;
 
-public record AbilitySelectionRequest(EntityUid Requestor, IImmutableList<IShard> ValidOptions, int Count = 1)
+public record AbilitySelectionRequest(EntityUid Requestor, ImmutableList<IShard> ValidOptions)
     : ISelectionRequest<IShard>;
 
-public record TargetSelectionRequest(EntityUid Requestor, IImmutableList<EntityUid> ValidOptions, int Count = 1)
+public record TargetSelectionRequest(EntityUid Requestor, ImmutableList<EntityUid> ValidOptions)
     : ISelectionRequest<EntityUid>;

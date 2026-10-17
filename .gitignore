@@ -427,7 +427,6 @@ fabric.properties
 *.Tests/
 TestResults/
 
-
 # Frorgbattle specifics
 */[Dd]ebug/
 */[Dd]ebugPublic/

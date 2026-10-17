@@ -7,10 +7,30 @@ public interface IQuery
 }
 
 /// <summary>
-/// Base query for things that create an action, and exist in a relationship;
+/// Base query for values that are inherent to an entity;
+/// Values that don't need a base value because they always exist in this way.
+/// </summary>
+public abstract class AttributeQuery : IQuery
+{
+    public required EntityUid Subject { get; init; }
+    public EntityUid? Reference { get; init; }
+
+    /// <summary>
+    /// Returns this query's subject.
+    /// </summary>
+    EntityUid IQuery.Main => Subject;
+
+    /// <summary>
+    /// Returns this query's reference.
+    /// </summary>
+    EntityUid? IQuery.Other => Reference;
+}
+
+/// <summary>
+/// Base query for things that exist in a relationship, at a certain point in time;
 /// Values that need some context, including a base value, because they only exist once created.
 /// </summary>
-public abstract record DynamicQuery : IQuery
+public abstract class CommandQuery : IQuery
 {
     /// <summary>
     /// Base value to start calculations from.
@@ -18,22 +38,17 @@ public abstract record DynamicQuery : IQuery
     public required double BaseValue { get; init; }
 
     /// <summary>
-    /// Context in which to query.
+    /// Context in which the query happens.
     /// </summary>
     public required RelationContext Context { get; init; }
 
+    /// <summary>
+    /// Returns the context's actor.
+    /// </summary>
     EntityUid IQuery.Main => Context.Actor;
-    EntityUid? IQuery.Other => Context.Target;
-}
 
-/// <summary>
-/// Base query for values that are inherent to an entity;
-/// Values that don't need a base value because they always exist in this way.
-/// </summary>
-public abstract record StaticQuery : IQuery
-{
-    public required EntityUid Subject { get; init; }
-    public EntityUid? Reference { get; init; }
-    EntityUid IQuery.Main => Subject;
-    EntityUid? IQuery.Other => Reference;
+    /// <summary>
+    /// Returns the context's target.
+    /// </summary>
+    EntityUid? IQuery.Other => Context.Target;
 }

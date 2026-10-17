@@ -5,9 +5,10 @@ namespace FrogBattleV4.Core.Combat.Actions;
 /// <summary>
 /// Represents a command for dealing damage to a target.
 /// </summary>
-public class DamageAction : ShardAction<DamageData>
+public class DamageCommand : BattleCommand<DamageData>
 {
-    public required double TotalAmount { get; init; }
-    public required CritResolution CritData { get; init; }
+    public required double NormalAmount { get; init; }
+    public required double CriticalAmount { get; init; }
+    public required double CriticalChance { get; init; }
     public override void Accept(IActionVisitor visitor) => visitor.Visit(this);
 }

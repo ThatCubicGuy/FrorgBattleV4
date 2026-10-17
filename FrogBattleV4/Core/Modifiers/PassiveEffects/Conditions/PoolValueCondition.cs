@@ -60,7 +60,7 @@ public class PoolValueCondition : IConditionComponent
             value /= new PoolStatQuery
             {
                 PoolId = Pool,
-                Channel = PoolValueChannel.Max,
+                Channel = PoolStatChannel.Max,
                 Subject = subject
             }.Calculate(env);
         }

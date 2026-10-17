@@ -2,16 +2,15 @@ namespace FrogBattleV4.Core.Combat.Actions;
 
 /// <inheritdoc/>
 /// <typeparam name="TData">Data relating to the shard action.</typeparam>
-public abstract class ShardAction<TData> : ShardAction where TData : notnull
+public abstract class BattleCommand<TData> : BattleCommand where TData : notnull
 {
     public required TData Data { get; init; }
 }
 
 /// <summary>
-/// A shard action causes things to happen in the game. Processed by the battle manager.
-/// Shard actions are fully resolved.
+/// A command causes things to happen in the game. Processed by the battle manager.
 /// </summary>
-public abstract class ShardAction
+public abstract class BattleCommand
 {
     public required RelationContext Relation { get; init; }
     public abstract void Accept(IActionVisitor visitor);

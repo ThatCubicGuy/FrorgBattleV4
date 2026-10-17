@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.Abilities.Components;
 
 namespace FrogBattleV4.Core.Abilities;
@@ -10,56 +11,25 @@ public abstract class Shard : IShard
 {
     #region Metadata
 
-    /// <summary>
-    /// A catchy name for this shard.
-    /// </summary>
+    /// <inheritdoc/>
     [Localizable(true)]
     public required string Name { get; init; }
 
-    /// <summary>
-    /// Description of what this shard does.
-    /// </summary>
+    /// <inheritdoc/>
     [Localizable(true)]
     public required string Description { get; init; }
 
-    public required UsageClass ShardFunction { get; init; }
-
-    /// <summary>
-    /// Defines the primary function of this shard.
-    /// </summary>
-    public enum UsageClass
-    {
-        /// <summary>
-        /// Attack shards target enemy targets and deal damage.
-        /// </summary>
-        Attack,
-
-        /// <summary>
-        /// Impair shards target enemies and apply debuffs.
-        /// </summary>
-        Impair,
-
-        /// <summary>
-        /// Restore shards target allies and restore HP, Energy, or others.
-        /// </summary>
-        Restore,
-
-        /// <summary>
-        /// Support shards target allies and apply buffs.
-        /// </summary>
-        Support,
-
-        /// <summary>
-        /// Enhance shards boost the capabilities of other shards in the chain.
-        /// </summary>
-        Enhance,
-    }
+    /// <inheritdoc/>
+    public required ShardFunction Function { get; init; }
 
     #endregion
 
     public required IShardRequirement Condition { get; init; }
 
+    /// <inheritdoc/>
     public bool IsUsable(LinkResolutionState state, BattleEnvironment env) => Condition.IsFulfilled(state, env);
+
+    /// <inheritdoc/>
     public abstract void Resolve(ref LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder);
 }
 
@@ -68,6 +38,64 @@ public abstract class Shard : IShard
 /// </summary>
 public interface IShard
 {
+    /// <summary>
+    /// A catchy name for this shard.
+    /// </summary>
+    [Localizable(true)]
+    string Name { get; }
+
+    /// <summary>
+    /// Description of what this shard does.
+    /// </summary>
+    [Localizable(true)]
+    string Description { get; }
+
+    /// <summary>
+    /// Describes the primary function of a shard.
+    /// </summary>
+    ShardFunction Function { get; }
+
+    /// <summary>
+    /// Determines whether the shard can be used in the current circumstances.
+    /// </summary>
+    /// <param name="state">Current link resolution state.</param>
+    /// <param name="env">Current environment.</param>
+    /// <returns>True if the shard can be used, false otherwise.</returns>
+    [Pure]
     bool IsUsable(LinkResolutionState state, BattleEnvironment env);
+
     void Resolve(ref LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder);
+}
+
+public enum ShardFunction
+{
+    /// <summary>
+    /// Attack shards target enemies and deal damage.
+    /// </summary>
+    Attack,
+
+    /// <summary>
+    /// Impair shards target enemies and apply debuffs.
+    /// </summary>
+    Impair,
+
+    /// <summary>
+    /// Restore shards target allies and restore HP, Energy, or others.
+    /// </summary>
+    Restore,
+
+    /// <summary>
+    /// Support shards target allies and apply buffs.
+    /// </summary>
+    Support,
+
+    /// <summary>
+    /// Target shards transform the current link's target selection.
+    /// </summary>
+    Target,
+
+    /// <summary>
+    /// Enhance shards boost the capabilities of other shards in the link.
+    /// </summary>
+    Enhance,
 }

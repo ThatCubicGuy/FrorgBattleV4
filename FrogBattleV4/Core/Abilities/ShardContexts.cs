@@ -34,12 +34,12 @@ public record ShardResolutionScope(
 
 public sealed class LinkResolutionBuilder
 {
-    private readonly List<ShardAction> _shardActions = [];
+    private readonly List<BattleCommand> _shardActions = [];
 
-    public void Emit(ShardAction shardAction) => _shardActions.Add(shardAction);
+    public void Emit(BattleCommand command) => _shardActions.Add(command);
 
     [Pure]
     public LinkResolution Build() => new([.. _shardActions]);
 }
 
-public record LinkResolution(ImmutableList<ShardAction> ShardActions);
+public record LinkResolution(ImmutableList<BattleCommand> ShardActions);

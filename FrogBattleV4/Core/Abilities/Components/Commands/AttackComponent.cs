@@ -4,43 +4,48 @@ using FrogBattleV4.Core.Combat.Actions;
 
 namespace FrogBattleV4.Core.Abilities.Components.Commands;
 
-public class AttackCommand(IShard parentShard) : ShardComponent(parentShard), IShardCommand
+public class AttackComponent(IShard parentShard) : ShardComponent(parentShard), IShardCommandComponent
 {
     public required DamageFormula Formula { get; init; }
     public required DamageData Data { get; init; }
     public AttackProperties Properties { get; init; } = new();
 
-    public void GenerateActions(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
+    public void GenerateCommands(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
     {
         var split = Properties.SplitDamageEvenly ? state.Selections.Count : 1;
         foreach (var targeting in state.Selections)
         {
+            var scope = new ShardResolutionScope(state.User, targeting, state.Modifiers);
+            var baseValue = Formula.Resolve(scope, env) / split;
             var ctx = new RelationContext
             {
                 Actor = state.User,
                 Target = targeting.Target
             };
-            var res = Properties.CanCrit ? new CritResolution(new DamageStatQuery
+            builder.Emit(new DamageCommand
             {
-                Data = Data,
-                Channel = DamageStatChannel.CritRate,
-                Subject = state.User,
-                Reference = targeting.Target
-            }.Calculate(env), env.NextRoll()) : new CritResolution(0, 0);
-            builder.Emit(new DamageAction
-            {
-                TotalAmount = new DamageQuery
+                NormalAmount = new DamageQuery
                 {
-                    BaseValue = Formula.Resolve(new ShardResolutionScope(
-                        state.User,
-                        targeting,
-                        state.Modifiers), env) / split,
+                    BaseValue = baseValue,
                     Data = Data,
-                    CritData = res,
+                    IsCrit = false,
                     Context = ctx
                 }.Calculate(env),
+                CriticalAmount = new DamageQuery
+                {
+                    BaseValue = baseValue,
+                    Data = Data,
+                    IsCrit = Properties.CanCrit,
+                    Context = ctx
+                }.Calculate(env),
+                CriticalChance = new DamageStatQuery
+                {
+                    Data = Data,
+                    Channel = DamageStatChannel.CritRate,
+                    Subject = state.User,
+                    Reference = targeting.Target
+                }.Calculate(env),
                 Data = Data,
-                CritData = res,
                 Relation = ctx
             });
         }
@@ -61,8 +66,8 @@ public abstract record DamageFormula
     /// </summary>
     public required double RankFalloff { get; init; }
 
-    private double GetFalloffModifier(ShardResolutionScope scope) => Math.Pow(1 - RankFalloff, scope.Targeting.Rank);
     public abstract double Resolve(ShardResolutionScope scope, BattleEnvironment env);
+    private double GetFalloffModifier(ShardResolutionScope scope) => Math.Pow(1 - RankFalloff, scope.Targeting.Rank);
 
     public sealed record Flat(double Amount) : DamageFormula
     {

@@ -9,7 +9,7 @@ namespace FrogBattleV4.Core.Abilities.Components.Requirements;
 public abstract class CostComponent(IShard parentShard) : ShardComponent(parentShard), IShardRequirement
 {
     public CostType Type { get; init; } = CostType.None;
-    public abstract IEnumerable<MutateAction> GetCost(LinkResolutionState state, BattleEnvironment env);
+    public abstract IEnumerable<MutateCommand> GetCost(LinkResolutionState state, BattleEnvironment env);
 
     public void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
     {
@@ -71,7 +71,7 @@ public abstract record CostFormula
             return new PoolStatQuery
             {
                 PoolId = Pool,
-                Channel = PoolValueChannel.Max,
+                Channel = PoolStatChannel.Max,
                 Subject = user,
             }.Calculate(env) * Ratio;
         }

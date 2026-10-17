@@ -2,11 +2,6 @@ namespace FrogBattleV4.Core.Calculation;
 
 public readonly record struct DamageSource(string Source)
 {
-    /// <summary>
-    /// Unique ID of the damage type. Automatically converted into snake case.
-    /// </summary>
-    public string Source { get; } = Source.ToSnakeCase();
-
     public override string ToString() => Source;
 
     #region Common Sources
@@ -19,6 +14,12 @@ public readonly record struct DamageSource(string Source)
 
     #endregion
 
-    public bool Matches(DamageSource other) =>
-        Source == other.Source || Source == All.Source || other.Source == All.Source;
+    /// <summary>
+    /// Determines whether damage from this source can be boosted by a modifier of source <paramref name="modifier"/>.
+    /// </summary>
+    /// <param name="modifier">Modifier's damage source.</param>
+    /// <returns>True if this damage can be boosted by a modifier of
+    /// source <paramref name="modifier"/>, false otherwise.</returns>
+    public bool Matches(DamageSource modifier) =>
+        Source == modifier.Source || Source == All.Source || modifier.Source == All.Source;
 }

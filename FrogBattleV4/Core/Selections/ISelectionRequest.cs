@@ -1,11 +1,12 @@
 using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace FrogBattleV4.Core.Selections;
 
 public interface ISelectionRequest<TResult>
 {
-    IImmutableList<TResult> ValidOptions { get; }
+    ImmutableList<TResult> ValidOptions { get; }
 }
 
 public static class SelectionRequestExtensions
@@ -14,6 +15,6 @@ public static class SelectionRequestExtensions
     public static SelectionResult<TResult> Select<TResult>(this ISelectionRequest<TResult> request,
         params int[] selections)
     {
-        return new SelectionResult<TResult>(request, selections);
+        return new SelectionResult<TResult>(selections.Select(x => request.ValidOptions[x]).ToImmutableList());
     }
 }

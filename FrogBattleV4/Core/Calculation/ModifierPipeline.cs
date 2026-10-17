@@ -11,21 +11,22 @@ public static class ModifierPipeline
     /// </summary>
     /// <param name="query">Query to calculate.</param>
     /// <param name="env">BattleEnvironment to calculate in.</param>
+    /// <param name="extra">Extra modifiers to account for.</param>
     /// <returns>The final calculated value for the given query.</returns>
     /// <exception cref="System.NotSupportedException">The given query type is unsupported.</exception>
     [Pure]
-    public static double Calculate(this IQuery query, BattleEnvironment env)
+    public static double Calculate(this IQuery query, BattleEnvironment env, IModifierProvider? extra = null)
     {
         return query switch
         {
-            StaticQuery s => s.CalculateStatic(env),
-            DynamicQuery d => d.CalculateDynamic(env),
+            AttributeQuery q => q.CalculateAttribute(env, extra ?? ModifierCollection.Empty),
+            CommandQuery q => q.CalculateAction(env, extra ?? ModifierCollection.Empty),
             _ => throw new System.NotSupportedException("Query not supported")
         };
     }
 
     [Pure]
-    private static double CalculateStatic(this StaticQuery query, BattleEnvironment env)
+    private static double CalculateAttribute(this AttributeQuery query, BattleEnvironment env, IModifierProvider extra)
     {
         var subject = query.Subject;
         var reference = query.Reference;
@@ -50,7 +51,8 @@ public static class ModifierPipeline
     }
 
     [Pure]
-    private static double CalculateDynamic(this DynamicQuery query, BattleEnvironment env)
+    private static double CalculateAction(this CommandQuery query, BattleEnvironment env, IModifierProvider extra)
+    
     {
         // (source.self + target.other) + (target.self + source.other)
         var actor = query.Context.Actor;

@@ -5,7 +5,7 @@ namespace FrogBattleV4.Core.Combat.Actions;
 /// <summary>
 /// Initializes a new mutation command with the given properties.
 /// </summary>
-public class MutateAction : ShardAction<MutateData>
+public class MutateCommand : BattleCommand<MutateData>
 {
     /// <summary>Base amount of the mutation.</summary>
     public double TotalAmount { get; init; }

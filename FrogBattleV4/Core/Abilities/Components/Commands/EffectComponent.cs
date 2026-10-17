@@ -4,12 +4,12 @@ using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Abilities.Components.Commands;
 
-public class EffectCommand(IShard parentShard) : ShardComponent(parentShard), IShardCommand
+public class EffectComponent(IShard parentShard) : ShardComponent(parentShard), IShardCommandComponent
 {
     public required EffectChanceFormula Formula { get; init; }
     public required ApplyEffectData Data { get; init; }
 
-    public void GenerateActions(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
+    public void GenerateCommands(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
     {
         foreach (var targeting in state.Selections)
         {
@@ -19,19 +19,16 @@ public class EffectCommand(IShard parentShard) : ShardComponent(parentShard), IS
 
     private void GenerateScoped(ShardResolutionScope scope, BattleEnvironment env, LinkResolutionBuilder builder)
     {
-        var res = new EffectChanceResolution(Formula.Resolve(scope, env), env.NextRoll());
-        if (res.CanApply)
+        builder.Emit(new ApplyEffectCommand
         {
-            builder.Emit(new ApplyEffectAction
+            ApplicationChance = Formula.Resolve(scope, env),
+            Data = Data,
+            Relation = new RelationContext
             {
-                Data = Data,
-                Relation = new RelationContext
-                {
-                    Actor = scope.User,
-                    Target = scope.Targeting.Target,
-                },
-            });
-        }
+                Actor = scope.User,
+                Target = scope.Targeting.Target,
+            },
+        });
     }
 }
 
