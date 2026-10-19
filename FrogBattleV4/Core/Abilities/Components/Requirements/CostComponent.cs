@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FrogBattleV4.Core.Calculation;
-using FrogBattleV4.Core.Combat.Actions;
+using FrogBattleV4.Core.Combat.Commands;
 
 namespace FrogBattleV4.Core.Abilities.Components.Requirements;
 
@@ -11,7 +11,7 @@ public abstract class CostComponent(IShard parentShard) : ShardComponent(parentS
     public CostType Type { get; init; } = CostType.None;
     public abstract IEnumerable<MutateCommand> GetCost(LinkResolutionState state, BattleEnvironment env);
 
-    public void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
+    public void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, CommandBuilder builder)
     {
         if (Type == CostType.Check) return;
         foreach (var cost in GetCost(state, env))

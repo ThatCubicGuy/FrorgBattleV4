@@ -1,9 +1,12 @@
+using FrogBattleV4.Core.Abilities;
+using FrogBattleV4.Core.Combat;
+
 namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 
 /// <summary>
-/// Represents an object that is attached to a pool and modifies its value at certain points in time.
+/// Represents an object that modifies the value of a pool at certain points in time.
 /// </summary>
 public interface IMutatorComponent
 {
-    // TODO
+    void Tick(TurnMoment moment, StatusEffectInstance effect, CommandBuilder builder);
 }

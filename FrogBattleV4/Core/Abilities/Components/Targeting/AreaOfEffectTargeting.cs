@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
@@ -11,19 +10,23 @@ public class AreaOfEffectTargeting : IShardTargeting
 {
     public required int RankPenalty { get; init; }
 
-    public ImmutableList<AbilityTargetingContext> SelectTargets(LinkResolutionState state, BattleEnvironment env)
+    public IEnumerable<ShardTargetingContext> SelectTargets(ShardResolutionScope scope, BattleEnvironment env)
     {
-        var result = new List<AbilityTargetingContext>();
-        foreach (var (target, rank) in state.Selections)
-        {
-            result.AddRange(env.GetNeighbors(target)
-                .Select(entity => new AbilityTargetingContext
-                {
-                    Target = entity,
-                    Rank = rank + RankPenalty,
-                }));
-        }
+        return env.GetNeighbors(scope.Targeting.Target)
+            .Select(entity => new ShardTargetingContext
+            {
+                Target = entity,
+                Rank = scope.Targeting.Rank + RankPenalty,
+            });
+    }
 
-        return result.ToImmutableList();
+    public TargetingInstruction GenerateInstruction(ShardResolutionScope scope, BattleEnvironment env)
+    {
+        return new TargetingInstruction.Fixed(env.GetNeighbors(scope.Targeting.Target)
+            .Select(entity => new ShardTargetingContext
+            {
+                Target = entity,
+                Rank = scope.Targeting.Rank + RankPenalty,
+            }));
     }
 }

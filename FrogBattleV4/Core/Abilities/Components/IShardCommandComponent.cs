@@ -5,5 +5,5 @@ namespace FrogBattleV4.Core.Abilities.Components;
 /// </summary>
 public interface IShardCommandComponent
 {
-    void GenerateCommands(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder);
+    void GenerateCommands(LinkResolutionState state, BattleEnvironment env, CommandBuilder builder);
 }

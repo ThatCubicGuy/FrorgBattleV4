@@ -2,7 +2,7 @@ using System.Diagnostics.Contracts;
 
 namespace FrogBattleV4.Core.Abilities.Components;
 
-public record AbilityTargetingContext
+public record ShardTargetingContext
 {
     /// <summary>
     /// The target of this hit.

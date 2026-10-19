@@ -4,11 +4,10 @@ namespace FrogBattleV4.Core.Modifiers;
 
 /// <summary>
 /// Represents a smarter ModifierStack that determines to which kind of queries to apply.
-/// <br/>Base non-generic class used to hold collections.
 /// </summary>
-public abstract class ModifierRule
+public interface IModifierRule
 {
-    public required ModifierStack ModifierStack { get; init; }
+    ModifierStack ModifierStack { get; }
 
     /// <summary>
     /// Determines whether this modifier applies to the given query.
@@ -16,7 +15,7 @@ public abstract class ModifierRule
     /// <param name="query">Query to check application for.</param>
     /// <param name="ctx">Data containing the modifier holder and the subject we're calculating for.</param>
     /// <returns>True if this modifier applies to the query in this context, false otherwise.</returns>
-    public abstract bool Applies(IQuery query, in ModifierContext ctx);
+    bool AppliesTo(IQuery query, in ModifierContext ctx);
 }
 
 /// <summary>
@@ -24,9 +23,11 @@ public abstract class ModifierRule
 /// <br/>Base generic class for common code.
 /// </summary>
 /// <typeparam name="TQuery">Type of the query this modifier applies to.</typeparam>
-public abstract class ModifierRule<TQuery> : ModifierRule where TQuery : IQuery
+public abstract class ModifierRule<TQuery> : IModifierRule where TQuery : IQuery
 {
-    public sealed override bool Applies(IQuery query, in ModifierContext ctx)
+    public required ModifierStack ModifierStack { get; init; }
+
+    bool IModifierRule.AppliesTo(IQuery query, in ModifierContext ctx)
     {
         return query is TQuery q && MatchesRelationship(q, ctx) && AppliesTo(q);
     }

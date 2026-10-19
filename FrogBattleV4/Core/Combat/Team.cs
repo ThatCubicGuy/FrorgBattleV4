@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using FrogBattleV4.Core.Modifiers;
 using FrogBattleV4.Core.Selections;
 
@@ -21,6 +22,7 @@ public class Team : Identifiable<TeamUid>
     public ImmutableList<IModifierProvider> Modifiers { get; private set; }
 
     public IEnumerable<EntityUid> GetOnFieldMembers() => _members;
+    public IEnumerable<EntityUid> GetAllMembers() => _members.Concat(_offFieldMembers);
 
     public void AddMember(EntityUid entity, EntityUid? nextTo = null)
     {

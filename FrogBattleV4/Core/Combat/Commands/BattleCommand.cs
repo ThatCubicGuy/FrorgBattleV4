@@ -1,4 +1,4 @@
-namespace FrogBattleV4.Core.Combat.Actions;
+namespace FrogBattleV4.Core.Combat.Commands;
 
 /// <inheritdoc/>
 /// <typeparam name="TData">Data relating to the shard action.</typeparam>
@@ -13,5 +13,5 @@ public abstract class BattleCommand<TData> : BattleCommand where TData : notnull
 public abstract class BattleCommand
 {
     public required RelationContext Relation { get; init; }
-    public abstract void Accept(IActionVisitor visitor);
+    public abstract void Accept(ICommandVisitor visitor);
 }

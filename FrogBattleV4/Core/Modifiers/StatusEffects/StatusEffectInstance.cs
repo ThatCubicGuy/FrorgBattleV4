@@ -1,15 +1,52 @@
+using System;
 using System.Diagnostics.Contracts;
+using System.Linq;
+using FrogBattleV4.Core.Abilities;
+using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.Combat;
 
 namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 
-public class StatusEffectInstance : ApplicableEffect
+public class StatusEffectInstance : IModifierProvider
 {
+    private int _turns;
+    private int _stacks;
     public required StatusEffectDefinition Definition { get; init; }
-    public int Turns { get; set; }
-    public int Stacks { get; set; }
+    public required EntityUid Applicant { get; init; }
+    public required EntityUid Holder { get; init; }
+
+    public int Turns
+    {
+        get => _turns;
+        set => _turns = Math.Clamp(value, 0, Definition.MaxDuration);
+    }
+
+    public int Stacks
+    {
+        get => _stacks;
+        set => _stacks = Math.Clamp(value, 0, Definition.MaxStacks);
+    }
 
     [Pure]
-    public override bool ShouldRemove() => Stacks <= 0 || (Turns <= 0 && !Definition.Properties.HasFlag(EffectFlags.Infinite));
+    public bool ShouldRemove() => Stacks <= 0 || (Turns <= 0 && !Definition.Properties.HasFlag(EffectFlags.Infinite));
 
-    protected override int GetStacks(EntityUid subject, EntityUid? reference, BattleEnvironment env) => Stacks;
+    public void OnTick(TurnMoment moment, CommandBuilder builder)
+    {
+        if (moment == (Definition.Properties.HasFlag(EffectFlags.StartTick) ? TurnMoment.Start : TurnMoment.End))
+        {
+            Turns -= 1;
+        }
+        foreach (var mutator in Definition.Mutators)
+        {
+            mutator.Tick(moment, this, builder);
+        }
+    }
+
+    [Pure]
+    public ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx)
+    {
+        return Definition.ModifierRules.Where(mr => mr.AppliesTo(query, ctx))
+            .Aggregate(new ModifierStack(), (stack, rule) =>
+                stack + rule.ModifierStack) * Stacks;
+    }
 }

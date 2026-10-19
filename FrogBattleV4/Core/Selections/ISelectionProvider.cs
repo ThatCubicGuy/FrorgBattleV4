@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using FrogBattleV4.Core.Abilities;
 
 namespace FrogBattleV4.Core.Selections;
 
@@ -7,14 +10,9 @@ namespace FrogBattleV4.Core.Selections;
 /// </summary>
 public interface ISelectionProvider
 {
-    Task<SelectionResult<TResult>> GetSelectionAsync<TResult>(ISelectionRequest<TResult> request);
+    Task<PlayerTurnAction> GetSelectionAsync(PlayerActionRequest request, CancellationToken cancellationToken);
 }
 
-/// <summary>
-/// Represents an object that can resolve selection requests of a certain type.
-/// </summary>
-/// <typeparam name="TResult">The type of selection that this type can resolve.</typeparam>
-public interface ISelectionProvider<TResult>
-{
-    Task<SelectionResult<TResult>> GetSelectionAsync(ISelectionRequest<TResult> request);
-}
+public sealed record PlayerTurnAction(IEnumerable<IShard> Link, EntityUid MainTarget);
+
+public sealed record PlayerActionRequest(EntityUid User, BattleEnvironment Environment);

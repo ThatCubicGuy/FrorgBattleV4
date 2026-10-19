@@ -1,6 +1,6 @@
-namespace FrogBattleV4.Core.Combat.Actions;
+namespace FrogBattleV4.Core.Combat.Commands;
 
-public interface IActionVisitor
+public interface ICommandVisitor
 {
     void Visit(DamageCommand command);
     void Visit(MutateCommand command);

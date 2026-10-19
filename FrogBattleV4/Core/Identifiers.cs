@@ -25,17 +25,11 @@ public interface IUniqueIdentifier<TSelf> : IEquatable<TSelf> where TSelf : stru
 public readonly record struct EntityUid() : IUniqueIdentifier<EntityUid>
 {
     private static long _idCounter;
-    private long Id { get; } = ++_idCounter;
+    private long Id { get; } = checked(++_idCounter);
 }
 
 public readonly record struct TeamUid() : IUniqueIdentifier<TeamUid>
 {
     private static long _idCounter;
-    private long Id { get; } = ++_idCounter;
-}
-
-public readonly record struct ShardUid() : IUniqueIdentifier<ShardUid>
-{
-    private static long _idCounter;
-    private long Id { get; } = ++_idCounter;
+    private long Id { get; } = checked(++_idCounter);
 }

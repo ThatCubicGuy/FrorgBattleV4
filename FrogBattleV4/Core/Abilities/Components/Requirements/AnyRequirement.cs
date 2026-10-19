@@ -18,7 +18,7 @@ public class AnyRequirement : IShardRequirement
         return Terms.Any(requirement => requirement.IsFulfilled(state, env));
     }
 
-    public void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
+    public void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, CommandBuilder builder)
     {
         Terms.First(requirement => requirement.IsFulfilled(state, env)).GenerateFulfill(state, env, builder);
     }

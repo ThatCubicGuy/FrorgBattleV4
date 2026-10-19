@@ -5,73 +5,10 @@ using FrogBattleV4.Core.Selections;
 
 namespace FrogBattleV4.ConsoleBattle;
 
-public class ConsoleSelectionProvider(CancellationToken cancellationToken) : ISelectionProvider
+public class ConsoleSelectionProvider : ISelectionProvider
 {
-    public async Task<SelectionResult<TResult>> GetSelectionAsync<TResult>(ISelectionRequest<TResult> request)
+    public async Task<PlayerTurnAction> GetSelectionAsync(PlayerActionRequest request, CancellationToken token)
     {
-        return request.Select(request switch
-        {
-            AbilitySelectionRequest ab => await GetAbilitySelectionAsync(ab, cancellationToken),
-            TargetSelectionRequest tg => await GetTargetSelectionAsync(tg, cancellationToken),
-            _ => throw new NotSupportedException($"Decision type {typeof(TResult).Name} not supported")
-        });
-    }
-
-    private static async Task<int> GetAbilitySelectionAsync(AbilitySelectionRequest request, CancellationToken cancel)
-    {
-        while (true)
-        {
-            try
-            {
-                var selection = 0;
-                await Console.Out.WriteAsync($"Select ability for {request.Requestor}: ");
-                try
-                {
-                    selection = int.Parse(await Task.Run(Console.ReadLine, cancel) ?? string.Empty);
-                }
-                catch (FormatException ex)
-                {
-                    await Console.Out.WriteLineAsync(ex.Message);
-                }
-
-                return selection < 0 || selection >= request.ValidOptions.Count
-                    ? throw new IndexOutOfRangeException(nameof(selection))
-                    : selection;
-            }
-            catch (Exception ex)
-            {
-                await Console.Out.WriteLineAsync(ex switch
-                {
-                    IndexOutOfRangeException or OverflowException => "Invalid ability number!",
-                    _ => ex.Message
-                });
-            }
-        }
-    }
-
-    private static async Task<int> GetTargetSelectionAsync(TargetSelectionRequest request, CancellationToken cancel)
-    {
-        while (true)
-        {
-            try
-            {
-                await Console.Out.WriteLineAsync($"Select target for {request.Requestor}: ");
-                if (int.TryParse(await Task.Run(Console.ReadLine, cancel), out var selection) &&
-                    selection >= 0 && selection < request.ValidOptions.Count)
-                {
-                    return selection;
-                }
-
-                await Console.Out.WriteLineAsync("Invalid target number!");
-            }
-            catch (Exception ex)
-            {
-                await Console.Out.WriteLineAsync(ex switch
-                {
-                    IndexOutOfRangeException or OverflowException => "Invalid target number!",
-                    _ => ex.Message
-                });
-            }
-        }
+        throw new NotImplementedException();
     }
 }

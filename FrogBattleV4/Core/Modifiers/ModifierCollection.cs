@@ -10,7 +10,7 @@ namespace FrogBattleV4.Core.Modifiers;
 /// </summary>
 public record ModifierCollection(ImmutableList<IModifierProvider> Modifiers) : IModifierProvider
 {
-    public static readonly ModifierCollection Empty = new([]);
+    public static readonly ModifierCollection Empty = new(ImmutableList<IModifierProvider>.Empty);
 
     /// <summary>
     /// Returns a new ModifierCollection with the added modifier.

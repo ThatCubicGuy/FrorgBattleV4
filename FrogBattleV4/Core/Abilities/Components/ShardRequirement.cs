@@ -18,5 +18,5 @@ public interface IShardRequirement
     /// <param name="state">Data about the shard link so far.</param>
     /// <param name="env">Battle environment to check in.</param>
     /// <param name="builder">Resolution builder to add actions to.</param>
-    void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder);
+    void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, CommandBuilder builder);
 }

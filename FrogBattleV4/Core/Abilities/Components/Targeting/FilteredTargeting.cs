@@ -1,5 +1,4 @@
-using System.Collections.Immutable;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
 
@@ -29,12 +28,21 @@ public class FilteredTargeting : IShardTargeting
     /// <summary>
     /// Extra filter to apply to each target.
     /// </summary>
-    public System.Func<AbilityTargetingContext, BattleEnvironment, bool> TargetFilter { get; init; } = (_, _) => true;
+    public System.Func<ShardTargetingContext, BattleEnvironment, bool> TargetFilter { get; init; } = (_, _) => true;
 
-    public ImmutableList<AbilityTargetingContext> SelectTargets(LinkResolutionState state, BattleEnvironment env)
+    public IEnumerable<ShardTargetingContext> SelectTargets(ShardResolutionScope scope, BattleEnvironment env)
     {
-        return state.Selections
-            .Where(atc => atc.Rank <= MaximumRank && TargetFilter(atc, env))
-            .Select(atc => atc with { Rank = atc.Rank + RankPenalty }).ToImmutableList();
+        var targeting = scope.Targeting;
+        if (targeting.Rank <= MaximumRank && TargetFilter(targeting, env))
+            yield return targeting with { Rank = targeting.Rank + RankPenalty };
+    }
+
+    public TargetingInstruction GenerateInstruction(ShardResolutionScope scope, BattleEnvironment env)
+    {
+        var targeting = scope.Targeting;
+        if (targeting.Rank <= MaximumRank && TargetFilter(targeting, env))
+            return TargetingInstruction.From(targeting with { Rank = targeting.Rank + RankPenalty });
+
+        return TargetingInstruction.Empty;
     }
 }

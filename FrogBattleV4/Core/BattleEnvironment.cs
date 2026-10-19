@@ -9,32 +9,25 @@ using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core;
 
-public class BattleEnvironment(
-    ImmutableDictionary<EntityUid, FighterData> memberData,
-    ImmutableDictionary<TeamUid, Team> teams,
-    Random random)
+public record BattleEnvironment
 {
+    public BattleEnvironment(ImmutableDictionary<EntityUid, Fighter> memberData,
+        ImmutableDictionary<TeamUid, Team> teams)
+    {
+        MemberData = memberData;
+        Teams = teams;
+    }
+
     #region Properties
 
-    private ImmutableDictionary<EntityUid, FighterData> MemberData { get; } = memberData;
-    private ImmutableDictionary<TeamUid, Team> Teams { get; } = teams;
+    private ImmutableDictionary<EntityUid, Fighter> MemberData { get; }
+    private ImmutableDictionary<TeamUid, Team> Teams { get; }
 
     public ModifierCollection ArenaModifiers { get; init; } = ModifierCollection.Empty;
 
     #endregion
 
     #region Methods
-
-    /// <summary>
-    /// Returns a random number provided by Rng.
-    /// </summary>
-    /// <returns>
-    /// A double-precision floating point number that is greater than or equal to 0.0, and less than 1.0.
-    /// </returns>
-    internal double NextRoll()
-    {
-        return random.NextDouble();
-    }
 
     /// <summary>
     /// Returns every member from the same field (on the same "line") as <paramref name="entity"/>.

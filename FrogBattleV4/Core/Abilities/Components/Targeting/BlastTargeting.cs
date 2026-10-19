@@ -20,27 +20,44 @@ public class BlastTargeting : IShardTargeting
     public int RankPenaltyPerSlot { get; init; } = 1;
 
     /// <summary>
-    /// The maximum rank that targets can have to be eligible for adjacent selection.
+    /// The maximum rank that targets can have to be eligible for selection.
     /// </summary>
     public int MaximumRank { get; init; } = 99;
 
-    public ImmutableList<AbilityTargetingContext> SelectTargets(LinkResolutionState state, BattleEnvironment env)
+    public IEnumerable<ShardTargetingContext> SelectTargets(ShardResolutionScope scope, BattleEnvironment env)
     {
-        var result = new List<AbilityTargetingContext>();
-        foreach (var (target, rank) in state.Selections.Where(atc => atc.Rank <= MaximumRank))
-        {
-            var allies = env.GetNeighbors(target).ToList();
-            var idx = allies.IndexOf(target);
-            result.AddRange(allies
-                .Skip(Math.Max(0, idx - Radius))
-                .Take(2 * Radius + 1)
-                .Select((member, i) => new AbilityTargetingContext
-                {
-                    Target = member,
-                    Rank = rank + Math.Abs(idx - i) * RankPenaltyPerSlot,
-                }));
-        }
+        var (target, rank) = scope.Targeting;
+        if (rank > MaximumRank) return [];
 
-        return result.ToImmutableList();
+        var allies = env.GetNeighbors(target).ToList();
+        var idx = allies.IndexOf(target);
+
+        return allies
+            .Skip(Math.Max(0, idx - Radius))
+            .Take(2 * Radius + 1)
+            .Select((member, i) => new ShardTargetingContext
+            {
+                Target = member,
+                Rank = rank + Math.Abs(idx - i) * RankPenaltyPerSlot,
+            });
+    }
+
+    public TargetingInstruction GenerateInstruction(ShardResolutionScope scope, BattleEnvironment env)
+    {
+        var (target, rank) = scope.Targeting;
+        if (rank > MaximumRank) return TargetingInstruction.Empty;
+
+        var allies = env.GetNeighbors(target).ToList();
+        var idx = allies.IndexOf(target);
+
+        return new TargetingInstruction.Fixed(allies
+            .Skip(Math.Max(0, idx - Radius))
+            .Take(2 * Radius + 1)
+            .Select((member, i) => new ShardTargetingContext
+            {
+                Target = member,
+                Rank = rank + Math.Abs(idx - i) * RankPenaltyPerSlot,
+            })
+            .Where(targeting => targeting.Rank <= MaximumRank));
     }
 }

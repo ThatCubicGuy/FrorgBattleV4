@@ -18,7 +18,7 @@ public class StatRequirement : IShardRequirement
         }.Calculate(env).IsWithinRange(MinValue, MaxValue);
     }
 
-    public void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
+    public void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, CommandBuilder builder)
     {
     }
 }

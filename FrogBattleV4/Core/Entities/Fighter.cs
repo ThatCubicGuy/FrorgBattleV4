@@ -1,6 +1,112 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
+using System.Linq;
+using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.Combat;
+using FrogBattleV4.Core.Modifiers;
+using FrogBattleV4.Core.Modifiers.StatusEffects;
+
 namespace FrogBattleV4.Core.Entities;
 
-public abstract class Fighter : GameEntity
+public class Fighter : GameEntity
 {
-    public required string Name { get; init; }
+    private readonly List<IModifierProvider> _passiveModifiers = [];
+    private readonly List<StatusEffectInstance> _statusEffects = [];
+    private readonly Dictionary<PoolId, PoolContainer> _pools = new();
+
+    public event EventHandler<DamageTakenArgs>? TakingDamage;
+    public event EventHandler<DamageTakenArgs>? TookDamage;
+    public event EventHandler<EffectAddedArgs>? EffectAdded;
+
+    public Fighter()
+    {
+        Pools = new ReadOnlyDictionary<PoolId, PoolContainer>(_pools);
+        StatusEffects = new ReadOnlyCollection<StatusEffectInstance>(_statusEffects);
+    }
+    public required FighterId Owner { get; init; }
+    public required TeamUid Team { get; init; }
+    public ReadOnlyDictionary<PoolId, PoolContainer> Pools { get; }
+    public ReadOnlyCollection<StatusEffectInstance> StatusEffects { get; }
+    public IEnumerable<IModifierProvider> GetAllModifiers() => _passiveModifiers.Concat(StatusEffects);
+
+    // Order in which pools take damage
+    private static readonly ImmutableArray<PoolId> DamagePriority =
+    [
+        PoolId.Shield,
+        PoolId.Overheal,
+        PoolId.Hp
+    ];
+
+    public void TakeDamage(double damage, DamageData damageData)
+    {
+        var args = new DamageTakenArgs(damage, damageData);
+        TakingDamage?.Invoke(this, args);
+
+        // Go down the line of damage-taking pools
+        foreach (var poolId in DamagePriority)
+        {
+            // "Consume" damage on the current pool
+            damage -= Pools[poolId].Value;
+
+            // If damage was less than the pool value, we must stop
+            if (damage <= 0)
+            {
+                // Pool value becomes -(damage - oldValue) = oldValue - damage
+                Pools[poolId].Value = -1 * damage;
+
+                break;
+            }
+
+            // If damage was greater than the pool value, we keep going
+            Pools[poolId].Value = 0;
+        }
+
+        TookDamage?.Invoke(this, args);
+    }
+
+    // TODO (Nova): don't like this way of implementing this functionality
+    public void Tick(TurnMoment moment, Abilities.CommandBuilder builder)
+    {
+        foreach (var effect in StatusEffects)
+        {
+            effect.OnTick(moment, builder);
+        }
+    }
+
+    public void AddStatusEffect(StatusEffectInstance effect)
+    {
+        _statusEffects.Add(effect);
+        EffectAdded?.Invoke(this, new EffectAddedArgs
+        {
+            Definition = effect.Definition,
+            Turns = effect.Turns,
+            Stacks = effect.Stacks
+        });
+    }
+
+    public void RemoveStatusEffect(StatusEffectId effectId)
+    {
+        
+        _statusEffects.RemoveAll(sei => sei.ShouldRemove());
+    }
+
+    public void AddModifier(IModifierProvider modifier)
+    {
+        _passiveModifiers.Add(modifier);
+    }
+}
+
+public class DamageTakenArgs(double amount, DamageData data) : EventArgs
+{
+    public double Amount { get; init; } = amount;
+    public DamageData Data { get; init; } = data;
+}
+
+public class EffectAddedArgs
+{
+    public required StatusEffectDefinition Definition { get; init; }
+    public required int Turns { get; init; }
+    public required int Stacks { get; init; }
 }

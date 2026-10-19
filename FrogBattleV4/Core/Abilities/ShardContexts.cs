@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.Abilities.Components;
-using FrogBattleV4.Core.Combat.Actions;
+using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Modifiers;
 
 namespace FrogBattleV4.Core.Abilities;
@@ -13,10 +11,10 @@ namespace FrogBattleV4.Core.Abilities;
 /// <param name="User">Entity using this link.</param>
 /// <param name="Selections">Currently selected targets.</param>
 /// <param name="Modifiers">Currently active modifiers.</param>
-/// <param name="CurrentShardIndex">Index of the currently resolving shard</param>
+/// <param name="CurrentShardIndex">Index of the currently resolving shard.</param>
 public sealed record LinkResolutionState(
     EntityUid User,
-    ImmutableList<AbilityTargetingContext> Selections,
+    IEnumerable<ShardTargetingContext> Selections,
     ModifierCollection Modifiers,
     int CurrentShardIndex);
 
@@ -26,20 +24,29 @@ public sealed record LinkResolutionState(
 /// <param name="User">User of the shard.</param>
 /// <param name="Targeting">Target of the shard.</param>
 /// <param name="Modifier">Modifiers owned by the user at time of resolution.</param>
+/// <param name="Rng">Random decision resolver.</param>
 public record ShardResolutionScope(
     EntityUid User,
-    AbilityTargetingContext Targeting,
+    ShardTargetingContext Targeting,
     // TODO (Nova): actually use bonus modifiers lmao
-    IModifierProvider Modifier);
+    IModifierProvider Modifier,
+    // TODO (Nova): i STILL don't like this
+    IBattleRng Rng);
 
-public sealed class LinkResolutionBuilder
+public sealed record CommandBuilder(IBattleRng Rng) // TODO (Nova): frickahh rng bruh
 {
-    private readonly List<BattleCommand> _shardActions = [];
+    private readonly List<BattleCommand> _commands = [];
+    
+    public void Emit(BattleCommand command)
+    {
+        _commands.Add(command);
+    }
 
-    public void Emit(BattleCommand command) => _shardActions.Add(command);
-
-    [Pure]
-    public LinkResolution Build() => new([.. _shardActions]);
+    public void Build(ICommandVisitor visitor)
+    {
+        foreach (var command in _commands)
+        {
+            command.Accept(visitor);
+        }
+    }
 }
-
-public record LinkResolution(ImmutableList<BattleCommand> ShardActions);

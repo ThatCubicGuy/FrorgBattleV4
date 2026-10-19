@@ -1,6 +1,7 @@
 using System;
+using System.Linq;
 using FrogBattleV4.Core.Calculation;
-using FrogBattleV4.Core.Combat.Actions;
+using FrogBattleV4.Core.Combat.Commands;
 
 namespace FrogBattleV4.Core.Abilities.Components.Commands;
 
@@ -10,13 +11,21 @@ public class AttackComponent(IShard parentShard) : ShardComponent(parentShard), 
     public required DamageData Data { get; init; }
     public AttackProperties Properties { get; init; } = new();
 
-    public void GenerateCommands(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
+    public void GenerateCommands(LinkResolutionState state, BattleEnvironment env, CommandBuilder builder)
     {
-        var split = Properties.SplitDamageEvenly ? state.Selections.Count : 1;
-        foreach (var targeting in state.Selections)
+        var selections = state.Selections.ToList();
+        var split = Properties.SplitDamageEvenly ? selections.Count : 1;
+        foreach (var targeting in selections)
         {
-            var scope = new ShardResolutionScope(state.User, targeting, state.Modifiers);
+            var scope = new ShardResolutionScope(state.User, targeting, state.Modifiers, builder.Rng);
             var baseValue = Formula.Resolve(scope, env) / split;
+            var isCrit = Properties.CanCrit && builder.Rng.Chance(new DamageStatQuery
+            {
+                Data = Data,
+                Channel = DamageStatChannel.CritRate,
+                Subject = state.User,
+                Reference = targeting.Target
+            }.Calculate(env));
             var ctx = new RelationContext
             {
                 Actor = state.User,
@@ -24,28 +33,15 @@ public class AttackComponent(IShard parentShard) : ShardComponent(parentShard), 
             };
             builder.Emit(new DamageCommand
             {
-                NormalAmount = new DamageQuery
+                TotalAmount = new DamageQuery
                 {
                     BaseValue = baseValue,
                     Data = Data,
-                    IsCrit = false,
+                    IsCrit = isCrit,
                     Context = ctx
-                }.Calculate(env),
-                CriticalAmount = new DamageQuery
-                {
-                    BaseValue = baseValue,
-                    Data = Data,
-                    IsCrit = Properties.CanCrit,
-                    Context = ctx
-                }.Calculate(env),
-                CriticalChance = new DamageStatQuery
-                {
-                    Data = Data,
-                    Channel = DamageStatChannel.CritRate,
-                    Subject = state.User,
-                    Reference = targeting.Target
                 }.Calculate(env),
                 Data = Data,
+                IsCrit = isCrit,
                 Relation = ctx
             });
         }

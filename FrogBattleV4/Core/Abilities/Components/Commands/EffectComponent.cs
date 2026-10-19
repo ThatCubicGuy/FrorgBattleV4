@@ -1,5 +1,5 @@
 using FrogBattleV4.Core.Calculation;
-using FrogBattleV4.Core.Combat.Actions;
+using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Abilities.Components.Commands;
@@ -9,15 +9,15 @@ public class EffectComponent(IShard parentShard) : ShardComponent(parentShard), 
     public required EffectChanceFormula Formula { get; init; }
     public required ApplyEffectData Data { get; init; }
 
-    public void GenerateCommands(LinkResolutionState state, BattleEnvironment env, LinkResolutionBuilder builder)
+    public void GenerateCommands(LinkResolutionState state, BattleEnvironment env, CommandBuilder builder)
     {
         foreach (var targeting in state.Selections)
         {
-            GenerateScoped(new ShardResolutionScope(state.User, targeting, state.Modifiers), env, builder);
+            GenerateScoped(new ShardResolutionScope(state.User, targeting, state.Modifiers, /* unused */null!), env, builder);
         }
     }
 
-    private void GenerateScoped(ShardResolutionScope scope, BattleEnvironment env, LinkResolutionBuilder builder)
+    private void GenerateScoped(ShardResolutionScope scope, BattleEnvironment env, CommandBuilder builder)
     {
         builder.Emit(new ApplyEffectCommand
         {
@@ -34,9 +34,8 @@ public class EffectComponent(IShard parentShard) : ShardComponent(parentShard), 
 
 public abstract record EffectChanceFormula
 {
-    private EffectChanceFormula()
-    {
-    }
+    private EffectChanceFormula() { }
+
     public abstract double Resolve(ShardResolutionScope scope, BattleEnvironment env);
 
     public sealed record Fixed(double FixedChance) : EffectChanceFormula

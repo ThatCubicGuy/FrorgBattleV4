@@ -97,3 +97,10 @@ public class TurnScheduler
         }
     }
 }
+
+public enum TurnMoment
+{
+    Outside,
+    Start,
+    End,
+}

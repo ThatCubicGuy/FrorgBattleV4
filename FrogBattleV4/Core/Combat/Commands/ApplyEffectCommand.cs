@@ -1,6 +1,6 @@
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 
-namespace FrogBattleV4.Core.Combat.Actions;
+namespace FrogBattleV4.Core.Combat.Commands;
 
 /// <summary>
 /// Represents a command for applying an effect to a target.
@@ -8,5 +8,5 @@ namespace FrogBattleV4.Core.Combat.Actions;
 public class ApplyEffectCommand : BattleCommand<ApplyEffectData>
 {
     public required double ApplicationChance { get; set; }
-    public override void Accept(IActionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(ICommandVisitor visitor) => visitor.Visit(this);
 }

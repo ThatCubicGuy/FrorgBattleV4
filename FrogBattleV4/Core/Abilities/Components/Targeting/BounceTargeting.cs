@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
@@ -7,29 +6,35 @@ namespace FrogBattleV4.Core.Abilities.Components.Targeting;
 public class BounceTargeting : IShardTargeting
 {
     public required int Count { get; init; }
-    public int RankPenaltyPerBounce { get; init; } = 0;
-    public ImmutableList<AbilityTargetingContext> SelectTargets(LinkResolutionState state, BattleEnvironment env)
+    public int RankPenalty { get; init; } = 0;
+    public IEnumerable<ShardTargetingContext> SelectTargets(ShardResolutionScope scope, BattleEnvironment env)
     {
-        var targets = new List<AbilityTargetingContext>();
-        foreach (var (target, rank) in state.Selections)
+        var (target, rank) = scope.Targeting;
+        yield return new ShardTargetingContext
         {
-            targets.Add(new AbilityTargetingContext
-            {
-                Target = target,
-                Rank = rank,
-            });
-            var neighbors = env.GetNeighbors(target);
-            for (var i = 0; i < Count; i++)
-            {
-                var next = neighbors.MinBy(_ => env.NextRoll());
-                targets.Add(new AbilityTargetingContext
-                {
-                    Target = next,
-                    Rank = rank + i * RankPenaltyPerBounce,
-                });
-            }
-        }
+            Target = target,
+            Rank = rank,
+        };
 
-        return targets.ToImmutableList();
+        var neighbors = env.GetNeighbors(target).ToArray();
+        for (var i = 0; i < Count; i++)
+        {
+            yield return new ShardTargetingContext
+            {
+                Target = scope.Rng.Choose(neighbors),
+                Rank = rank + i * RankPenalty,
+            };
+        }
+    }
+
+    public TargetingInstruction GenerateInstruction(ShardResolutionScope scope, BattleEnvironment env)
+    {
+        var (target, rank) = scope.Targeting;
+        return TargetingInstruction.From(scope.Targeting)
+            .WithRandom(env.GetNeighbors(target).Select(entity => new ShardTargetingContext
+                {
+                    Target = entity,
+                    Rank = rank + RankPenalty
+                }), Count);
     }
 }
