@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
@@ -23,24 +22,6 @@ public class BlastTargeting : IShardTargeting
     /// The maximum rank that targets can have to be eligible for selection.
     /// </summary>
     public int MaximumRank { get; init; } = 99;
-
-    public IEnumerable<ShardTargetingContext> SelectTargets(ShardResolutionScope scope, BattleEnvironment env)
-    {
-        var (target, rank) = scope.Targeting;
-        if (rank > MaximumRank) return [];
-
-        var allies = env.GetNeighbors(target).ToList();
-        var idx = allies.IndexOf(target);
-
-        return allies
-            .Skip(Math.Max(0, idx - Radius))
-            .Take(2 * Radius + 1)
-            .Select((member, i) => new ShardTargetingContext
-            {
-                Target = member,
-                Rank = rank + Math.Abs(idx - i) * RankPenaltyPerSlot,
-            });
-    }
 
     public TargetingInstruction GenerateInstruction(ShardResolutionScope scope, BattleEnvironment env)
     {

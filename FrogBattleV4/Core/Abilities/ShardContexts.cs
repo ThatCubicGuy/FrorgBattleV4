@@ -24,16 +24,13 @@ public sealed record LinkResolutionState(
 /// <param name="User">User of the shard.</param>
 /// <param name="Targeting">Target of the shard.</param>
 /// <param name="Modifier">Modifiers owned by the user at time of resolution.</param>
-/// <param name="Rng">Random decision resolver.</param>
 public record ShardResolutionScope(
     EntityUid User,
     ShardTargetingContext Targeting,
     // TODO (Nova): actually use bonus modifiers lmao
-    IModifierProvider Modifier,
-    // TODO (Nova): i STILL don't like this
-    IBattleRng Rng);
+    IModifierProvider Modifier);
 
-public sealed record CommandBuilder(IBattleRng Rng) // TODO (Nova): frickahh rng bruh
+public sealed record CommandBuilder(IBattleRng Rng) // TODO (Nova): we are close to getting RID of rng here
 {
     private readonly List<BattleCommand> _commands = [];
     

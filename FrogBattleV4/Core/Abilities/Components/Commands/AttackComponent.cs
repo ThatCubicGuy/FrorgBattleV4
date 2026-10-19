@@ -17,8 +17,9 @@ public class AttackComponent(IShard parentShard) : ShardComponent(parentShard), 
         var split = Properties.SplitDamageEvenly ? selections.Count : 1;
         foreach (var targeting in selections)
         {
-            var scope = new ShardResolutionScope(state.User, targeting, state.Modifiers, builder.Rng);
+            var scope = new ShardResolutionScope(state.User, targeting, state.Modifiers);
             var baseValue = Formula.Resolve(scope, env) / split;
+            // TODO: Move this RNG outside as well?
             var isCrit = Properties.CanCrit && builder.Rng.Chance(new DamageStatQuery
             {
                 Data = Data,

@@ -13,7 +13,7 @@ public class EffectComponent(IShard parentShard) : ShardComponent(parentShard), 
     {
         foreach (var targeting in state.Selections)
         {
-            GenerateScoped(new ShardResolutionScope(state.User, targeting, state.Modifiers, /* unused */null!), env, builder);
+            GenerateScoped(new ShardResolutionScope(state.User, targeting, state.Modifiers), env, builder);
         }
     }
 

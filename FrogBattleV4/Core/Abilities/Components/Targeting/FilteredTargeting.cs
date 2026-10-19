@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace FrogBattleV4.Core.Abilities.Components.Targeting;
 
 /// <summary>
@@ -29,13 +27,6 @@ public class FilteredTargeting : IShardTargeting
     /// Extra filter to apply to each target.
     /// </summary>
     public System.Func<ShardTargetingContext, BattleEnvironment, bool> TargetFilter { get; init; } = (_, _) => true;
-
-    public IEnumerable<ShardTargetingContext> SelectTargets(ShardResolutionScope scope, BattleEnvironment env)
-    {
-        var targeting = scope.Targeting;
-        if (targeting.Rank <= MaximumRank && TargetFilter(targeting, env))
-            yield return targeting with { Rank = targeting.Rank + RankPenalty };
-    }
 
     public TargetingInstruction GenerateInstruction(ShardResolutionScope scope, BattleEnvironment env)
     {

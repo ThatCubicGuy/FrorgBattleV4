@@ -5,8 +5,6 @@ namespace FrogBattleV4.Core.Abilities.Components;
 
 public interface IShardTargeting
 {
-    [System.Obsolete("RNG will be removed from shard resolution pipeline.")]
-    IEnumerable<ShardTargetingContext> SelectTargets(ShardResolutionScope scope, BattleEnvironment env);
     TargetingInstruction GenerateInstruction(ShardResolutionScope scope, BattleEnvironment env);
 }
 

@@ -15,7 +15,7 @@ public class AffectShard : Shard
     public ModifierCollection Modifiers { get; init; } = ModifierCollection.Empty;
     public override void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder)
     {
-        var scope = new ShardResolutionScope(state.User, null!, state.Modifiers, /*TODO:*/ builder.Rng);
+        var scope = new ShardResolutionScope(state.User, null!, state.Modifiers);
         CommandComponents.GenerateCommands(state with
         {
             Selections = state.Selections.SelectMany(targeting =>
