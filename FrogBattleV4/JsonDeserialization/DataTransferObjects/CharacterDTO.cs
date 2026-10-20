@@ -1,6 +1,9 @@
+using System.Text.Json.Serialization;
+
 namespace FrogBattleV4.JsonDeserialization.DataTransferObjects;
 
-public class CharacterDTO
+[JsonSerializable(typeof(CharacterDto))]
+public partial class CharacterDto : JsonSerializerContext
 {
-    
+    // TODO (Nova)
 }
