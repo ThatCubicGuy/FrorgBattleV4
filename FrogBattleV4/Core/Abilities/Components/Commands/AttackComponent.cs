@@ -19,14 +19,6 @@ public class AttackComponent(IShard parentShard) : ShardComponent(parentShard), 
         {
             var scope = new ShardResolutionScope(state.User, targeting, state.Modifiers);
             var baseValue = Formula.Resolve(scope, env) / split;
-            // TODO: Move this RNG outside as well?
-            var isCrit = Properties.CanCrit && builder.Rng.Chance(new DamageStatQuery
-            {
-                Data = Data,
-                Channel = DamageStatChannel.CritRate,
-                Subject = state.User,
-                Reference = targeting.Target
-            }.Calculate(env));
             var ctx = new RelationContext
             {
                 Actor = state.User,
@@ -34,15 +26,28 @@ public class AttackComponent(IShard parentShard) : ShardComponent(parentShard), 
             };
             builder.Emit(new DamageCommand
             {
-                TotalAmount = new DamageQuery
+                NormalAmount = new DamageQuery
                 {
                     BaseValue = baseValue,
                     Data = Data,
-                    IsCrit = isCrit,
+                    IsCrit = false,
                     Context = ctx
                 }.Calculate(env),
+                CriticalAmount = new DamageQuery
+                {
+                    BaseValue = baseValue,
+                    Data = Data,
+                    IsCrit = Properties.CanCrit,
+                    Context = ctx
+                }.Calculate(env),
+                CriticalChance = Properties.CanCrit ? new DamageStatQuery
+                {
+                    Data = Data,
+                    Channel = DamageStatChannel.CritRate,
+                    Subject = state.User,
+                    Reference = targeting.Target
+                }.Calculate(env) : 0,
                 Data = Data,
-                IsCrit = isCrit,
                 Relation = ctx
             });
         }

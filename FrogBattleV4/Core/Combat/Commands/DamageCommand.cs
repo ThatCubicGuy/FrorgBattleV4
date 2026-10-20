@@ -7,7 +7,8 @@ namespace FrogBattleV4.Core.Combat.Commands;
 /// </summary>
 public class DamageCommand : BattleCommand<DamageData>
 {
-    public required double TotalAmount { get; init; }
-    public required bool IsCrit { get; init; }
+    public required double NormalAmount { get; init; }
+    public required double CriticalAmount { get; init; }
+    public required double CriticalChance { get; init; }
     public override void Accept(ICommandVisitor visitor) => visitor.Visit(this);
 }

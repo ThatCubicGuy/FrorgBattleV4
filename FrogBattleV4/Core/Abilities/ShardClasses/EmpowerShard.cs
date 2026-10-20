@@ -9,7 +9,8 @@ namespace FrogBattleV4.Core.Abilities.ShardClasses;
 public class EmpowerShard : Shard
 {
     public required ModifierCollection Modifiers { get; set; }
-    public override void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder)
+    public override void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder,
+        IBattleRng rng)
     {
         state = state with
         {

@@ -36,7 +36,8 @@ public abstract class Shard : IShard
     public bool IsUsable(LinkResolutionState state, BattleEnvironment env) => Condition.IsFulfilled(state, env);
 
     /// <inheritdoc/>
-    public abstract void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder);
+    public abstract void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder,
+        IBattleRng rng);
 }
 
 /// <summary>
@@ -53,7 +54,7 @@ public interface IShard
     [Pure]
     bool IsUsable(LinkResolutionState state, BattleEnvironment env);
 
-    void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder);
+    void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder, IBattleRng rng);
 }
 
 public enum ShardFunction

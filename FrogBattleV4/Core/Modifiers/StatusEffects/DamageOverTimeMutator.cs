@@ -13,8 +13,9 @@ public class DamageOverTimeMutator : IMutatorComponent
     {
         builder.Emit(new DamageCommand
         {
-            TotalAmount = DamageAmount,
-            IsCrit = false,
+            NormalAmount = DamageAmount,
+            CriticalAmount = DamageAmount,
+            CriticalChance = 0,
             Relation = new RelationContext
             {
                 Actor = effect.Applicant,

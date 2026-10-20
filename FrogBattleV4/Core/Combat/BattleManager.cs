@@ -52,11 +52,12 @@ public class BattleManager : IBattle
         while (!cancellationToken.IsCancellationRequested && Scheduler.MoveNext())
         {
             var env = GetEnvironment();
+            var actor = Scheduler.Current;
 
-            var action = await Teams[MemberData[Scheduler.Current].Team].Provider.GetSelectionAsync(
-                new PlayerActionRequest(Scheduler.Current, env), cancellationToken);
+            var action = await Teams[MemberData[actor].Team].Provider.GetSelectionAsync(
+                new PlayerActionRequest(actor, env), cancellationToken);
 
-            var state = new LinkResolutionState(Scheduler.Current, [
+            var state = new LinkResolutionState(actor, [
                 new ShardTargetingContext
                 {
                     Target = action.MainTarget,
@@ -64,7 +65,7 @@ public class BattleManager : IBattle
                 }
             ], ModifierCollection.Empty, 0);
 
-            var builder = new CommandBuilder(_rng);
+            var builder = new CommandBuilder();
             foreach (var shard in action.Link)
             {
                 // You can submit a shard link that contains unusable shards,
@@ -72,7 +73,7 @@ public class BattleManager : IBattle
                 // they need to be executed, the shard link stops.
                 if (!shard.IsUsable(state, env)) break;
 
-                shard.Resolve(ref state, env, builder);
+                shard.Resolve(ref state, env, builder, _rng);
                 state = state with
                 {
                     CurrentShardIndex = state.CurrentShardIndex + 1
@@ -182,7 +183,11 @@ public class BattleManager : IBattle
             var (actor, target) = command.Relation;
             var data = command.Data;
 
-            _manager.MemberData[target].TakeDamage(command.TotalAmount, data);
+            _manager.MemberData[target]
+                .TakeDamage(_manager._rng.Chance(command.CriticalChance)
+                        ? command.CriticalAmount
+                        : command.NormalAmount,
+                    data);
         }
 
         public void Visit(MutateCommand command)

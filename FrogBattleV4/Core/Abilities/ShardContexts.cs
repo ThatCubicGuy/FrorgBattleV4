@@ -30,7 +30,7 @@ public record ShardResolutionScope(
     // TODO (Nova): actually use bonus modifiers lmao
     IModifierProvider Modifier);
 
-public sealed record CommandBuilder(IBattleRng Rng) // TODO (Nova): we are close to getting RID of rng here
+public sealed class CommandBuilder
 {
     private readonly List<BattleCommand> _commands = [];
     
