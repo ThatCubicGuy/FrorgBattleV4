@@ -7,7 +7,7 @@ public class Counter
     private readonly long _defaultValue;
     private long _currentValue;
 
-    public event EventHandler<ValueChangedArgs>? ValueChanged;
+    public event EventHandler<ValueChangedEventArgs>? ValueChanged;
     public event EventHandler? TriggerValueReached;
 
     public long DefaultValue
@@ -28,7 +28,7 @@ public class Counter
         {
             var oldValue = _currentValue;
             _currentValue = MaxValue.HasValue ? Math.Clamp(value, 0L, MaxValue.Value) : Math.Max(value, 0L);
-            ValueChanged?.Invoke(this, new ValueChangedArgs
+            ValueChanged?.Invoke(this, new ValueChangedEventArgs
             {
                 OldValue = oldValue,
                 NewValue = _currentValue
@@ -90,7 +90,7 @@ public class Counter
         CurrentValue = DefaultValue;
     }
 
-    public class ValueChangedArgs : EventArgs
+    public class ValueChangedEventArgs : EventArgs
     {
         public required long OldValue { get; init; }
         public required long NewValue { get; init; }

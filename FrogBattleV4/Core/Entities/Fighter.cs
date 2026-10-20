@@ -16,8 +16,8 @@ public class Fighter : Identifiable<EntityUid>
     private readonly List<StatusEffectInstance> _statusEffects = [];
     private readonly Dictionary<PoolId, Pool> _pools = new();
 
-    public event EventHandler<DamageTakenArgs>? DamageTaken;
-    public event EventHandler<EffectAddedArgs>? EffectAdded;
+    public event EventHandler<DamageTakenEventArgs>? DamageTaken;
+    public event EventHandler<EffectAddedEventArgs>? EffectAdded;
 
     public Fighter()
     {
@@ -43,7 +43,7 @@ public class Fighter : Identifiable<EntityUid>
 
     public void TakeDamage(double damage, DamageData damageData)
     {
-        var args = new DamageTakenArgs(damage, damageData);
+        var args = new DamageTakenEventArgs(damage, damageData);
 
         // Go down the line of damage-taking pools
         foreach (var poolId in DamagePriority)
@@ -79,7 +79,7 @@ public class Fighter : Identifiable<EntityUid>
     public void AddStatusEffect(StatusEffectInstance effect)
     {
         _statusEffects.Add(effect);
-        EffectAdded?.Invoke(this, new EffectAddedArgs
+        EffectAdded?.Invoke(this, new EffectAddedEventArgs
         {
             Definition = effect.Definition,
             Turns = effect.Turns,
@@ -99,13 +99,13 @@ public class Fighter : Identifiable<EntityUid>
     }
 }
 
-public class DamageTakenArgs(double amount, DamageData data) : EventArgs
+public class DamageTakenEventArgs(double amount, DamageData data) : EventArgs
 {
     public double Amount { get; init; } = amount;
     public DamageData Data { get; init; } = data;
 }
 
-public class EffectAddedArgs
+public class EffectAddedEventArgs
 {
     public required StatusEffectDefinition Definition { get; init; }
     public required int Turns { get; init; }

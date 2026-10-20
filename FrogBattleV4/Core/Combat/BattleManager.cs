@@ -15,15 +15,13 @@ using FrogBattleV4.Core.Selections;
 namespace FrogBattleV4.Core.Combat;
 
 // TODO: Full revamp
-public class BattleManager : IBattle
+public partial class BattleManager : IBattle
 {
     private readonly SeededBattleRng _rng;
     private readonly CommandResolver _commandResolver;
 
     public event EventHandler? BattleStarted;
     public event EventHandler? BattleEnded;
-    public event EventHandler<EffectAddedArgs>? EffectAdded;
-    public event EventHandler<EffectAddedArgs>? EffectResisted;
 
     private BattleManager(ImmutableDictionary<EntityUid, Fighter> memberData, ImmutableDictionary<TeamUid, Team> teams)
     {
@@ -147,123 +145,6 @@ public class BattleManager : IBattle
             return new BattleManager(_fighters.ToImmutableDictionary(), _teams.ToImmutableDictionary(t => t.Id));
         }
     }
-
-    private class SeededBattleRng(int seed) : IBattleRng
-    {
-        private readonly Random _random = new(seed);
-
-        public bool Chance(double chance)
-        {
-            return chance > _random.NextDouble();
-        }
-
-        public T Choose<T>(IEnumerable<T> values)
-        {
-            return values.MinBy(_ => _random.Next())
-                   ?? throw new InvalidOperationException("Values cannot be an empty collection.");
-        }
-
-        public IEnumerable<T> Shuffle<T>(IEnumerable<T> source)
-        {
-            return source.OrderBy(_ => _random.Next());
-        }
-    }
-
-    private class CommandResolver : ICommandVisitor
-    {
-        private readonly BattleManager _manager;
-
-        public CommandResolver(BattleManager manager)
-        {
-            _manager = manager;
-        }
-
-        public void Visit(DamageCommand command)
-        {
-            var (actor, target) = command.Relation;
-            var data = command.Data;
-
-            _manager.MemberData[target]
-                .TakeDamage(_manager._rng.Chance(command.CriticalChance)
-                        ? command.CriticalAmount
-                        : command.NormalAmount,
-                    data);
-        }
-
-        public void Visit(MutateCommand command)
-        {
-            var (actor, target) = command.Relation;
-            var data = command.Data;
-
-            _manager.MemberData[target].Pools[data.TargetPool].Value += command.TotalAmount;
-        }
-
-        public void Visit(ApplyEffectCommand command)
-        {
-            var (actor, target) = command.Relation;
-            var data = command.Data;
-
-            var args = new EffectAddedArgs
-            {
-                Definition = data.Effect,
-                Stacks = data.AddedStacks,
-                Turns = data.InitialTurns
-            };
-            if (!_manager._rng.Chance(command.ApplicationChance))
-            {
-                _manager.EffectResisted?.Invoke(this, args);
-                return;
-            }
-
-            _manager.MemberData[target].AddStatusEffect(new StatusEffectInstance
-            {
-                Applicant = actor,
-                Holder = target,
-                Definition = data.Effect,
-                Stacks = data.AddedStacks,
-                Turns = data.InitialTurns
-            });
-            _manager.EffectAdded?.Invoke(this, args);
-        }
-
-        public void Visit(RemoveEffectCommand command)
-        {
-            var (actor, target) = command.Relation;
-            var data = command.Data;
-
-            foreach (var effect in _manager.MemberData[target].StatusEffects.Where(data.Predicate))
-            {
-                if (effect.Definition.Properties.HasFlag(EffectFlags.Unremovable)) continue;
-
-                if (effect.Definition.Properties.HasFlag(EffectFlags.RemoveStack))
-                {
-                    var eff = _manager.MemberData[target].StatusEffects
-                        .SingleOrDefault(sei => sei.Definition.Id == effect.Definition.Id);
-                    if (eff != null) eff.Stacks -= 1;
-                }
-                else
-                {
-                    _manager.MemberData[target].RemoveStatusEffect(effect.Definition.Id);
-                }
-            }
-        }
-
-        public void Visit(AdvanceTurnCommand command)
-        {
-            var (actor, target) = command.Relation;
-            var data = command.Data;
-
-            _manager.Scheduler.AdvanceEntity(target, data.AdvancePercent);
-        }
-
-        public void Visit(QueueTurnCommand command)
-        {
-            var (actor, target) = command.Relation;
-            var data = command.Data;
-
-            _manager.Scheduler.Schedule(target, data.BaseActionValue);
-        }
-    }
 }
 
 public interface IBattle
@@ -271,12 +152,7 @@ public interface IBattle
     Task RunAsync(CancellationToken cancellationToken);
 }
 
-public class CommandLaunchingArgs : EventArgs
-{
-    public required BattleCommand Command { get; init; }
-}
-
-public class ActionLaunchedArgs : EventArgs
+public class CommandLaunchedEventArgs : EventArgs
 {
     public required BattleCommand Command { get; init; }
 }
