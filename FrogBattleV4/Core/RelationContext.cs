@@ -4,4 +4,10 @@ public readonly record struct RelationContext
 {
     public required EntityUid Actor { get; init; }
     public required EntityUid Target { get; init; }
+
+    public void Deconstruct(out EntityUid actor, out EntityUid target)
+    {
+        actor = Actor;
+        target = Target;
+    }
 }

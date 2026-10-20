@@ -11,15 +11,21 @@ public abstract class Shard : IShard
 {
     #region Metadata
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// A catchy name for this shard.
+    /// </summary>
     [Localizable(true)]
     public required string Name { get; init; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Description of what this shard does.
+    /// </summary>
     [Localizable(true)]
     public required string Description { get; init; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Describes the primary function of a shard.
+    /// </summary>
     public required ShardFunction Function { get; init; }
 
     #endregion
@@ -38,23 +44,6 @@ public abstract class Shard : IShard
 /// </summary>
 public interface IShard
 {
-    /// <summary>
-    /// A catchy name for this shard.
-    /// </summary>
-    [Localizable(true)]
-    string Name { get; }
-
-    /// <summary>
-    /// Description of what this shard does.
-    /// </summary>
-    [Localizable(true)]
-    string Description { get; }
-
-    /// <summary>
-    /// Describes the primary function of a shard.
-    /// </summary>
-    ShardFunction Function { get; }
-
     /// <summary>
     /// Determines whether the shard can be used in the current circumstances.
     /// </summary>

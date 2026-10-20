@@ -51,9 +51,10 @@ public class BattleManager : IBattle
         BattleStarted?.Invoke(this, EventArgs.Empty);
         while (!cancellationToken.IsCancellationRequested && Scheduler.MoveNext())
         {
+            var env = GetEnvironment();
+
             var action = await Teams[MemberData[Scheduler.Current].Team].Provider.GetSelectionAsync(
-                new PlayerActionRequest(
-                    Scheduler.Current, GetEnvironment()), cancellationToken);
+                new PlayerActionRequest(Scheduler.Current, env), cancellationToken);
 
             var state = new LinkResolutionState(Scheduler.Current, [
                 new ShardTargetingContext
@@ -62,10 +63,15 @@ public class BattleManager : IBattle
                     Rank = 0,
                 }
             ], ModifierCollection.Empty, 0);
-            var env = GetEnvironment();
+
             var builder = new CommandBuilder(_rng);
             foreach (var shard in action.Link)
             {
+                // You can submit a shard link that contains unusable shards,
+                // but if said shards don't become usable by the time
+                // they need to be executed, the shard link stops.
+                if (!shard.IsUsable(state, env)) break;
+
                 shard.Resolve(ref state, env, builder);
                 state = state with
                 {
@@ -173,21 +179,25 @@ public class BattleManager : IBattle
 
         public void Visit(DamageCommand command)
         {
+            var (actor, target) = command.Relation;
             var data = command.Data;
-            var damage = command.TotalAmount;
 
-            _manager.MemberData[command.Relation.Target].TakeDamage(damage, data);
+            _manager.MemberData[target].TakeDamage(command.TotalAmount, data);
         }
 
         public void Visit(MutateCommand command)
         {
+            var (actor, target) = command.Relation;
             var data = command.Data;
-            _manager.MemberData[command.Relation.Target].Pools[data.TargetPool].Value += command.TotalAmount;
+
+            _manager.MemberData[target].Pools[data.TargetPool].Value += command.TotalAmount;
         }
 
         public void Visit(ApplyEffectCommand command)
         {
+            var (actor, target) = command.Relation;
             var data = command.Data;
+
             var args = new EffectAddedArgs
             {
                 Definition = data.Effect,
@@ -200,10 +210,10 @@ public class BattleManager : IBattle
                 return;
             }
 
-            _manager.MemberData[command.Relation.Target].AddStatusEffect(new StatusEffectInstance
+            _manager.MemberData[target].AddStatusEffect(new StatusEffectInstance
             {
-                Applicant = command.Relation.Actor,
-                Holder = command.Relation.Target,
+                Applicant = actor,
+                Holder = target,
                 Definition = data.Effect,
                 Stacks = data.AddedStacks,
                 Turns = data.InitialTurns
@@ -213,34 +223,40 @@ public class BattleManager : IBattle
 
         public void Visit(RemoveEffectCommand command)
         {
+            var (actor, target) = command.Relation;
             var data = command.Data;
-            foreach (var effect in _manager.MemberData[command.Relation.Target].StatusEffects.Where(data.Predicate))
+
+            foreach (var effect in _manager.MemberData[target].StatusEffects.Where(data.Predicate))
             {
                 if (effect.Definition.Properties.HasFlag(EffectFlags.Unremovable)) continue;
 
                 if (effect.Definition.Properties.HasFlag(EffectFlags.RemoveStack))
                 {
-                    var eff = _manager.MemberData[command.Relation.Target].StatusEffects
+                    var eff = _manager.MemberData[target].StatusEffects
                         .SingleOrDefault(sei => sei.Definition.Id == effect.Definition.Id);
                     if (eff != null) eff.Stacks -= 1;
                 }
                 else
                 {
-                    _manager.MemberData[command.Relation.Target].RemoveStatusEffect(effect.Definition.Id);
+                    _manager.MemberData[target].RemoveStatusEffect(effect.Definition.Id);
                 }
             }
         }
 
         public void Visit(AdvanceTurnCommand command)
         {
+            var (actor, target) = command.Relation;
             var data = command.Data;
-            _manager.Scheduler.AdvanceEntity(command.Relation.Target, data.AdvancePercent);
+
+            _manager.Scheduler.AdvanceEntity(target, data.AdvancePercent);
         }
 
         public void Visit(QueueTurnCommand command)
         {
+            var (actor, target) = command.Relation;
             var data = command.Data;
-            _manager.Scheduler.Schedule(command.Relation.Target, data.BaseActionValue);
+
+            _manager.Scheduler.Schedule(target, data.BaseActionValue);
         }
     }
 }
