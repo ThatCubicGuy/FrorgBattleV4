@@ -12,12 +12,11 @@ public class TargetShard : Shard
     public required IShardTargeting Targeting { get; init; }
     public override void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder)
     {
-        var scope = new ShardResolutionScope(state.User, null!, state.Modifiers);
         state = state with
         {
             Selections = state.Selections.SelectMany(targeting =>
                 // TODO (Nova): Somehow get rid of RNG here as well?
-                Targeting.GenerateInstruction(scope with { Targeting = targeting }, env).Resolve(builder.Rng))
+                Targeting.GenerateInstruction(targeting, env).Resolve(builder.Rng))
         };
     }
 }

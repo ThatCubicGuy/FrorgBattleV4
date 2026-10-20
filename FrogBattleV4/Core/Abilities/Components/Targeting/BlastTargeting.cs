@@ -23,9 +23,9 @@ public class BlastTargeting : IShardTargeting
     /// </summary>
     public int MaximumRank { get; init; } = 99;
 
-    public TargetingInstruction GenerateInstruction(ShardResolutionScope scope, BattleEnvironment env)
+    public TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env)
     {
-        var (target, rank) = scope.Targeting;
+        var (target, rank) = targeting;
         if (rank > MaximumRank) return TargetingInstruction.Empty;
 
         var allies = env.GetNeighbors(target).ToList();

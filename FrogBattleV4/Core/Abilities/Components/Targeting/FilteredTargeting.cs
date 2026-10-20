@@ -28,9 +28,8 @@ public class FilteredTargeting : IShardTargeting
     /// </summary>
     public System.Func<ShardTargetingContext, BattleEnvironment, bool> TargetFilter { get; init; } = (_, _) => true;
 
-    public TargetingInstruction GenerateInstruction(ShardResolutionScope scope, BattleEnvironment env)
+    public TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env)
     {
-        var targeting = scope.Targeting;
         if (targeting.Rank <= MaximumRank && TargetFilter(targeting, env))
             return TargetingInstruction.From(targeting with { Rank = targeting.Rank + RankPenalty });
 

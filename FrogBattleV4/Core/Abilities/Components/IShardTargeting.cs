@@ -5,7 +5,7 @@ namespace FrogBattleV4.Core.Abilities.Components;
 
 public interface IShardTargeting
 {
-    TargetingInstruction GenerateInstruction(ShardResolutionScope scope, BattleEnvironment env);
+    TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env);
 }
 
 public abstract record TargetingInstruction

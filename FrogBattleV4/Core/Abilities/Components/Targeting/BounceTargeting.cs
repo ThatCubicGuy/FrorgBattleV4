@@ -7,10 +7,10 @@ public class BounceTargeting : IShardTargeting
     public required int Count { get; init; }
     public int RankPenalty { get; init; } = 0;
 
-    public TargetingInstruction GenerateInstruction(ShardResolutionScope scope, BattleEnvironment env)
+    public TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env)
     {
-        var (target, rank) = scope.Targeting;
-        return TargetingInstruction.From(scope.Targeting)
+        var (target, rank) = targeting;
+        return TargetingInstruction.From(targeting)
             .WithRandom(env.GetNeighbors(target).Select(entity => new ShardTargetingContext
                 {
                     Target = entity,

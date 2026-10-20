@@ -9,13 +9,14 @@ public class AreaOfEffectTargeting : IShardTargeting
 {
     public required int RankPenalty { get; init; }
 
-    public TargetingInstruction GenerateInstruction(ShardResolutionScope scope, BattleEnvironment env)
+    public TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env)
     {
-        return new TargetingInstruction.Fixed(env.GetNeighbors(scope.Targeting.Target)
+        var (target, rank) = targeting;
+        return new TargetingInstruction.Fixed(env.GetNeighbors(target)
             .Select(entity => new ShardTargetingContext
             {
                 Target = entity,
-                Rank = scope.Targeting.Rank + RankPenalty,
+                Rank = rank + RankPenalty,
             }));
     }
 }
