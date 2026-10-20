@@ -10,28 +10,30 @@ using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Entities;
 
-public class Fighter : GameEntity
+public class Fighter : Identifiable<EntityUid>
 {
     private readonly List<IModifierProvider> _passiveModifiers = [];
     private readonly List<StatusEffectInstance> _statusEffects = [];
-    private readonly Dictionary<PoolId, PoolContainer> _pools = new();
+    private readonly Dictionary<PoolId, Pool> _pools = new();
 
-    public event EventHandler<DamageTakenArgs>? TakingDamage;
-    public event EventHandler<DamageTakenArgs>? TookDamage;
+    public event EventHandler<DamageTakenArgs>? DamageTaken;
     public event EventHandler<EffectAddedArgs>? EffectAdded;
 
     public Fighter()
     {
-        Pools = new ReadOnlyDictionary<PoolId, PoolContainer>(_pools);
+        Pools = new ReadOnlyDictionary<PoolId, Pool>(_pools);
         StatusEffects = new ReadOnlyCollection<StatusEffectInstance>(_statusEffects);
     }
+
     public required FighterId Owner { get; init; }
     public required TeamUid Team { get; init; }
-    public ReadOnlyDictionary<PoolId, PoolContainer> Pools { get; }
+    public ReadOnlyDictionary<PoolId, Pool> Pools { get; }
     public ReadOnlyCollection<StatusEffectInstance> StatusEffects { get; }
     public IEnumerable<IModifierProvider> GetAllModifiers() => _passiveModifiers.Concat(StatusEffects);
 
-    // Order in which pools take damage
+    /// <summary>
+    /// Determines the order in which fighter pools absorb damage.
+    /// </summary>
     private static readonly ImmutableArray<PoolId> DamagePriority =
     [
         PoolId.Shield,
@@ -42,7 +44,6 @@ public class Fighter : GameEntity
     public void TakeDamage(double damage, DamageData damageData)
     {
         var args = new DamageTakenArgs(damage, damageData);
-        TakingDamage?.Invoke(this, args);
 
         // Go down the line of damage-taking pools
         foreach (var poolId in DamagePriority)
@@ -63,7 +64,7 @@ public class Fighter : GameEntity
             Pools[poolId].Value = 0;
         }
 
-        TookDamage?.Invoke(this, args);
+        DamageTaken?.Invoke(this, args);
     }
 
     // TODO (Nova): don't like this way of implementing this functionality
@@ -88,7 +89,7 @@ public class Fighter : GameEntity
 
     public void RemoveStatusEffect(StatusEffectId effectId)
     {
-        
+
         _statusEffects.RemoveAll(sei => sei.ShouldRemove());
     }
 

@@ -2,11 +2,11 @@ using System;
 
 namespace FrogBattleV4.Core.Entities;
 
-public class PoolContainer
+public class Pool
 {
     private double _currentValue;
 
-    public event EventHandler<PoolValueChangedArgs>? ValueChanged;
+    public event EventHandler<ValueChangedArgs>? ValueChanged;
     public double Capacity { get; set; }
 
     public double Value
@@ -16,17 +16,17 @@ public class PoolContainer
         {
             var oldValue = _currentValue;
             _currentValue = Math.Clamp(value, 0, Capacity);
-            ValueChanged?.Invoke(this, new PoolValueChangedArgs
+            ValueChanged?.Invoke(this, new ValueChangedArgs
             {
                 OldValue = oldValue,
                 NewValue = _currentValue
             });
         }
     }
-}
 
-public class PoolValueChangedArgs : EventArgs
-{
-    public required double OldValue { get; init; }
-    public required double NewValue { get; init; }
+    public class ValueChangedArgs : EventArgs
+    {
+        public required double OldValue { get; init; }
+        public required double NewValue { get; init; }
+    }
 }

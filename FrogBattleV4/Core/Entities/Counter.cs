@@ -7,12 +7,19 @@ public class Counter
     private readonly long _defaultValue;
     private long _currentValue;
 
-    public event EventHandler<CounterValueChangedArgs>? ValueChanged;
+    public event EventHandler<ValueChangedArgs>? ValueChanged;
+    public event EventHandler? TriggerValueReached;
+
     public long DefaultValue
     {
         get => _defaultValue;
         init => CurrentValue = _defaultValue = value;
     }
+
+    /// <summary>
+    /// Value at which the TriggerValueReached event is invoked.
+    /// </summary>
+    public long? TriggerValue { get; init; }
 
     public long CurrentValue
     {
@@ -21,11 +28,15 @@ public class Counter
         {
             var oldValue = _currentValue;
             _currentValue = MaxValue.HasValue ? Math.Clamp(value, 0L, MaxValue.Value) : Math.Max(value, 0L);
-            ValueChanged?.Invoke(this, new CounterValueChangedArgs
+            ValueChanged?.Invoke(this, new ValueChangedArgs
             {
                 OldValue = oldValue,
                 NewValue = _currentValue
             });
+            if (_currentValue == TriggerValue)
+            {
+                TriggerValueReached?.Invoke(this, EventArgs.Empty);
+            }
         }
     }
 
@@ -71,14 +82,17 @@ public class Counter
         return true;
     }
 
+    /// <summary>
+    /// Resets the counter back to its default value.
+    /// </summary>
     public void Reset()
     {
         CurrentValue = DefaultValue;
     }
-}
 
-public class CounterValueChangedArgs : EventArgs
-{
-    public required long OldValue { get; init; }
-    public required long NewValue { get; init; }
+    public class ValueChangedArgs : EventArgs
+    {
+        public required long OldValue { get; init; }
+        public required long NewValue { get; init; }
+    }
 }
