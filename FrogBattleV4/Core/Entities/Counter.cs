@@ -28,14 +28,14 @@ public class Counter
         {
             var oldValue = _currentValue;
             _currentValue = MaxValue.HasValue ? Math.Clamp(value, 0L, MaxValue.Value) : Math.Max(value, 0L);
-            ValueChanged?.Invoke(this, new ValueChangedEventArgs
+            OnValueChanged(new ValueChangedEventArgs
             {
                 OldValue = oldValue,
                 NewValue = _currentValue
             });
             if (_currentValue == TriggerValue)
             {
-                TriggerValueReached?.Invoke(this, EventArgs.Empty);
+                OnTriggerValueReached();
             }
         }
     }
@@ -94,5 +94,15 @@ public class Counter
     {
         public required long OldValue { get; init; }
         public required long NewValue { get; init; }
+    }
+
+    protected virtual void OnValueChanged(ValueChangedEventArgs e)
+    {
+        ValueChanged?.Invoke(this, e);
+    }
+
+    protected virtual void OnTriggerValueReached()
+    {
+        TriggerValueReached?.Invoke(this, EventArgs.Empty);
     }
 }

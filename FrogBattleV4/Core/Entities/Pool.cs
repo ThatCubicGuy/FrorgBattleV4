@@ -7,6 +7,7 @@ public class Pool
     private double _currentValue;
 
     public event EventHandler<ValueChangedEventArgs>? ValueChanged;
+
     public double Capacity { get; set; }
 
     public double Value
@@ -16,12 +17,17 @@ public class Pool
         {
             var oldValue = _currentValue;
             _currentValue = Math.Clamp(value, 0, Capacity);
-            ValueChanged?.Invoke(this, new ValueChangedEventArgs
+            OnValueChanged(new ValueChangedEventArgs
             {
                 OldValue = oldValue,
                 NewValue = _currentValue
             });
         }
+    }
+
+    protected virtual void OnValueChanged(ValueChangedEventArgs e)
+    {
+        ValueChanged?.Invoke(this, e);
     }
 
     public class ValueChangedEventArgs : EventArgs

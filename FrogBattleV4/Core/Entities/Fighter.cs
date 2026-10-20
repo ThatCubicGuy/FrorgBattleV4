@@ -43,7 +43,11 @@ public class Fighter : Identifiable<EntityUid>
 
     public void TakeDamage(double damage, DamageData damageData)
     {
-        var args = new DamageTakenEventArgs(damage, damageData);
+        var args = new DamageTakenEventArgs
+        {
+            Amount = damage,
+            Data = damageData
+        };
 
         // Go down the line of damage-taking pools
         foreach (var poolId in DamagePriority)
@@ -64,7 +68,7 @@ public class Fighter : Identifiable<EntityUid>
             Pools[poolId].Value = 0;
         }
 
-        DamageTaken?.Invoke(this, args);
+        OnDamageTaken(args);
     }
 
     // TODO (Nova): don't like this way of implementing this functionality
@@ -79,7 +83,8 @@ public class Fighter : Identifiable<EntityUid>
     public void AddStatusEffect(StatusEffectInstance effect)
     {
         _statusEffects.Add(effect);
-        EffectAdded?.Invoke(this, new EffectAddedEventArgs
+
+        OnEffectAdded(new EffectAddedEventArgs
         {
             Definition = effect.Definition,
             Turns = effect.Turns,
@@ -97,12 +102,22 @@ public class Fighter : Identifiable<EntityUid>
     {
         _passiveModifiers.Add(modifier);
     }
+
+    protected virtual void OnDamageTaken(DamageTakenEventArgs e)
+    {
+        DamageTaken?.Invoke(this, e);
+    }
+
+    protected virtual void OnEffectAdded(EffectAddedEventArgs e)
+    {
+        EffectAdded?.Invoke(this, e);
+    }
 }
 
-public class DamageTakenEventArgs(double amount, DamageData data) : EventArgs
+public class DamageTakenEventArgs : EventArgs
 {
-    public double Amount { get; init; } = amount;
-    public DamageData Data { get; init; } = data;
+    public required double Amount { get; init; }
+    public required DamageData Data { get; init; }
 }
 
 public class EffectAddedEventArgs

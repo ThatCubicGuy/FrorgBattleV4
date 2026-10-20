@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core.Abilities;
@@ -9,7 +8,6 @@ using FrogBattleV4.Core.Abilities.Components;
 using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Modifiers;
-using FrogBattleV4.Core.Modifiers.StatusEffects;
 using FrogBattleV4.Core.Selections;
 
 namespace FrogBattleV4.Core.Combat;
@@ -25,14 +23,14 @@ public partial class BattleManager : IBattle
 
     private BattleManager(ImmutableDictionary<EntityUid, Fighter> memberData, ImmutableDictionary<TeamUid, Team> teams)
     {
-        StartTime = DateTime.UtcNow.Ticks;
-        _rng = new SeededBattleRng(StartTime.GetHashCode());
+        CreationTime = DateTime.UtcNow.Ticks;
+        _rng = new SeededBattleRng(CreationTime.GetHashCode());
         _commandResolver = new CommandResolver(this);
         MemberData = memberData;
         Teams = teams;
     }
 
-    public long StartTime { get; private set; }
+    public long CreationTime { get; private set; }
     public TurnScheduler Scheduler { get; } = new();
 
     public ImmutableDictionary<EntityUid, Fighter> MemberData { get; private set; }
@@ -46,7 +44,7 @@ public partial class BattleManager : IBattle
     public async Task RunAsync(CancellationToken cancellationToken = default)
     {
         // TODO (Nova): incomplete
-        BattleStarted?.Invoke(this, EventArgs.Empty);
+        OnBattleStarted();
         while (!cancellationToken.IsCancellationRequested && Scheduler.MoveNext())
         {
             var env = GetEnvironment();
@@ -81,12 +79,22 @@ public partial class BattleManager : IBattle
             builder.Build(_commandResolver);
         }
 
-        BattleEnded?.Invoke(this, EventArgs.Empty);
+        OnBattleEnded();
     }
 
     public BattleEnvironment GetEnvironment()
     {
         return new BattleEnvironment(MemberData, Teams);
+    }
+
+    protected virtual void OnBattleStarted()
+    {
+        BattleStarted?.Invoke(this, EventArgs.Empty);
+    }
+
+    protected virtual void OnBattleEnded()
+    {
+        BattleEnded?.Invoke(this, EventArgs.Empty);
     }
 
     public static Builder CreateBuilder()

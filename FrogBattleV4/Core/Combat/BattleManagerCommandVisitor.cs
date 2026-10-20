@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using FrogBattleV4.Core.Combat.Commands;
-using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Combat;
@@ -9,6 +8,11 @@ namespace FrogBattleV4.Core.Combat;
 public partial class BattleManager
 {
     public event EventHandler<EntityUid>? EffectResisted;
+
+    protected virtual void OnEffectResisted(EntityUid e)
+    {
+        EffectResisted?.Invoke(this, e);
+    }
 
     private class CommandResolver : ICommandVisitor
     {
@@ -46,7 +50,7 @@ public partial class BattleManager
 
             if (!_manager._rng.Chance(command.ApplicationChance))
             {
-                _manager.EffectResisted?.Invoke(this, target);
+                _manager.OnEffectResisted(target);
                 return;
             }
 
