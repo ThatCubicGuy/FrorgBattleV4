@@ -4,7 +4,6 @@ namespace FrogBattleV4.Core.Abilities.Components.Requirements;
 
 public class StatRequirement : IShardRequirement
 {
-    public required IShard ParentShard { get; init; }
     public required StatId Stat { get; init; }
     public double? MinValue { get; init; } = null;
     public double? MaxValue { get; init; } = null;

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
+using System.Text.Json.Serialization;
 using FrogBattleV4.Core.Abilities.Components;
 
 namespace FrogBattleV4.Core.Abilities;
@@ -7,6 +8,10 @@ namespace FrogBattleV4.Core.Abilities;
 /// <summary>
 /// Represents a single component of a link.
 /// </summary>
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+[JsonDerivedType(typeof(ShardClasses.TargetShard), "target")]
+[JsonDerivedType(typeof(ShardClasses.EmpowerShard), "empower")]
+[JsonDerivedType(typeof(ShardClasses.AffectShard), "affect")]
 public abstract class Shard : IShard
 {
     #region Metadata
@@ -30,10 +35,10 @@ public abstract class Shard : IShard
 
     #endregion
 
-    public required IShardRequirement Condition { get; init; }
+    public required IShardRequirement Requirement { get; init; }
 
     /// <inheritdoc/>
-    public bool IsUsable(LinkResolutionState state, BattleEnvironment env) => Condition.IsFulfilled(state, env);
+    public bool IsUsable(LinkResolutionState state, BattleEnvironment env) => Requirement.IsFulfilled(state, env);
 
     /// <inheritdoc/>
     public abstract void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder,
@@ -57,6 +62,7 @@ public interface IShard
     void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder, IBattleRng rng);
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter<ShardFunction>))]
 public enum ShardFunction
 {
     /// <summary>

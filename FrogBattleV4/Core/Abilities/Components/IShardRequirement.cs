@@ -1,7 +1,13 @@
 using System.Diagnostics.Contracts;
+using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Abilities.Components;
 
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+[JsonDerivedType(typeof(Requirements.AllRequirement), "all_of")]
+[JsonDerivedType(typeof(Requirements.AnyRequirement), "any_of")]
+[JsonDerivedType(typeof(Requirements.StatRequirement), "stat")]
+// [JsonDerivedType(typeof(Requirements.CostComponent), "cost")]
 public interface IShardRequirement
 {
     /// <summary>

@@ -8,7 +8,7 @@
     "type": {
       "type": "string",
       "enum": [
-        "filtered",
+        "filter",
         "blast",
         "bounce",
         "area_of_effect"
@@ -20,10 +20,10 @@
     {
       "properties": {
         "type": {
-          "const": "filtered"
+          "const": "filter"
         }
       },
-      "$ref": "schema://components/targeting/filtered"
+      "$ref": "schema://components/targeting/filter"
     },
     {
       "properties": {

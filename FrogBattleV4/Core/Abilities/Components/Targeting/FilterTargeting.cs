@@ -5,13 +5,13 @@ namespace FrogBattleV4.Core.Abilities.Components.Targeting;
 /// a given predicate and a maximum rank and
 /// applies a rank penalty after filtering.
 /// </summary>
-public class FilteredTargeting : IShardTargeting
+public class FilterTargeting : IShardTargeting
 {
     /// <summary>
     /// Targets every already selected target at the same rank.
     /// Basically, leaves everything unchanged.
     /// </summary>
-    public static FilteredTargeting Identity { get; } = new();
+    public static FilterTargeting Identity { get; } = new();
 
     /// <summary>
     /// Additional rank added to each selected target after filtering.

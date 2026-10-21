@@ -1,7 +1,11 @@
 using System.Diagnostics.Contracts;
+using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Modifiers.PassiveEffects.Conditions;
-
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+[JsonDerivedType(typeof(PoolValueCondition), "pool_value")]
+[JsonDerivedType(typeof(StatValueCondition), "stat_value")]
+[JsonDerivedType(typeof(StatusEffectCondition), "status_effect")]
 public interface IConditionComponent
 {
     /// <summary>

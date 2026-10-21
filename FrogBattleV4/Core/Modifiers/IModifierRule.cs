@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.Modifiers;
@@ -23,6 +24,12 @@ public interface IModifierRule
 /// <br/>Base generic class for common code.
 /// </summary>
 /// <typeparam name="TQuery">Type of the query this modifier applies to.</typeparam>
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+[JsonDerivedType(typeof(StatModifier), "stat")]
+[JsonDerivedType(typeof(DamageModifier), "damage")]
+[JsonDerivedType(typeof(PoolMutModifier), "mutation")]
+[JsonDerivedType(typeof(PoolStatModifier), "pool_property")]
+[JsonDerivedType(typeof(DamageStatModifier), "damage_property")]
 public abstract class ModifierRule<TQuery> : IModifierRule where TQuery : IQuery
 {
     public required ModifierStack ModifierStack { get; init; }

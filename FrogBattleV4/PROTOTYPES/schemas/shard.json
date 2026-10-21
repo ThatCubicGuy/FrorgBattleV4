@@ -6,8 +6,8 @@
   "type": "object",
   "required": ["name", "description", "type"],
   "properties": {
-    "condition": {
-      "$ref": "schema://shards/condition"
+    "requirement": {
+      "$ref": "schema://shards/requirement"
     },
     "name": {
       "description": "Name of the shard.",

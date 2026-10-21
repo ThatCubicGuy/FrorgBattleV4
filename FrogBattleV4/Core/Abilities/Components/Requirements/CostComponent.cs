@@ -1,11 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat.Commands;
 
 namespace FrogBattleV4.Core.Abilities.Components.Requirements;
 
 // TODO (Nova): massive rework lmao i'm so bad at this
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+[JsonDerivedType(typeof(Costs.SingleCost), "single")]
+[JsonDerivedType(typeof(Costs.ConditionalCost), "conditional")]
 public abstract class CostComponent(IShard parentShard) : ShardComponent(parentShard), IShardRequirement
 {
     public CostType Type { get; init; } = CostType.None;
