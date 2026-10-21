@@ -19,7 +19,7 @@
       "default": true
     },
     "insert": {
-      "description": "Parameters for subtituting into the text field after translation (if necessary).",
+      "description": "Parameters for substituting into the text field after translation (if necessary).",
       "type": "array",
       "items": {
         "$comment": "Array items should be property names of the object owning the name.",
