@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Text.Json.Serialization;
-using FrogBattleV4.Core.Abilities.Components;
 
 namespace FrogBattleV4.Core.Abilities;
 

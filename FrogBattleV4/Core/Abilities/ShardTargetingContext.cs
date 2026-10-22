@@ -1,6 +1,6 @@
 using System.Diagnostics.Contracts;
 
-namespace FrogBattleV4.Core.Abilities.Components;
+namespace FrogBattleV4.Core.Abilities;
 
 public record ShardTargetingContext
 {

@@ -1,4 +1,4 @@
-namespace FrogBattleV4.Core.Abilities.Components.Targeting;
+namespace FrogBattleV4.Core.Abilities.Targeting;
 
 /// <summary>
 /// Filters targets already selected based on

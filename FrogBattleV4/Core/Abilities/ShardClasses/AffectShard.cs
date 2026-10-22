@@ -1,6 +1,5 @@
 using System.Linq;
-using FrogBattleV4.Core.Abilities.Components;
-using FrogBattleV4.Core.Abilities.Components.Targeting;
+using FrogBattleV4.Core.Abilities.Targeting;
 using FrogBattleV4.Core.Modifiers;
 
 namespace FrogBattleV4.Core.Abilities.ShardClasses;

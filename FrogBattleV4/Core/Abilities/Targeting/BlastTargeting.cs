@@ -1,8 +1,7 @@
 using System;
-using System.Collections.Immutable;
 using System.Linq;
 
-namespace FrogBattleV4.Core.Abilities.Components.Targeting;
+namespace FrogBattleV4.Core.Abilities.Targeting;
 
 /// <summary>
 /// Selects targets adjacent to other selected ones

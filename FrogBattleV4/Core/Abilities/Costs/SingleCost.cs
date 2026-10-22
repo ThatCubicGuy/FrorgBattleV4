@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using FrogBattleV4.Core.Abilities.Components.Requirements;
+using FrogBattleV4.Core.Abilities.Requirements;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat.Commands;
 
-namespace FrogBattleV4.Core.Abilities.Components.Costs;
+namespace FrogBattleV4.Core.Abilities.Costs;
 
 public class SingleCost(IShard parentShard) : CostComponent(parentShard)
 {

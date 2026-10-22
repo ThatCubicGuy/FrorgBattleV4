@@ -3,7 +3,7 @@ using System.Linq;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat.Commands;
 
-namespace FrogBattleV4.Core.Abilities.Components.Commands;
+namespace FrogBattleV4.Core.Abilities.Components;
 
 public class AttackComponent(IShard parentShard) : ShardComponent(parentShard), IShardCommandComponent
 {

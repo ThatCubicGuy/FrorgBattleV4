@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 
-namespace FrogBattleV4.Core.Abilities.Components;
+namespace FrogBattleV4.Core.Abilities;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(Targeting.AreaOfEffectTargeting), "area_of_effect")]

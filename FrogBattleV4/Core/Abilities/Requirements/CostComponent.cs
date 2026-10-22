@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat.Commands;
 
-namespace FrogBattleV4.Core.Abilities.Components.Requirements;
+namespace FrogBattleV4.Core.Abilities.Requirements;
 
 // TODO (Nova): massive rework lmao i'm so bad at this
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]

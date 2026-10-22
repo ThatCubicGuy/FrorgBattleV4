@@ -1,6 +1,6 @@
 using FrogBattleV4.Core.Calculation;
 
-namespace FrogBattleV4.Core.Abilities.Components.Requirements;
+namespace FrogBattleV4.Core.Abilities.Requirements;
 
 public class StatRequirement : IShardRequirement
 {

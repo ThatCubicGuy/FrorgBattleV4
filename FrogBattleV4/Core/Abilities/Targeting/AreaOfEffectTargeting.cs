@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace FrogBattleV4.Core.Abilities.Components.Targeting;
+namespace FrogBattleV4.Core.Abilities.Targeting;
 
 /// <summary>
 /// Selects an entire team.

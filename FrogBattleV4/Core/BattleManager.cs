@@ -4,13 +4,13 @@ using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core.Abilities;
-using FrogBattleV4.Core.Abilities.Components;
+using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Modifiers;
 using FrogBattleV4.Core.Selections;
 
-namespace FrogBattleV4.Core.Combat;
+namespace FrogBattleV4.Core;
 
 // TODO: Full revamp
 public partial class BattleManager : IBattle
@@ -24,8 +24,8 @@ public partial class BattleManager : IBattle
     private BattleManager(ImmutableDictionary<EntityUid, Fighter> memberData, ImmutableDictionary<TeamUid, Team> teams)
     {
         CreationTime = DateTime.UtcNow.Ticks;
-        _rng = new SeededBattleRng(CreationTime.GetHashCode());
-        _commandResolver = new CommandResolver(this);
+        _rng = new BattleManager.SeededBattleRng(CreationTime.GetHashCode());
+        _commandResolver = new BattleManager.CommandResolver(this);
         MemberData = memberData;
         Teams = teams;
     }

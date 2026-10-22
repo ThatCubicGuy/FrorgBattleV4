@@ -3,7 +3,7 @@ using System.Linq;
 using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 
-namespace FrogBattleV4.Core.Combat;
+namespace FrogBattleV4.Core;
 
 public partial class BattleManager
 {
@@ -16,9 +16,9 @@ public partial class BattleManager
 
     private class CommandResolver : ICommandVisitor
     {
-        private readonly BattleManager _manager;
+        private readonly Core.BattleManager _manager;
 
-        public CommandResolver(BattleManager manager)
+        public CommandResolver(Core.BattleManager manager)
         {
             _manager = manager;
         }

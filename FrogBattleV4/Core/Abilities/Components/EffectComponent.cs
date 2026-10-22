@@ -2,7 +2,7 @@ using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 
-namespace FrogBattleV4.Core.Abilities.Components.Commands;
+namespace FrogBattleV4.Core.Abilities.Components;
 
 public class EffectComponent(IShard parentShard) : ShardComponent(parentShard), IShardCommandComponent
 {

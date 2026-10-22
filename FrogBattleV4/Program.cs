@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text.Json;
 using FrogBattleV4.Core.Abilities;
-using FrogBattleV4.Core.Abilities.Components.Requirements;
-using FrogBattleV4.Core.Abilities.Components.Targeting;
+using FrogBattleV4.Core.Abilities.Requirements;
 using FrogBattleV4.Core.Abilities.ShardClasses;
+using FrogBattleV4.Core.Abilities.Targeting;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.JsonDeserialization;
 
