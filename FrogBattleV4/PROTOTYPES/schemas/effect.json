@@ -11,15 +11,13 @@
     },
     "duration": {
       "description": "Turns until this status effect is removed.",
-      "type": "number",
-      "multipleOf": 1,
-      "exclusiveMinimum": 1
+      "type": "integer",
+      "minimum": 1
     },
     "max_stacks": {
       "description": "Maximum amount of stacks that can be applied at once.",
-      "type": "number",
-      "multipleOf": 1,
-      "exclusiveMinimum": 1
+      "type": "integer",
+      "minimum": 1
     },
     "modifiers": {
       "description": "Array of modifier rules for this status effect.",

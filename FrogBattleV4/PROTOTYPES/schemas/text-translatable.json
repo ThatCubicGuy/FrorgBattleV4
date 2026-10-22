@@ -8,33 +8,38 @@
     "string"
   ],
   "properties": {
-    "text": {
-      "description": "Text field for the name. Can be a translation key if `name.translatable` is set to `true`.",
-      "type": "string",
-      "maxLength": 255
-    },
-    "translatable": {
-      "description": "Whether the text field represents a translation key. Defaults to `true`.",
-      "type": "boolean",
-      "default": true
-    },
-    "insert": {
-      "description": "Parameters for substituting into the text field after translation (if necessary).",
-      "type": "array",
-      "items": {
-        "$comment": "Array items should be property names of the object owning the name.",
-        "description": "A property of the object to get the value of.",
-        "type": "string"
-      }
-    },
     "extra": {
       "description": "Extra text to append to this instance.",
       "$ref": "schema://text-translatable"
     }
   },
-  "required": ["text"],
+  "oneOf": [
+    {
+      "description": "Displays plain text.",
+      "required": ["text"],
+      "properties": {
+        "text": {
+          "description": "A string containing plain text to display directly.",
+          "type": "string"
+        }
+      }
+    },
+    {
+      "description": "Displays a translated piece of text from the currently selected language.",
+      "required": ["translate"],
+      "properties": {
+        "translate": {
+          "description": "A translation key from the currently selected language.",
+          "type": "string"
+        },
+        "fallback": {
+          "description": "Optional. Text to fall back on if the translation key is not found.",
+          "type": "string"
+        }
+      }
+    }
+  ],
   "items": {
     "$ref": "schema://text-translatable"
-  },
-  "maxLength": 255
+  }
 }
