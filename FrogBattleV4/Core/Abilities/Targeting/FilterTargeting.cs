@@ -26,12 +26,13 @@ public class FilterTargeting : IShardTargeting
     /// <summary>
     /// Extra filter to apply to each target.
     /// </summary>
-    public System.Func<ShardTargetingContext, BattleEnvironment, bool> TargetFilter { get; init; } = (_, _) => true;
+    public EntityPredicate Filter { get; init; }
 
     public TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env)
     {
-        if (targeting.Rank <= MaximumRank && TargetFilter(targeting, env))
-            return TargetingInstruction.From(targeting with { Rank = targeting.Rank + RankPenalty });
+        var (target, rank) = targeting;
+        if (rank <= MaximumRank && env.IsPredicate(target, Filter))
+            return TargetingInstruction.From(targeting with { Rank = rank + RankPenalty });
 
         return TargetingInstruction.Empty;
     }

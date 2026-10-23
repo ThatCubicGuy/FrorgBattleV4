@@ -15,11 +15,13 @@ public class AffectShard : Shard
     public override void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder,
         IBattleRng rng)
     {
-        CommandComponents.GenerateCommands(state with
+        var user = state.User;
+        var selections = state.Selections.SelectMany(targeting =>
+            Targeting.GenerateInstruction(targeting, env).Resolve(rng));
+        var mods = state.Modifiers.With(Modifiers);
+        foreach (var targeting in selections)
         {
-            Selections = state.Selections.SelectMany(targeting =>
-                Targeting.GenerateInstruction(targeting, env).Resolve(rng)),
-            Modifiers = Modifiers.With(Modifiers)
-        }, env, builder);
+            CommandComponents.GenerateCommands(new ShardResolutionScope(user, targeting, mods), env, builder);
+        }
     }
 }

@@ -4,11 +4,11 @@ namespace FrogBattleV4.Core.Modifiers;
 
 public class PoolStatModifier : AttributeModifier<PoolStatQuery>
 {
-    public required PoolId PoolId { get; init; }
+    public required PoolName Pool { get; init; }
     public required PoolStatChannel Channel { get; init; }
 
     protected override bool AppliesTo(PoolStatQuery query)
     {
-        return query.PoolId == PoolId && query.Channel == Channel;
+        return query.Pool == Pool && query.Channel == Channel;
     }
 }

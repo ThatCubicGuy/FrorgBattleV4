@@ -11,7 +11,7 @@ public class StatValueCondition : IConditionComponent
     /// <summary>
     /// Stat to query for.
     /// </summary>
-    public required StatId Stat { get; set; }
+    public required StatName Stat { get; set; }
 
     /// <summary>
     /// The starting value that the interval starts being calculated from.

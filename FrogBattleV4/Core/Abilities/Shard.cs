@@ -67,30 +67,36 @@ public enum ShardFunction
     /// <summary>
     /// Attack shards target enemies and deal damage.
     /// </summary>
+    [JsonStringEnumMemberName("attack")]
     Attack,
 
     /// <summary>
     /// Impair shards target enemies and apply debuffs.
     /// </summary>
+    [JsonStringEnumMemberName("impair")]
     Impair,
 
     /// <summary>
     /// Restore shards target allies and restore HP, Energy, or others.
     /// </summary>
+    [JsonStringEnumMemberName("restore")]
     Restore,
 
     /// <summary>
     /// Support shards target allies and apply buffs.
     /// </summary>
+    [JsonStringEnumMemberName("support")]
     Support,
 
     /// <summary>
     /// Target shards transform the current link's target selection.
     /// </summary>
+    [JsonStringEnumMemberName("target")]
     Target,
 
     /// <summary>
     /// Enhance shards boost the capabilities of other shards in the link.
     /// </summary>
+    [JsonStringEnumMemberName("enhance")]
     Enhance,
 }

@@ -28,7 +28,7 @@ public partial class BattleManager
             var (_, target) = command.Relation;
             var data = command.Data;
 
-            _manager.MemberData[target]
+            _manager.Entities[target]
                 .TakeDamage(_manager._rng.Chance(command.CriticalChance)
                         ? command.CriticalAmount
                         : command.NormalAmount,
@@ -40,7 +40,7 @@ public partial class BattleManager
             var (_, target) = command.Relation;
             var data = command.Data;
 
-            _manager.MemberData[target].Pools[data.TargetPool].Value += command.TotalAmount;
+            _manager.Entities[target].Pools[data.TargetPool].Value += command.TotalAmount;
         }
 
         public void Visit(ApplyEffectCommand command)
@@ -54,7 +54,7 @@ public partial class BattleManager
                 return;
             }
 
-            _manager.MemberData[target].AddStatusEffect(new StatusEffectInstance
+            _manager.Entities[target].AddStatusEffect(new StatusEffectInstance
             {
                 Applicant = actor,
                 Holder = target,
@@ -69,19 +69,19 @@ public partial class BattleManager
             var (_, target) = command.Relation;
             var data = command.Data;
 
-            foreach (var effect in _manager.MemberData[target].StatusEffects.Where(data.Predicate))
+            foreach (var effect in _manager.Entities[target].StatusEffects.Where(data.Predicate))
             {
                 if (effect.Definition.Properties.HasFlag(EffectFlags.Unremovable)) continue;
 
                 if (effect.Definition.Properties.HasFlag(EffectFlags.RemoveStack))
                 {
-                    var eff = _manager.MemberData[target].StatusEffects
+                    var eff = _manager.Entities[target].StatusEffects
                         .SingleOrDefault(sei => sei.Definition.Id == effect.Definition.Id);
                     if (eff != null) eff.Stacks -= data.RemovedStacks;
                 }
                 else
                 {
-                    _manager.MemberData[target].RemoveStatusEffect(effect.Definition.Id);
+                    _manager.Entities[target].RemoveStatusEffect(effect.Definition.Id);
                 }
             }
         }

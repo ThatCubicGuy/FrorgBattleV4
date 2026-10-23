@@ -9,15 +9,7 @@ public class EffectComponent(IShard parentShard) : ShardComponent(parentShard), 
     public required EffectChanceFormula Formula { get; init; }
     public required ApplyEffectData Data { get; init; }
 
-    public void GenerateCommands(LinkResolutionState state, BattleEnvironment env, CommandBuilder builder)
-    {
-        foreach (var targeting in state.Selections)
-        {
-            GenerateScoped(new ShardResolutionScope(state.User, targeting, state.Modifiers), env, builder);
-        }
-    }
-
-    private void GenerateScoped(ShardResolutionScope scope, BattleEnvironment env, CommandBuilder builder)
+    public void GenerateCommands(ShardResolutionScope scope, BattleEnvironment env, CommandBuilder builder)
     {
         builder.Emit(new ApplyEffectCommand
         {

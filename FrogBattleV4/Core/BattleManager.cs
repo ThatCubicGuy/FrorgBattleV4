@@ -21,19 +21,19 @@ public partial class BattleManager : IBattle
     public event EventHandler? BattleStarted;
     public event EventHandler? BattleEnded;
 
-    private BattleManager(ImmutableDictionary<EntityUid, Fighter> memberData, ImmutableDictionary<TeamUid, Team> teams)
+    private BattleManager(ImmutableDictionary<EntityUid, Entity> entities, ImmutableDictionary<TeamUid, Team> teams)
     {
         CreationTime = DateTime.UtcNow.Ticks;
-        _rng = new BattleManager.SeededBattleRng(CreationTime.GetHashCode());
-        _commandResolver = new BattleManager.CommandResolver(this);
-        MemberData = memberData;
+        _rng = new SeededBattleRng(CreationTime.GetHashCode());
+        _commandResolver = new CommandResolver(this);
+        Entities = entities;
         Teams = teams;
     }
 
     public long CreationTime { get; private set; }
     public TurnScheduler Scheduler { get; } = new();
 
-    public ImmutableDictionary<EntityUid, Fighter> MemberData { get; private set; }
+    public ImmutableDictionary<EntityUid, Entity> Entities { get; private set; }
     public ImmutableDictionary<TeamUid, Team> Teams { get; private set; }
 
     public static Builder GetBuilder()
@@ -41,7 +41,7 @@ public partial class BattleManager : IBattle
         return new Builder();
     }
 
-    public async Task RunAsync(CancellationToken cancellationToken = default)
+    public async Task RunAsync(CancellationToken cancellationToken)
     {
         // TODO (Nova): incomplete
         OnBattleStarted();
@@ -50,7 +50,7 @@ public partial class BattleManager : IBattle
             var env = GetEnvironment();
             var actor = Scheduler.Current;
 
-            var action = await Teams[MemberData[actor].Team].Provider.GetSelectionAsync(
+            var action = await Teams[Entities[actor].Team].Provider.GetSelectionAsync(
                 new PlayerActionRequest(actor, env), cancellationToken);
 
             var state = new LinkResolutionState(actor, [
@@ -84,7 +84,7 @@ public partial class BattleManager : IBattle
 
     public BattleEnvironment GetEnvironment()
     {
-        return new BattleEnvironment(MemberData, Teams);
+        return new BattleEnvironment(Entities, Teams);
     }
 
     protected virtual void OnBattleStarted()
@@ -104,7 +104,7 @@ public partial class BattleManager : IBattle
 
     public class Builder
     {
-        private readonly Dictionary<EntityUid, Fighter> _fighters = [];
+        private readonly Dictionary<EntityUid, Entity> _fighters = [];
         private readonly List<Team> _teams = [];
 
         internal Builder()
@@ -127,18 +127,18 @@ public partial class BattleManager : IBattle
             return this;
         }
 
-        public Builder AddMember(TeamUid alliedTeam, FighterDefinition member)
+        public Builder AddMember(TeamUid alliedTeam, FighterId member)
         {
-            var data = new Fighter
+            var data = new Entity
             {
-                Owner = member.Id,
+                Owner = member,
                 Team = alliedTeam,
             };
             _fighters[data.Id] = data;
             return this;
         }
 
-        public Builder AddMembers(TeamUid alliedTeam, IEnumerable<FighterDefinition> members)
+        public Builder AddMembers(TeamUid alliedTeam, IEnumerable<FighterId> members)
         {
             foreach (var member in members)
             {

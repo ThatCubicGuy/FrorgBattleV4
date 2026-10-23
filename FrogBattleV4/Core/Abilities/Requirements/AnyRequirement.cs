@@ -10,7 +10,7 @@ namespace FrogBattleV4.Core.Abilities.Requirements;
 /// <remarks>For fulfillment generation, only the first fulfilled term is executed.</remarks>
 public class AnyRequirement : IShardRequirement
 {
-    public required ImmutableList<IShardRequirement> Terms { get; init; }
+    public required ImmutableArray<IShardRequirement> Terms { get; init; }
 
     [Pure]
     public virtual bool IsFulfilled(LinkResolutionState state, BattleEnvironment env)

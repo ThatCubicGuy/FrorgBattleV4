@@ -10,7 +10,7 @@ public class PoolValueCondition : IConditionComponent
 
     #region Metadata
 
-    public required PoolId Pool { get; init; }
+    public required PoolName Pool { get; init; }
     public required AffectedSide Direction { get; init; }
 
     /// <summary>
@@ -59,7 +59,7 @@ public class PoolValueCondition : IConditionComponent
         {
             value /= new PoolStatQuery
             {
-                PoolId = Pool,
+                Pool = Pool,
                 Channel = PoolStatChannel.Max,
                 Subject = subject
             }.Calculate(env);

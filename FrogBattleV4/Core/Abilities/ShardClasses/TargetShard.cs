@@ -3,8 +3,7 @@ using System.Linq;
 namespace FrogBattleV4.Core.Abilities.ShardClasses;
 
 /// <summary>
-/// Target shards are required in most links.
-/// They provide targeting, or change it if they are added after another target shard.
+/// Target shards transform the current targeting selection.
 /// </summary>
 public class TargetShard : Shard
 {
@@ -15,7 +14,7 @@ public class TargetShard : Shard
         state = state with
         {
             Selections = state.Selections.SelectMany(targeting =>
-                // TODO (Nova): Somehow get rid of RNG here as well?
+                // TODO (Nova): Maybe get rid of RNG here as well?
                 Targeting.GenerateInstruction(targeting, env).Resolve(rng))
         };
     }

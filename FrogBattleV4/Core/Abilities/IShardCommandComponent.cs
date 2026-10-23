@@ -10,5 +10,5 @@ namespace FrogBattleV4.Core.Abilities;
 [JsonDerivedType(typeof(Components.EffectComponent), "effect")]
 public interface IShardCommandComponent
 {
-    void GenerateCommands(LinkResolutionState state, BattleEnvironment env, CommandBuilder builder);
+    void GenerateCommands(ShardResolutionScope scope, BattleEnvironment env, CommandBuilder builder);
 }

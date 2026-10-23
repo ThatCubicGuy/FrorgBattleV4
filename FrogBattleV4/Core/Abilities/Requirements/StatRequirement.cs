@@ -4,9 +4,9 @@ namespace FrogBattleV4.Core.Abilities.Requirements;
 
 public class StatRequirement : IShardRequirement
 {
-    public required StatId Stat { get; init; }
-    public double? MinValue { get; init; } = null;
-    public double? MaxValue { get; init; } = null;
+    public required StatName Stat { get; init; }
+    public double? MinValue { get; init; }
+    public double? MaxValue { get; init; }
 
     public virtual bool IsFulfilled(LinkResolutionState state, BattleEnvironment env)
     {

@@ -56,7 +56,7 @@ public abstract record CostFormula
         }
     }
 
-    public sealed record StatPercentage(StatId Scalar, double Ratio) : CostFormula
+    public sealed record StatPercentage(StatName Scalar, double Ratio) : CostFormula
     {
         public override double Resolve(EntityUid user, BattleEnvironment env)
         {
@@ -68,13 +68,13 @@ public abstract record CostFormula
         }
     }
 
-    public sealed record Percentage(PoolId Pool, double Ratio) : CostFormula
+    public sealed record Percentage(PoolName Pool, double Ratio) : CostFormula
     {
         public override double Resolve(EntityUid user, BattleEnvironment env)
         {
             return new PoolStatQuery
             {
-                PoolId = Pool,
+                Pool = Pool,
                 Channel = PoolStatChannel.Max,
                 Subject = user,
             }.Calculate(env) * Ratio;

@@ -6,5 +6,5 @@ namespace FrogBattleV4.Core.Calculation;
 public sealed class StatQuery : AttributeQuery
 {
     /// <summary>ID of the stat to query.</summary>
-    public required StatId Stat { get; init; }
+    public required StatName Stat { get; init; }
 }

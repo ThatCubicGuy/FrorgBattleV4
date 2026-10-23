@@ -10,7 +10,7 @@ public class SingleCost(IShard parentShard) : CostComponent(parentShard)
     // Always set by required property initializer
     private readonly MutateData _data = null!;
 
-    public required PoolId Pool
+    public required PoolName Pool
     {
         get => _data.TargetPool;
         init => _data = new MutateData(value, PoolMutChannel.Cost);

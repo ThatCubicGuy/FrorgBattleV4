@@ -4,7 +4,7 @@ namespace FrogBattleV4.Core.Modifiers;
 
 public class StatModifier : AttributeModifier<StatQuery>
 {
-    public required StatId Stat { get; init; }
+    public required StatName Stat { get; init; }
 
     protected override bool AppliesTo(StatQuery query)
     {

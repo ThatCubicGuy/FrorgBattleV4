@@ -20,7 +20,7 @@ var shard = new TargetShard
     Function = ShardFunction.Target,
     Requirement = new StatRequirement
     {
-        Stat = StatId.Atk,
+        Stat = StatName.Atk,
         MinValue = 100,
     },
     Targeting = new BlastTargeting
@@ -57,10 +57,23 @@ const string jsonString =
 var deserializedShard = JsonSerializer.Deserialize(jsonString, AppSerializerContext.Default.Shard);
 Console.Out.WriteLine(deserializedShard is null
     ? "Whoops..."
-    : $"""
-       Name = {deserializedShard.Name}
-       Description = {deserializedShard.Description}
-       Function = {deserializedShard.Function}
-       Requirement = {deserializedShard.Requirement}
-       Type = {deserializedShard.GetType().Name}
-       """);
+    : deserializedShard.ToDebugString());
+
+file static class Extensions
+{
+    public static string ToDebugString(this Shard shard)
+    {
+        return $"""
+                Type = {shard.GetType().Name}
+                Name = {shard.Name}
+                Description = {shard.Description}
+                Function = {shard.Function}
+                Requirement = {shard.Requirement.ToDebugString()}
+                """;
+    }
+
+    public static string ToDebugString(this IShardRequirement requirement)
+    {
+        return $"Type = {requirement.GetType().Name}";
+    }
+}

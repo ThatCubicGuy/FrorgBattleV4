@@ -5,7 +5,7 @@ namespace FrogBattleV4.Core.Calculation;
 /// </summary>
 public sealed class PoolStatQuery : AttributeQuery
 {
-    public required PoolId PoolId { get; init; }
+    public required PoolName Pool { get; init; }
     public required PoolStatChannel Channel { get; init; }
 }
 

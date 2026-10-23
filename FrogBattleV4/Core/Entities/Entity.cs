@@ -10,35 +10,41 @@ using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Entities;
 
-public class Fighter : Identifiable<EntityUid>
+/// <summary>
+/// Mutable in game data for any individual entity.
+/// </summary>
+public class Entity : Identifiable<EntityUid>
 {
     private readonly List<IModifierProvider> _passiveModifiers = [];
     private readonly List<StatusEffectInstance> _statusEffects = [];
-    private readonly Dictionary<PoolId, Pool> _pools = new();
+    private readonly Dictionary<PoolName, Pool> _pools = new();
 
     public event EventHandler<DamageTakenEventArgs>? DamageTaken;
     public event EventHandler<EffectAddedEventArgs>? EffectAdded;
 
-    public Fighter()
+    public Entity()
     {
-        Pools = new ReadOnlyDictionary<PoolId, Pool>(_pools);
+        Pools = new ReadOnlyDictionary<PoolName, Pool>(_pools);
         StatusEffects = new ReadOnlyCollection<StatusEffectInstance>(_statusEffects);
     }
 
+    /// <summary>
+    /// ResourceId of the behavior definition for this entity.
+    /// </summary>
     public required FighterId Owner { get; init; }
     public required TeamUid Team { get; init; }
-    public ReadOnlyDictionary<PoolId, Pool> Pools { get; }
+    public ReadOnlyDictionary<PoolName, Pool> Pools { get; }
     public ReadOnlyCollection<StatusEffectInstance> StatusEffects { get; }
     public IEnumerable<IModifierProvider> GetAllModifiers() => _passiveModifiers.Concat(StatusEffects);
 
     /// <summary>
     /// Determines the order in which fighter pools absorb damage.
     /// </summary>
-    private static readonly ImmutableArray<PoolId> DamagePriority =
+    private static readonly ImmutableArray<PoolName> DamagePriority =
     [
-        PoolId.Shield,
-        PoolId.Overheal,
-        PoolId.Hp
+        PoolName.Shield,
+        PoolName.Overheal,
+        PoolName.Hp
     ];
 
     public void TakeDamage(double damage, DamageData damageData)

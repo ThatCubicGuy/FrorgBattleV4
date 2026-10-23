@@ -11,50 +11,44 @@ public class AttackComponent(IShard parentShard) : ShardComponent(parentShard), 
     public required DamageData Data { get; init; }
     public AttackProperties Properties { get; init; } = new();
 
-    public void GenerateCommands(LinkResolutionState state, BattleEnvironment env, CommandBuilder builder)
+    public void GenerateCommands(ShardResolutionScope scope, BattleEnvironment env, CommandBuilder builder)
     {
-        var selections = state.Selections.ToList();
-        var split = Properties.SplitDamageEvenly ? selections.Count : 1;
-        foreach (var targeting in selections)
+        var baseValue = Formula.Resolve(scope, env);
+        var ctx = new RelationContext
         {
-            var scope = new ShardResolutionScope(state.User, targeting, state.Modifiers);
-            var baseValue = Formula.Resolve(scope, env) / split;
-            var ctx = new RelationContext
+            Actor = scope.User,
+            Target = scope.Targeting.Target
+        };
+        builder.Emit(new DamageCommand
+        {
+            NormalAmount = new DamageQuery
             {
-                Actor = state.User,
-                Target = targeting.Target
-            };
-            builder.Emit(new DamageCommand
-            {
-                NormalAmount = new DamageQuery
-                {
-                    BaseValue = baseValue,
-                    Data = Data,
-                    IsCrit = false,
-                    Context = ctx
-                }.Calculate(env),
-                CriticalAmount = new DamageQuery
-                {
-                    BaseValue = baseValue,
-                    Data = Data,
-                    IsCrit = Properties.CanCrit,
-                    Context = ctx
-                }.Calculate(env),
-                CriticalChance = Properties.CanCrit ? new DamageStatQuery
-                {
-                    Data = Data,
-                    Channel = DamageStatChannel.CritRate,
-                    Subject = state.User,
-                    Reference = targeting.Target
-                }.Calculate(env) : 0,
+                BaseValue = baseValue,
                 Data = Data,
-                Relation = ctx
-            });
-        }
+                IsCrit = false,
+                Context = ctx
+            }.Calculate(env),
+            CriticalAmount = new DamageQuery
+            {
+                BaseValue = baseValue,
+                Data = Data,
+                IsCrit = Properties.CanCrit,
+                Context = ctx
+            }.Calculate(env),
+            CriticalChance = Properties.CanCrit ? new DamageStatQuery
+            {
+                Data = Data,
+                Channel = DamageStatChannel.CritRate,
+                Subject = scope.User,
+                Reference = scope.Targeting.Target
+            }.Calculate(env) : 0,
+            Data = Data,
+            Relation = ctx
+        });
     }
 }
 
-public sealed record AttackProperties(bool CanCrit = true, bool SplitDamageEvenly = false);
+public sealed record AttackProperties(bool CanCrit = true);
 
 public abstract record DamageFormula
 {
@@ -79,7 +73,7 @@ public abstract record DamageFormula
         }
     }
 
-    public sealed record StatPercentage(StatId Scalar, double Ratio) : DamageFormula
+    public sealed record StatPercentage(StatName Scalar, double Ratio) : DamageFormula
     {
         public override double Resolve(ShardResolutionScope scope, BattleEnvironment env)
         {
@@ -92,7 +86,7 @@ public abstract record DamageFormula
         }
     }
 
-    public sealed record PoolValuePercentage(PoolId Pool, double Ratio) : DamageFormula
+    public sealed record PoolValuePercentage(PoolName Pool, double Ratio) : DamageFormula
     {
         public override double Resolve(ShardResolutionScope scope, BattleEnvironment env)
         {

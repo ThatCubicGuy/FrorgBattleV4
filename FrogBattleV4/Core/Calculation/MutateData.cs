@@ -1,7 +1,7 @@
 namespace FrogBattleV4.Core.Calculation;
 
 public record MutateData(
-    PoolId TargetPool,
+    PoolName TargetPool,
     PoolMutChannel Channel);
 
 public enum PoolMutChannel

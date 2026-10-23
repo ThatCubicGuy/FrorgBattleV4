@@ -7,6 +7,7 @@ namespace FrogBattleV4.Core.Abilities;
 [JsonDerivedType(typeof(Requirements.AllRequirement), "all_of")]
 [JsonDerivedType(typeof(Requirements.AnyRequirement), "any_of")]
 [JsonDerivedType(typeof(Requirements.StatRequirement), "stat")]
+[JsonDerivedType(typeof(Requirements.PoolRequirement), "pool")]
 public interface IShardRequirement
 {
     /// <summary>

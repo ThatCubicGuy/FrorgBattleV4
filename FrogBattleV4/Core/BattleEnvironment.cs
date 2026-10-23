@@ -11,16 +11,16 @@ namespace FrogBattleV4.Core;
 
 public record BattleEnvironment
 {
-    public BattleEnvironment(ImmutableDictionary<EntityUid, Fighter> memberData,
+    public BattleEnvironment(ImmutableDictionary<EntityUid, Entity> entities,
         ImmutableDictionary<TeamUid, Team> teams)
     {
-        MemberData = memberData;
+        Entities = entities;
         Teams = teams;
     }
 
     #region Properties
 
-    private ImmutableDictionary<EntityUid, Fighter> MemberData { get; }
+    private ImmutableDictionary<EntityUid, Entity> Entities { get; }
     private ImmutableDictionary<TeamUid, Team> Teams { get; }
 
     public ModifierCollection ArenaModifiers { get; init; } = ModifierCollection.Empty;
@@ -30,6 +30,18 @@ public record BattleEnvironment
     #region Methods
 
     /// <summary>
+    /// Determines whether an entity fulfills the given predicate in the current environment.
+    /// </summary>
+    /// <param name="entity">Entity to validate the predicate against.</param>
+    /// <param name="predicate">Predicate to check.</param>
+    /// <returns></returns>
+    public bool IsPredicate(EntityUid entity, EntityPredicate predicate)
+    {
+        EnsureExists(entity);
+        return predicate.Matches(Entities[entity]);
+    }
+
+    /// <summary>
     /// Returns every member from the same field (on the same "line") as <paramref name="entity"/>.
     /// </summary>
     /// <param name="entity">Entity UID.</param>
@@ -37,7 +49,7 @@ public record BattleEnvironment
     public IEnumerable<EntityUid> GetNeighbors(EntityUid entity)
     {
         EnsureExists(entity);
-        return Teams[MemberData[entity].Team].GetOnFieldMembers();
+        return Teams[Entities[entity].Team].GetOnFieldMembers();
     }
 
     /// <summary>
@@ -52,7 +64,7 @@ public record BattleEnvironment
     public ModifierCollection GetModifiers(EntityUid entity)
     {
         EnsureExists(entity);
-        var data = MemberData[entity];
+        var data = Entities[entity];
         return ArenaModifiers
             .With(data.GetAllModifiers())
             .With(Teams[data.Team].Modifiers);
@@ -68,21 +80,21 @@ public record BattleEnvironment
     /// There exists no entity with ID <paramref name="entity"/>
     /// in the current context.
     /// </exception>
-    public double GetPoolValue(EntityUid entity, PoolId pool)
+    public double GetPoolValue(EntityUid entity, PoolName pool)
     {
         EnsureExists(entity);
-        return MemberData[entity].Pools[pool].Value;
+        return Entities[entity].Pools[pool].Value;
     }
 
     public IEnumerable<StatusEffectInstance> GetStatusEffects(EntityUid entity)
     {
         EnsureExists(entity);
-        return MemberData[entity].StatusEffects;
+        return Entities[entity].StatusEffects;
     }
 
     private void EnsureExists(EntityUid entity)
     {
-        if (!MemberData.ContainsKey(entity)) throw new EntityMissingException(entity);
+        if (!Entities.ContainsKey(entity)) throw new EntityMissingException(entity);
     }
 
     #endregion
