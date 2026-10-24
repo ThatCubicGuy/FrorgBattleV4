@@ -10,7 +10,7 @@ namespace FrogBattleV4.Core.Modifiers.PassiveEffects;
 /// </summary>
 public class PassiveModifier : IModifierProvider
 {
-    public required ModifierCollection Modifiers { get; init; }
+    public required IModifierRule[] Modifiers { get; init; }
     /// <summary>
     /// List of conditions that enable the PassiveModifier's stacks.
     /// </summary>
@@ -25,6 +25,6 @@ public class PassiveModifier : IModifierProvider
     [Pure]
     public ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx)
     {
-        return Modifiers.GetContributingModifiers(query, env, ctx) * GetStacks(query.Main, query.Other, env);
+        return ModifierRules.Aggregate(Modifiers, query, ctx) * GetStacks(query.Main, query.Other, env);
     }
 }

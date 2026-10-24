@@ -51,7 +51,6 @@ public static class ModifierPipeline
 
     [Pure]
     private static double CalculateCommand(this CommandQuery query, BattleEnvironment env)
-    
     {
         // (source.self + target.other) + (target.self + source.other)
         var actor = query.Context.Actor;

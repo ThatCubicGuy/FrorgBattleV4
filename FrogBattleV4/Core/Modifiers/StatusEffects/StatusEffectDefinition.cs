@@ -8,8 +8,8 @@ public class StatusEffectDefinition
     public required StatusEffectId Id { get; init; }
     public required string Name { get; init; }
     public string? Description { get; init; }
-    public IEnumerable<IModifierRule> ModifierRules { get; init; } = [];
-    public IEnumerable<IMutatorComponent> Mutators { get; init; } = [];
+    public IModifierRule[] ModifierRules { get; init; } = [];
+    public IMutatorComponent[] Mutators { get; init; } = [];
     public EffectFlags Properties { get; init; } = EffectFlags.None;
 
     public required int MaxStacks { get; init; }

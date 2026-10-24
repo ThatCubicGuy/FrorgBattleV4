@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Abilities;
@@ -34,10 +35,11 @@ public abstract class Shard : IShard
 
     #endregion
 
-    public required IShardRequirement Requirement { get; init; }
+    public IShardRequirement[] Requirements { get; init; } = [];
 
     /// <inheritdoc/>
-    public bool IsUsable(LinkResolutionState state, BattleEnvironment env) => Requirement.IsFulfilled(state, env);
+    public bool IsUsable(LinkResolutionState state, BattleEnvironment env) =>
+        Requirements.All(sr => sr.IsFulfilled(state, env));
 
     /// <inheritdoc/>
     public abstract void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder,

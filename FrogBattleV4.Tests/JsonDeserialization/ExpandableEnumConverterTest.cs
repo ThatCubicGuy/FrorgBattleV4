@@ -7,8 +7,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace FrogBattleV4.Tests.JsonDeserialization;
 
 [TestClass]
-[TestSubject(typeof(NameConverter<>))]
-public class NameConverterTest
+[TestSubject(typeof(ExpandableEnumConverter<>))]
+public class ExpandableEnumConverterTest
 {
     private const string Name = "something_i_guess";
 
@@ -42,8 +42,8 @@ public class NameConverterTest
     public void Deserialize_WhenInvalidName_ThrowsError()
     {
         var invalidName = """
-                   "This is a VERY !!! invalid name :3"
-                   """;
+                          "This is a VERY !!! invalid name :3"
+                          """;
         Assert.Throws<JsonException>(() =>
             JsonSerializer.Deserialize(invalidName, AppSerializerContext.Default.StatName));
     }

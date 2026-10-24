@@ -3,10 +3,10 @@ using FrogBattleV4.JsonDeserialization;
 
 namespace FrogBattleV4.Core.Calculation;
 
-[JsonConverter(typeof(NameConverter<StatName>))]
-public readonly record struct StatName(string Name) : IPropertyName
+[JsonConverter(typeof(ExpandableEnumConverter<StatName>))]
+public readonly record struct StatName(string Identifier) : IExpandableEnum
 {
-    public override string ToString() => Name;
+    public override string ToString() => Identifier;
 
     #region Common Stats
 

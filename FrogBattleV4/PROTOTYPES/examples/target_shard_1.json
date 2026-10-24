@@ -1,0 +1,41 @@
+{
+  "type": "empower",
+  "modifiers": [
+    {
+      "type": "damage",
+      "data": {
+        "type": "slash",
+        "source": "link"
+      },
+      "crit_only": false,
+      "affected_side": "this",
+      "direction": "outgoing",
+      "modifier_stack": {
+        "base_add_value": 10,
+        "add_base_percent": 0,
+        "multiply_total": 1,
+        "final_add_value": 0
+      }
+    }
+  ],
+  "name": "Empower Shard",
+  "description": "Empower shard hardcoded for testing.",
+  "function": "enhance",
+  "requirement": {
+    "type": "all_of",
+    "terms": [
+      {
+        "type": "pool",
+        "pool": "mana",
+        "min_value": 100,
+        "max_value": null
+      },
+      {
+        "type": "stat",
+        "stat": "dex",
+        "min_value": 20,
+        "max_value": null
+      }
+    ]
+  }
+}

@@ -1,8 +1,12 @@
+using System.Text.Json.Serialization;
+using FrogBattleV4.JsonDeserialization;
+
 namespace FrogBattleV4.Core.Calculation;
 
-public readonly record struct DamageType(string Type)
+[JsonConverter(typeof(ExpandableEnumConverter<DamageType>))]
+public readonly record struct DamageType(string Identifier) : IExpandableEnum
 {
-    public override string ToString() => Type;
+    public override string ToString() => Identifier;
 
     #region Common Types
 
@@ -24,5 +28,5 @@ public readonly record struct DamageType(string Type)
     /// <returns>True if this damage can be boosted by a modifier of
     /// type <paramref name="modifier"/>, false otherwise.</returns>
     public bool Matches(DamageType modifier) =>
-        Type == modifier.Type || Type == All.Type || modifier.Type == All.Type;
+        Identifier == modifier.Identifier || Identifier == All.Identifier || modifier.Identifier == All.Identifier;
 }

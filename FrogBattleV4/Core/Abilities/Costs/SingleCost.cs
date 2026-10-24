@@ -5,7 +5,7 @@ using FrogBattleV4.Core.Combat.Commands;
 
 namespace FrogBattleV4.Core.Abilities.Costs;
 
-public class SingleCost(IShard parentShard) : CostComponent(parentShard)
+public class SingleCost(IShard parentShard) : CostComponent()
 {
     // Always set by required property initializer
     private readonly MutateData _data = null!;

@@ -1,11 +1,12 @@
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat.Commands;
 
 namespace FrogBattleV4.Core.Abilities.Components;
 
-public class AttackComponent(IShard parentShard) : ShardComponent(parentShard), IShardCommandComponent
+public class AttackComponent : IShardCommandComponent
 {
     public required DamageFormula Formula { get; init; }
     public required DamageData Data { get; init; }
@@ -50,7 +51,11 @@ public class AttackComponent(IShard parentShard) : ShardComponent(parentShard), 
 
 public sealed record AttackProperties(bool CanCrit = true);
 
-public abstract record DamageFormula
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+[JsonDerivedType(typeof(Flat), "flat")]
+[JsonDerivedType(typeof(StatPercentage), "stat_percent")]
+[JsonDerivedType(typeof(PoolValuePercentage), "pool_value_percent")]
+public abstract class DamageFormula
 {
     private DamageFormula()
     {
@@ -65,16 +70,19 @@ public abstract record DamageFormula
     public abstract double Resolve(ShardResolutionScope scope, BattleEnvironment env);
     private double GetFalloffModifier(ShardResolutionScope scope) => Math.Pow(1 - RankFalloff, scope.Targeting.Rank);
 
-    public sealed record Flat(double Amount) : DamageFormula
+    public sealed class Flat : DamageFormula
     {
+        public required double Amount { get; init; }
         public override double Resolve(ShardResolutionScope scope, BattleEnvironment env)
         {
             return Amount * GetFalloffModifier(scope);
         }
     }
 
-    public sealed record StatPercentage(StatName Scalar, double Ratio) : DamageFormula
+    public sealed class StatPercentage : DamageFormula
     {
+        public required StatName Scalar { get; init; }
+        public required double Ratio { get; init; }
         public override double Resolve(ShardResolutionScope scope, BattleEnvironment env)
         {
             return new StatQuery
@@ -86,8 +94,10 @@ public abstract record DamageFormula
         }
     }
 
-    public sealed record PoolValuePercentage(PoolName Pool, double Ratio) : DamageFormula
+    public sealed class PoolValuePercentage : DamageFormula
     {
+        public required PoolName Pool { get; init; }
+        public required double Ratio { get; init; }
         public override double Resolve(ShardResolutionScope scope, BattleEnvironment env)
         {
             return env.GetPoolValue(scope.User, Pool) * Ratio * GetFalloffModifier(scope);

@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
@@ -45,8 +44,6 @@ public class StatusEffectInstance : IModifierProvider
     [Pure]
     public ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx)
     {
-        return Definition.ModifierRules.Where(mr => mr.AppliesTo(query, ctx))
-            .Aggregate(new ModifierStack(), (stack, rule) =>
-                stack + rule.ModifierStack) * Stacks;
+        return ModifierRules.Aggregate(Definition.ModifierRules, query, ctx) * Stacks;
     }
 }

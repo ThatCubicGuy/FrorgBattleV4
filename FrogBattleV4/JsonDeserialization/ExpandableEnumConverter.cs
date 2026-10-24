@@ -6,10 +6,10 @@ using System.Text.RegularExpressions;
 namespace FrogBattleV4.JsonDeserialization;
 
 /// <summary>
-/// Converts a string token to a StatName or PoolName. Accepts only lowercase alphanumeric characters.
+/// Converts a string token to a wrapper struct for data-driven enums. Accepts only lowercase alphanumeric characters.
 /// </summary>
-/// <typeparam name="TName"></typeparam>
-internal partial class NameConverter<TName> : JsonConverter<TName> where TName : struct, IPropertyName
+/// <typeparam name="TName">Type of the expandable enum to convert to.</typeparam>
+internal partial class ExpandableEnumConverter<TName> : JsonConverter<TName> where TName : struct, IExpandableEnum
 {
     public override TName Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -27,20 +27,20 @@ internal partial class NameConverter<TName> : JsonConverter<TName> where TName :
 
         return new TName
         {
-            Name = result
+            Identifier = result
         };
     }
 
     public override void Write(Utf8JsonWriter writer, TName value, JsonSerializerOptions options)
     {
-        writer.WriteStringValue(value.Name);
+        writer.WriteStringValue(value.Identifier);
     }
 
     [GeneratedRegex("^[a-z][a-z0-9_]*$")]
     private static partial Regex AlphanumericRegex();
 }
 
-internal interface IPropertyName
+internal interface IExpandableEnum
 {
-    string Name { get; init; }
+    string Identifier { get; init; }
 }

@@ -5,7 +5,7 @@ using FrogBattleV4.Core.Combat.Commands;
 
 namespace FrogBattleV4.Core.Abilities.Costs;
 
-public class ConditionalCost(IShard parentShard) : CostComponent(parentShard)
+public class ConditionalCost(IShard parentShard) : CostComponent()
 {
     public required System.Func<LinkResolutionState, BattleEnvironment, bool> Predicate { get; init; }
     public required CostComponent CostIfTrue { get; init; }

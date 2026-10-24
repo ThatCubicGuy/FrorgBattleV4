@@ -4,7 +4,7 @@ using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Abilities.Components;
 
-public class EffectComponent(IShard parentShard) : ShardComponent(parentShard), IShardCommandComponent
+public class EffectComponent : IShardCommandComponent
 {
     public required EffectChanceFormula Formula { get; init; }
     public required ApplyEffectData Data { get; init; }

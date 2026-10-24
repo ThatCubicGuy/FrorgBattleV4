@@ -10,7 +10,7 @@ namespace FrogBattleV4.Core.Abilities.Requirements;
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(Costs.SingleCost), "single")]
 [JsonDerivedType(typeof(Costs.ConditionalCost), "conditional")]
-public abstract class CostComponent(IShard parentShard) : ShardComponent(parentShard), IShardRequirement
+public abstract class CostComponent : IShardRequirement
 {
     public CostType Type { get; init; } = CostType.None;
     public abstract IEnumerable<MutateCommand> GetCost(LinkResolutionState state, BattleEnvironment env);
@@ -40,6 +40,10 @@ public enum CostType
     Check,
 }
 
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+[JsonDerivedType(typeof(Flat), "flat")]
+[JsonDerivedType(typeof(Percentage), "percentage")]
+[JsonDerivedType(typeof(StatPercentage), "stat_percentage")]
 public abstract record CostFormula
 {
     private CostFormula()

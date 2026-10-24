@@ -1,11 +1,19 @@
+using System.Linq;
 using System.Text.Json.Serialization;
 using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.JsonDeserialization;
 
 namespace FrogBattleV4.Core.Modifiers;
 
 /// <summary>
 /// Represents a smarter ModifierStack that determines to which kind of queries to apply.
 /// </summary>
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+[JsonDerivedType(typeof(StatModifier), "stat")]
+[JsonDerivedType(typeof(DamageModifier), "damage")]
+[JsonDerivedType(typeof(PoolMutModifier), "mutation")]
+[JsonDerivedType(typeof(PoolStatModifier), "pool_property")]
+[JsonDerivedType(typeof(DamageStatModifier), "damage_property")]
 public interface IModifierRule
 {
     ModifierStack ModifierStack { get; }
@@ -24,12 +32,6 @@ public interface IModifierRule
 /// <br/>Base generic class for common code.
 /// </summary>
 /// <typeparam name="TQuery">Type of the query this modifier applies to.</typeparam>
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
-[JsonDerivedType(typeof(StatModifier), "stat")]
-[JsonDerivedType(typeof(DamageModifier), "damage")]
-[JsonDerivedType(typeof(PoolMutModifier), "mutation")]
-[JsonDerivedType(typeof(PoolStatModifier), "pool_property")]
-[JsonDerivedType(typeof(DamageStatModifier), "damage_property")]
 public abstract class ModifierRule<TQuery> : IModifierRule where TQuery : IQuery
 {
     public required ModifierStack ModifierStack { get; init; }
@@ -50,6 +52,9 @@ public abstract class ModifierRule<TQuery> : IModifierRule where TQuery : IQuery
 /// <typeparam name="TQuery">Type of the query this modifier applies to.</typeparam>
 public abstract class AttributeModifier<TQuery> : ModifierRule<TQuery> where TQuery : AttributeQuery
 {
+    /// <summary>
+    /// Determines whether this modifier applies to the holder or the target.
+    /// </summary>
     public required AffectedSide AffectedSide { get; init; }
 
     protected sealed override bool MatchesRelationship(TQuery query, in ModifierContext ctx)
@@ -73,7 +78,13 @@ public abstract class AttributeModifier<TQuery> : ModifierRule<TQuery> where TQu
 /// <typeparam name="TQuery">Type of the query this modifier applies to.</typeparam>
 public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQuery : CommandQuery
 {
+    /// <summary>
+    /// Determines whether this modifier applies to the holder or the target.
+    /// </summary>
     public required AffectedSide AffectedSide { get; init; }
+    /// <summary>
+    /// Determines whether this modifier applies to incoming or outgoing mutations.
+    /// </summary>
     public required MutationDirection Direction { get; init; }
 
     protected sealed override bool MatchesRelationship(TQuery query, in ModifierContext ctx)
@@ -129,29 +140,47 @@ public readonly record struct ModifierContext(EntityUid Holder, EntityUid Subjec
 /// <summary>
 /// Represents which character's stats get modified (holder or target)
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter<AffectedSide>))]
 public enum AffectedSide
 {
     /// <summary>
     /// The effects of this modifier will affect the holder. (e.g. holder's DamageRes)
     /// </summary>
+    [JsonStringEnumMemberName("this")]
     This,
     /// <summary>
     /// The effects of this modifier will affect the other. (e.g. holder's DamageRes PENALTY)
     /// </summary>
+    [JsonStringEnumMemberName("other")]
     Other
 }
 
 /// <summary>
 /// Represents the direction of a mutation (incoming or outgoing)
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter<MutationDirection>))]
 public enum MutationDirection
 {
     /// <summary>
     /// Modifies the mutation as it leaves Actor. (e.g. holder's damage DEALT)
     /// </summary>
+    [JsonStringEnumMemberName("outgoing")]
     Outgoing,
     /// <summary>
     /// Modifies the mutation as it affects Target. (e.g. holder's damage TAKEN)
     /// </summary>
+    [JsonStringEnumMemberName("incoming")]
     Incoming,
+}
+
+/// <summary>
+/// Defines methods for aggregating collections of IModifierRules into one ModifierStack.
+/// </summary>
+public static class ModifierRules
+{
+    public static ModifierStack Aggregate(System.Collections.Generic.IEnumerable<IModifierRule> rules, IQuery query, ModifierContext ctx)
+    {
+        return rules.Where(rule => rule.AppliesTo(query, ctx)).Select(rule => rule.ModifierStack)
+            .Aggregate((current, next) => current + next);
+    }
 }
