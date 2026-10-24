@@ -8,6 +8,7 @@ namespace FrogBattleV4.Core;
 public class EntityPredicate
 {
     public FighterId? Id { get; init; }
+    public ShardId[]? Shards { get; init; }
 
     // TODO (Nova): Expand predicate
 

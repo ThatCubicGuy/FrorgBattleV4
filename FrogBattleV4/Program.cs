@@ -41,9 +41,7 @@ const string jsonString =
         "description": "Target shard hardcoded JSON.",
         "requirement": {
             "type": "stat",
-            "stat": {
-                "id": "def"
-            },
+            "stat": "def",
             "min_value": 500
         },
         "targeting": {

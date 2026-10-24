@@ -1,5 +1,9 @@
+using System.Text.Json.Serialization;
+using FrogBattleV4.JsonDeserialization;
+
 namespace FrogBattleV4.Core.Calculation;
 
+[JsonConverter(typeof(NameConverter<StatName>))]
 public readonly record struct StatName(string Name) : IPropertyName
 {
     public override string ToString() => Name;
