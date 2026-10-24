@@ -25,3 +25,8 @@ internal class NameConverter<TName> : JsonConverter<TName> where TName : struct,
         writer.WriteStringValue(value.Name);
     }
 }
+
+internal interface IPropertyName
+{
+    string Name { get; init; }
+}
