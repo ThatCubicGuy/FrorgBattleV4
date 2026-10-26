@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "schema://character",
+  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/character.json",
   "title": "Character",
   "description": "A character that will fight in battles.",
   "type": "object",
   "properties": {
     "name": {
       "description": "Name of the character.",
-      "$ref": "schema://text-translatable"
+      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/text-translatable.json"
     }
   }
 }

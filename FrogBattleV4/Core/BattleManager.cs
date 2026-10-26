@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core.Abilities;
@@ -47,6 +48,10 @@ public partial class BattleManager : IBattle
     public async Task RunAsync(CancellationToken cancellationToken)
     {
         // TODO (Nova): incomplete
+        foreach (var uid in Entities.Keys)
+        {
+            Scheduler.Schedule(uid, 100);
+        }
         OnBattleStarted();
         while (!cancellationToken.IsCancellationRequested && Scheduler.MoveNext())
         {
@@ -65,13 +70,11 @@ public partial class BattleManager : IBattle
             ], ModifierCollection.Empty, 0);
 
             var builder = new CommandBuilder();
-            foreach (var shard in action.Link)
+            // You can submit a shard link that contains unusable shards,
+            // but if said shards don't become usable by the time
+            // they need to be executed, the shard link stops.
+            foreach (var shard in action.Link.TakeWhile(s => s.IsUsable(state, env)))
             {
-                // You can submit a shard link that contains unusable shards,
-                // but if said shards don't become usable by the time
-                // they need to be executed, the shard link stops.
-                if (!shard.IsUsable(state, env)) break;
-
                 shard.Resolve(ref state, env, builder, _rng);
                 state = state with
                 {
@@ -100,11 +103,6 @@ public partial class BattleManager : IBattle
         BattleEnded?.Invoke(this, EventArgs.Empty);
     }
 
-    public static Builder CreateBuilder()
-    {
-        return new Builder();
-    }
-
     public class Builder
     {
         private readonly Dictionary<EntityUid, Entity> _fighters = [];
@@ -114,38 +112,64 @@ public partial class BattleManager : IBattle
         {
         }
 
+        /// <summary>
+        /// Adds a new team to the builder with the given selection provider.
+        /// </summary>
+        /// <param name="provider">An object that will resolve selection requests for this team.</param>
+        /// <returns>This builder instance.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="provider"/> is null.</exception>
         public Builder AddTeam(ISelectionProvider provider)
         {
+            ArgumentNullException.ThrowIfNull(provider);
+            if (_teams.Count > 0 && !_teams[^1].GetAllMembers().Any())
+            {
+                throw new InvalidOperationException("Cannot add a team when the previous team contains no members.");
+            }
+
             _teams.Add(new Team(provider));
             return this;
         }
 
-        public Builder AddTeams(IEnumerable<ISelectionProvider> teams)
+        /// <summary>
+        /// Adds a member to the last added team of this builder.
+        /// </summary>
+        /// <param name="member">Member to add to the team.</param>
+        /// <returns>This builder instance.</returns>
+        /// <exception cref="InvalidOperationException">No team was added yet.</exception>
+        public Builder AddMember(FighterId member)
         {
-            foreach (var team in teams)
+            if (_teams.Count == 0)
             {
-                AddTeam(team);
+                throw new InvalidOperationException("Cannot add members when there are no teams.");
             }
 
-            return this;
-        }
-
-        public Builder AddMember(TeamUid alliedTeam, FighterId member)
-        {
+            var team = _teams[^1];
             var data = new Entity
             {
                 Owner = member,
-                Team = alliedTeam,
+                Team = team.Uid,
             };
-            _fighters[data.Id] = data;
+            _fighters[data.Uid] = data;
+            team.AddMember(data.Uid);
             return this;
         }
 
-        public Builder AddMembers(TeamUid alliedTeam, IEnumerable<FighterId> members)
+        /// <summary>
+        /// Adds multiple members to the last added team of this builder.
+        /// </summary>
+        /// <param name="members">Members to add to the team.</param>
+        /// <returns>This builder instance.</returns>
+        /// <exception cref="InvalidOperationException">No team was added yet.</exception>
+        public Builder AddMembers(IEnumerable<FighterId> members)
         {
+            if (_teams.Count == 0)
+            {
+                throw new InvalidOperationException("Cannot add members when there are no teams.");
+            }
+
             foreach (var member in members)
             {
-                AddMember(alliedTeam, member);
+                AddMember(member);
             }
 
             return this;
@@ -153,7 +177,12 @@ public partial class BattleManager : IBattle
 
         public BattleManager Build()
         {
-            return new BattleManager(_fighters.ToImmutableDictionary(), _teams.ToImmutableDictionary(t => t.Id));
+            if (_teams.Count < 2)
+            {
+                throw new InvalidOperationException("Cannot build a battle with less than two teams.");
+            }
+
+            return new BattleManager(_fighters.ToImmutableDictionary(), _teams.ToImmutableDictionary(t => t.Uid));
         }
     }
 }

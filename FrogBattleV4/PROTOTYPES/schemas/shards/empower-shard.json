@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "schema://shards/target-shard",
+  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/shards/target-shard.json",
   "title": "Target shard",
   "description": "A shard which adds modifiers for the rest of the link.",
   "type": "object",
   "properties": {
     "modifier": {
       "description": "Modifier component to alter this link's calculations by.",
-      "$ref": "schema://components/modifier-collection"
+      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/modifier-collection.json"
     }
   },
   "required": ["modifier"]

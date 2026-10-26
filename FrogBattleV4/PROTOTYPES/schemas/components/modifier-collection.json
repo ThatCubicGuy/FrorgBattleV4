@@ -1,10 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "schema://shards/components/modifier",
+  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/shards/components/modifier.json",
   "title": "Modifier collection",
   "description": "A collection of ModifierRules.",
   "type": "array",
   "items": {
-    "$ref": "schema://components/modifiers/modifier-rule"
+    "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/modifiers/modifier-rule.json"
   }
 }

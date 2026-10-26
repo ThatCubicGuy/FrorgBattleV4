@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
@@ -13,9 +14,11 @@ public abstract class Registry<TKey, TItems>(FrozenDictionary<TKey, TItems> item
 {
     private FrozenDictionary<TKey, TItems> _items = items;
 
-    public TItems Get(TKey key) => _items[key];
+    public TItems Get(TKey key) => TryGet(key, out var value)
+        ? value
+        : throw new KeyNotFoundException($"Key {key} does not exist in the registry.");
 
-    public bool TryGet(TKey key, out TItems? item) => _items.TryGetValue(key, out item);
+    public bool TryGet(TKey key, [MaybeNullWhen(false)] out TItems item) => _items.TryGetValue(key, out item);
 
     /// <summary>
     /// Replace the entire registry with the given value.

@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "schema://costs/single-cost",
+  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/costs/single-cost.json",
   "title": "Shard cost",
   "description": "A cost that must be paid to use a shard as part of a link.",
   "type": "object",
   "properties": {
     "resource": {
       "description": "Resource that the cost consumes.",
-      "$ref": "schema://ids/pools"
+      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/ids/pools.json"
     },
     "formula": {
       "description": "Formula for calculating the cost.",
@@ -46,7 +46,7 @@
             },
             "stat": {
               "description": "Stat to scale by.",
-              "$ref": "schema://ids/stats"
+              "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/ids/stats.json"
             }
           },
           "required": ["amount", "stat"]

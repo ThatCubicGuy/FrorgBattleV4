@@ -4,10 +4,10 @@ namespace FrogBattleV4.Core;
 
 public abstract class Identifiable<TUid> where TUid : struct, IUniqueIdentifier<TUid>
 {
-    public TUid Id { get; } = new();
-    public override string ToString() => $"ID #{Id}";
-    public sealed override int GetHashCode() => Id.GetHashCode();
-    public sealed override bool Equals(object? obj) => obj is Identifiable<TUid> id && Id.Equals(id.Id);
+    public TUid Uid { get; } = new();
+    public override string ToString() => $"ID #{Uid}";
+    public sealed override int GetHashCode() => Uid.GetHashCode();
+    public sealed override bool Equals(object? obj) => obj is Identifiable<TUid> id && Uid.Equals(id.Uid);
 }
 
 /// <summary>

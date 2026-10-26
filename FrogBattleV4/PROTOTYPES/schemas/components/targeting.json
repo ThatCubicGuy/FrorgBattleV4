@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "schema://components/targeting",
+  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/targeting.json",
   "title": "Targeting component",
   "description": "A component that selects targets for shards.",
   "type": "object",
@@ -23,7 +23,7 @@
           "const": "filter"
         }
       },
-      "$ref": "schema://components/targeting/filter"
+      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/targeting/filter.json"
     },
     {
       "properties": {
@@ -31,7 +31,7 @@
           "const": "blast"
         }
       },
-      "$ref": "schema://components/targeting/blast"
+      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/targeting/blast.json"
     },
     {
       "properties": {
@@ -39,7 +39,7 @@
           "const": "bounce"
         }
       },
-      "$ref": "schema://components/targeting/bounce"
+      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/targeting/bounce.json"
     },
     {
       "properties": {
@@ -47,7 +47,7 @@
           "const": "area_of_effect"
         }
       },
-      "$ref": "schema://components/targeting/area-of-effect"
+      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/targeting/area-of-effect.json"
     }
   ]
 }

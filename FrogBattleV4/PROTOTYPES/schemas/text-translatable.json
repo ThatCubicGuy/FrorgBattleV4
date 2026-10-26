@@ -1,21 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "schema://text-translatable",
+  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/text-translatable.json",
   "$comment": "Schema used for various translatable text within other definitions.",
-  "type": [
-    "object",
-    "array",
-    "string"
-  ],
-  "properties": {
-    "extra": {
-      "description": "Extra text to append to this instance.",
-      "$ref": "schema://text-translatable"
-    }
-  },
   "oneOf": [
     {
       "description": "Displays plain text.",
+      "type": "object",
       "required": ["text"],
       "properties": {
         "text": {
@@ -26,6 +16,7 @@
     },
     {
       "description": "Displays a translated piece of text from the currently selected language.",
+      "type": "object",
       "required": ["translate"],
       "properties": {
         "translate": {
@@ -37,9 +28,21 @@
           "type": "string"
         }
       }
+    },
+    {
+      "type": "string"
+    },
+    {
+      "type": "array",
+      "items": {
+        "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/text-translatable.json"
+      }
     }
   ],
-  "items": {
-    "$ref": "schema://text-translatable"
+  "properties": {
+    "extra": {
+      "description": "Optional. Extra text to append to this instance.",
+      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/text-translatable.json"
+    }
   }
 }

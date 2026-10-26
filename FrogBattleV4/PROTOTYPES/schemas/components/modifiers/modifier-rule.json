@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "schema://components/modifiers/modifier-rule",
+  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/modifiers/modifier-rule.json",
   "title": "Modifier rule",
   "description": "A single ModifierRule for applying a modification to stats, damage, etc.",
   "type": "object",
   "properties": {
     "values": {
       "description": "Modifier stack to apply.",
-      "$ref": "schema://components/modifier-stack"
+      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/modifier-stack.json"
     },
     "entity": {
       "description": "Whose properties this modifier affects. `this` modifies the holder of the modifier, `other` modifies anybody calculating against it.",
@@ -39,7 +39,7 @@
               "const": "stat"
             }
           },
-          "$ref": "schema://components/modifiers/stat-mod"
+          "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/modifiers/stat-mod.json"
         },
         {
           "properties": {
@@ -47,7 +47,7 @@
               "const": "damage_property"
             }
           },
-          "$ref": "schema://components/modifiers/damage-property-mod"
+          "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/modifiers/damage-property-mod.json"
         },
         {
           "properties": {
@@ -55,7 +55,7 @@
               "const": "pool_property"
             }
           },
-          "$ref": "schema://components/modifiers/pool-property-mod"
+          "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/modifiers/pool-property-mod.json"
         }
       ]
     },
@@ -79,7 +79,7 @@
               "const": "damage"
             }
           },
-          "$ref": "schema://components/modifiers/damage-mod"
+          "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/modifiers/damage-mod.json"
         },
         {
           "properties": {
@@ -87,7 +87,7 @@
               "const": "mutation"
             }
           },
-          "$ref": "schema://components/modifiers/mutation-mod"
+          "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/modifiers/mutation-mod.json"
         }
       ]
     }

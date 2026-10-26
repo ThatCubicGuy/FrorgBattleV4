@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "schema://effect",
+  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/effect.json",
   "title": "Status Effect",
   "description": "A status effect that can be applied to fighters in battle.",
   "type": "object",
   "properties": {
     "name": {
       "description": "Name of the status effect.",
-      "$ref": "schema://text-translatable"
+      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/text-translatable.json"
     },
     "duration": {
       "description": "Turns until this status effect is removed.",
@@ -22,7 +22,7 @@
     "modifiers": {
       "description": "Array of modifier rules for this status effect.",
       "type": "array",
-      "$ref": "schema://components/modifier-collection"
+      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/modifier-collection.json"
     }
   },
   "required": ["name", "duration", "max_stacks", "modifiers"]

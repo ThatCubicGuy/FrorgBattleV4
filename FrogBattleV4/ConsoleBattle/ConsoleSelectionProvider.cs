@@ -37,7 +37,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
             }
             else
             {
-                await Console.Out.WriteLineAsync("Invalid selection");
+                await Console.Out.WriteLineAsync($"Invalid selection: \"{nextLine}\"");
             }
         }
 
