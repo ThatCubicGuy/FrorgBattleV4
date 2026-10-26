@@ -2,11 +2,12 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
-using FrogBattleV4.ConsoleBattle;
+using System.Threading.Tasks;
 using FrogBattleV4.Core;
 using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Registries;
+using FrogBattleV4.Core.Selections;
 using FrogBattleV4.JsonDeserialization;
 
 // using var game = new FrogBattleV4.FrogBattle();
@@ -43,13 +44,13 @@ foreach (var kvp in fighterRegistry)
     Console.Out.WriteLine("(end)");
 }
 
-var console = new ConsoleSelectionProvider();
-var member = new FighterId(new ResourceId("frorgbattle", "fighter1"));
-var manager = BattleManager.GetBuilder().AddTeam(console).AddMember(member).AddTeam(console).AddMember(member).Build();
-var task = manager.RunAsync(CancellationToken.None);
-Console.Out.WriteLine("Battle started");
-task.GetAwaiter().GetResult();
-Console.Out.WriteLine("Battle ended");
+// var console = new SetSelectionProvider();
+// var member = new FighterId(new ResourceId("frorgbattle", "fighter1"));
+// var manager = BattleManager.GetBuilder().AddTeam(console).AddMember(member).AddTeam(console).AddMember(member).Build();
+// var task = manager.RunAsync(CancellationToken.None);
+// Console.Out.WriteLine("Battle started");
+// await task;
+// Console.Out.WriteLine("Battle ended");
 
 file static class Extensions
 {
@@ -80,5 +81,20 @@ file static class Extensions
         return $"""
                 S
                 """;
+    }
+}
+
+file class SetSelectionProvider : ISelectionProvider
+{
+    public Task<PlayerTurnAction> GetSelectionAsync(PlayerActionRequest request, CancellationToken cancellationToken)
+    {
+        var shards = request.Environment
+            .GetShards(request.User)
+            .Select(ShardRegistry.Global.Get)
+            .ToArray();
+        var enemies = request.Environment
+            .GetEnemies(request.User)
+            .ToArray();
+        return Task.FromResult(new PlayerTurnAction([.. shards], enemies[0]));
     }
 }

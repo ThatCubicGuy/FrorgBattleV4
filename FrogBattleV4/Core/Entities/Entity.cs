@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
-using System.Linq;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
-using FrogBattleV4.Core.Modifiers;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Entities;
@@ -15,9 +13,8 @@ namespace FrogBattleV4.Core.Entities;
 /// </summary>
 public class Entity : Identifiable<EntityUid>
 {
-    private readonly List<IModifierProvider> _passiveModifiers = [];
     private readonly List<StatusEffectInstance> _statusEffects = [];
-    private readonly Dictionary<PoolName, Pool> _pools = new();
+    private readonly Dictionary<PoolName, Pool> _pools = new(4);
 
     public event EventHandler<DamageTakenEventArgs>? DamageTaken;
     public event EventHandler<EffectAddedEventArgs>? EffectAdded;
@@ -35,7 +32,6 @@ public class Entity : Identifiable<EntityUid>
     public required TeamUid Team { get; init; }
     public ReadOnlyDictionary<PoolName, Pool> Pools { get; }
     public ReadOnlyCollection<StatusEffectInstance> StatusEffects { get; }
-    public IEnumerable<IModifierProvider> GetAllModifiers() => _passiveModifiers.Concat(StatusEffects);
 
     /// <summary>
     /// Determines the order in which fighter pools absorb damage.
@@ -102,11 +98,6 @@ public class Entity : Identifiable<EntityUid>
     {
 
         _statusEffects.RemoveAll(sei => sei.ShouldRemove());
-    }
-
-    public void AddModifier(IModifierProvider modifier)
-    {
-        _passiveModifiers.Add(modifier);
     }
 
     protected virtual void OnDamageTaken(DamageTakenEventArgs e)

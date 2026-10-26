@@ -8,7 +8,6 @@ using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Entities;
-using FrogBattleV4.Core.Modifiers;
 using FrogBattleV4.Core.Registries;
 using FrogBattleV4.Core.Selections;
 
@@ -67,7 +66,7 @@ public partial class BattleManager : IBattle
                     Target = action.MainTarget,
                     Rank = 0,
                 }
-            ], ModifierCollection.Empty, 0);
+            ], [], 0);
 
             var builder = new CommandBuilder();
             // You can submit a shard link that contains unusable shards,

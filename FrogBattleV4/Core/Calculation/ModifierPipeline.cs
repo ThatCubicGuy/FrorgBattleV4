@@ -1,4 +1,5 @@
 using System.Diagnostics.Contracts;
+using System.Linq;
 using FrogBattleV4.Core.Modifiers;
 
 namespace FrogBattleV4.Core.Calculation;
@@ -20,7 +21,7 @@ public static class ModifierPipeline
         {
             AttributeQuery q => q.CalculateAttribute(env),
             CommandQuery q => q.CalculateCommand(env),
-            _ => throw new System.NotSupportedException("Query not supported")
+            _ => throw new System.NotSupportedException($"Query {query.GetType().FullName} not supported.")
         };
     }
 
@@ -29,7 +30,7 @@ public static class ModifierPipeline
     {
         var subject = query.Subject;
         var reference = query.Reference;
-        var actorMods = env.GetModifiers(subject);
+        var actorMods = env.GetModifiers(subject).Concat(env.SubjectiveModifiers);
 
         var totalStack = actorMods.GetContributingModifiers(query, env,
             new ModifierContext(subject, subject));
@@ -55,8 +56,8 @@ public static class ModifierPipeline
         // (source.self + target.other) + (target.self + source.other)
         var actor = query.Context.Actor;
         var target = query.Context.Target;
-        var actorMods = env.GetModifiers(actor);
-        var targetMods = env.GetModifiers(target);
+        var actorMods = env.GetModifiers(actor).Concat(env.SubjectiveModifiers).ToArray();
+        var targetMods = env.GetModifiers(target).ToArray();
         var totalValue = query.BaseValue;
         // kinda like this...
         totalValue = (actorMods.GetContributingModifiers(query, env,

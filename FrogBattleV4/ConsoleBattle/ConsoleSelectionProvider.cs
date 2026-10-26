@@ -27,6 +27,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
 
         while (true)
         {
+            await Console.Out.WriteAsync($"Shard: ");
             var nextLine = await Console.In.ReadLineAsync(token);
 
             if (uint.TryParse(nextLine, out var selection) && selection <= shards.Length)
@@ -43,6 +44,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
 
         while (true)
         {
+            await Console.Out.WriteAsync($"Target: ");
             var nextLine = await Console.In.ReadLineAsync(token);
 
             if (int.TryParse(nextLine, out var selection) && selection <= shards.Length)
@@ -51,7 +53,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
                     request.Environment.GetEnemies(request.User).ElementAt(selection - 1));
             }
 
-            await Console.Out.WriteLineAsync("Invalid selection");
+            await Console.Out.WriteLineAsync($"Invalid target selection \"{nextLine}\"");
         }
     }
 }

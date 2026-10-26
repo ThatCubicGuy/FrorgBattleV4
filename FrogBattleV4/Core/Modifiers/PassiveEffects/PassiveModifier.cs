@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Modifiers.PassiveEffects.Conditions;
@@ -10,14 +11,14 @@ namespace FrogBattleV4.Core.Modifiers.PassiveEffects;
 /// </summary>
 public class PassiveModifier : IModifierProvider
 {
-    public required IModifierRule[] Modifiers { get; init; }
+    public required ImmutableArray<IModifierRule> Modifiers { get; init; }
     /// <summary>
     /// List of conditions that enable the PassiveModifier's stacks.
     /// </summary>
     public required ConditionCollection Conditions { get; init; }
 
     [Pure]
-    protected int GetStacks(EntityUid subject, EntityUid? reference, BattleEnvironment env)
+    private int GetStacks(EntityUid subject, EntityUid? reference, BattleEnvironment env)
     {
         return Math.Max(0, Conditions.GetContribution(subject, reference, env));
     }
@@ -25,6 +26,6 @@ public class PassiveModifier : IModifierProvider
     [Pure]
     public ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx)
     {
-        return ModifierRules.Aggregate(Modifiers, query, ctx) * GetStacks(query.Main, query.Other, env);
+        return Modifiers.GetContributingModifiers(query, env, ctx) * GetStacks(query.Main, query.Other, env);
     }
 }

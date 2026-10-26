@@ -12,9 +12,9 @@ public interface IConditionComponent
     /// Gets the value that this condition is fulfilled by.
     /// This value may be negative.
     /// </summary>
-    /// <param name="subject"></param>
-    /// <param name="reference"></param>
-    /// <param name="env"></param>
+    /// <param name="subject">The subject holding this passive effect.</param>
+    /// <param name="reference">The reference to evaluate against.</param>
+    /// <param name="env">Environment to resolve in.</param>
     /// <returns>The fulfillment value.</returns>
     [Pure]
     int GetContribution(EntityUid subject, EntityUid? reference, BattleEnvironment env);

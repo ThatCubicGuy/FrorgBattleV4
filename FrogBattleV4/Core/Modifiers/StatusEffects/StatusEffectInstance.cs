@@ -44,6 +44,6 @@ public class StatusEffectInstance : IModifierProvider
     [Pure]
     public ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx)
     {
-        return ModifierRules.Aggregate(Definition.ModifierRules, query, ctx) * Stacks;
+        return Definition.ModifierRules.GetContributingModifiers(query, env, ctx) * Stacks;
     }
 }

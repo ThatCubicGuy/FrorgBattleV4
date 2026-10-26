@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 
@@ -8,8 +8,8 @@ public class StatusEffectDefinition
     public required StatusEffectId Id { get; init; }
     public required string Name { get; init; }
     public string? Description { get; init; }
-    public IModifierRule[] ModifierRules { get; init; } = [];
-    public IMutatorComponent[] Mutators { get; init; } = [];
+    public ImmutableArray<IModifierRule> ModifierRules { get; init; } = [];
+    public ImmutableArray<IMutatorComponent> Mutators { get; init; } = [];
     public EffectFlags Properties { get; init; } = EffectFlags.None;
 
     public required int MaxStacks { get; init; }

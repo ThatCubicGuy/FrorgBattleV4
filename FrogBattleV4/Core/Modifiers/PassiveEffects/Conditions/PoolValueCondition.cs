@@ -46,7 +46,7 @@ public class PoolValueCondition : IConditionComponent
     /// Specifies whether the MinValue, MaxValue and Step properties should be treated
     /// as a percentage of the pool's MaxValue instead of flat values.
     /// </summary>
-    public bool Percent { get; init; } = false;
+    public bool Percent { get; init; }
 
     #endregion
 
@@ -65,7 +65,6 @@ public class PoolValueCondition : IConditionComponent
             }.Calculate(env);
         }
 
-        return (int)Math.Floor(
-            (Math.Clamp(value, MinValue, MaxValue) - MinValue) / Step);
+        return (int)Math.Floor((Math.Clamp(value, MinValue, MaxValue) - MinValue) / Step);
     }
 }

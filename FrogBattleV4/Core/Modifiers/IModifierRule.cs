@@ -1,7 +1,5 @@
-using System.Linq;
 using System.Text.Json.Serialization;
 using FrogBattleV4.Core.Calculation;
-using FrogBattleV4.JsonDeserialization;
 
 namespace FrogBattleV4.Core.Modifiers;
 
@@ -14,8 +12,11 @@ namespace FrogBattleV4.Core.Modifiers;
 [JsonDerivedType(typeof(PoolMutModifier), "mutation")]
 [JsonDerivedType(typeof(PoolStatModifier), "pool_property")]
 [JsonDerivedType(typeof(DamageStatModifier), "damage_property")]
-public interface IModifierRule
+// TODO (Nova): prefer not to inherit IModifierProvider interface here
+public interface IModifierRule : IModifierProvider
 {
+    ModifierStack IModifierProvider.GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx) => AppliesTo(query, ctx) ? ModifierStack : ModifierStack.None;
+
     ModifierStack ModifierStack { get; }
 
     /// <summary>
@@ -171,16 +172,4 @@ public enum MutationDirection
     /// </summary>
     [JsonStringEnumMemberName("incoming")]
     Incoming,
-}
-
-/// <summary>
-/// Defines methods for aggregating collections of IModifierRules into one ModifierStack.
-/// </summary>
-public static class ModifierRules
-{
-    public static ModifierStack Aggregate(System.Collections.Generic.IEnumerable<IModifierRule> rules, IQuery query, ModifierContext ctx)
-    {
-        return rules.Where(rule => rule.AppliesTo(query, ctx)).Select(rule => rule.ModifierStack)
-            .Aggregate((current, next) => current + next);
-    }
 }

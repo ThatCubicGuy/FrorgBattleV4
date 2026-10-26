@@ -16,6 +16,11 @@ public record ModifierStack(
     double MultiplyTotal = 1,
     double FinalAddValue = 0)
 {
+    /// <summary>
+    /// Represents a modifier stack that makes no changes to any value.
+    /// </summary>
+    public static readonly ModifierStack None = new();
+
     private double this[ModifierOperation operation] => operation switch
     {
         ModifierOperation.BaseAddValue => BaseAddValue,

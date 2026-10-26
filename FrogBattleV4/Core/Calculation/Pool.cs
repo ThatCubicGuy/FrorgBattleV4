@@ -1,6 +1,6 @@
 using System;
 
-namespace FrogBattleV4.Core.Entities;
+namespace FrogBattleV4.Core.Calculation;
 
 public class Pool
 {

@@ -31,12 +31,30 @@ public record BattleEnvironment
 
     private ImmutableDictionary<EntityUid, Entity> Entities { get; }
     private ImmutableDictionary<TeamUid, Team> Teams { get; }
+    private ImmutableList<IModifierProvider> ArenaModifiers { get; init; } = ImmutableList<IModifierProvider>.Empty;
 
-    public ModifierCollection ArenaModifiers { get; init; } = ModifierCollection.Empty;
+    /// <summary>
+    /// Subjective modifiers are modifiers that should only apply to the current user.
+    /// Used to propagate bonus modifiers from abilities and such.
+    /// </summary>
+    public ImmutableList<IModifierProvider> SubjectiveModifiers { get; init; } = ImmutableList<IModifierProvider>.Empty;
 
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Adds the specified modifiers to the SubjectiveModifiers list.
+    /// </summary>
+    /// <param name="modifiers">Modifiers to append.</param>
+    /// <returns>A new BattleEnvironment.</returns>
+    public BattleEnvironment WithSubjectMods(IEnumerable<IModifierProvider> modifiers)
+    {
+        return this with
+        {
+            SubjectiveModifiers = SubjectiveModifiers.AddRange(modifiers)
+        };
+    }
 
     /// <summary>
     /// Determines whether an entity fulfills the given predicate in the current environment.
@@ -84,13 +102,14 @@ public record BattleEnvironment
     /// There exists no entity with ID <paramref name="entity"/>
     /// in the current context.
     /// </exception>
-    public ModifierCollection GetModifiers(EntityUid entity)
+    public IEnumerable<IModifierProvider> GetModifiers(EntityUid entity)
     {
         EnsureExists(entity);
         var data = Entities[entity];
         return ArenaModifiers
-            .With(data.GetAllModifiers())
-            .With(Teams[data.Team].Modifiers);
+            .Concat(data.StatusEffects)
+            .Concat(_fighterRegistry.Get(data.Owner).PassiveModifiers)
+            .Concat(Teams[data.Team].Modifiers);
     }
 
     /// <summary>

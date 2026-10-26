@@ -1,53 +1,23 @@
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.Modifiers;
 
 /// <summary>
-/// A wrapped list of IModifierRules and IModifierProviders that in turn implements IModifierProvider.
+/// Defines methods for aggregating modifier rules and providers into a single modifier stack.
 /// </summary>
-public record ModifierCollection(ImmutableList<IModifierRule> Rules, ImmutableList<IModifierProvider> Providers) : IModifierProvider
+public static class ModifierCollections
 {
-    public static readonly ModifierCollection Empty = new(
-        ImmutableList<IModifierRule>.Empty,
-        ImmutableList<IModifierProvider>.Empty);
-
-    /// <summary>
-    /// Returns a new ModifierCollection with the added modifier.
-    /// </summary>
-    /// <param name="modifier">Modifier to append to the collection.</param>
-    /// <returns>A new ModifierCollection.</returns>
-    public ModifierCollection With(IModifierProvider modifier)
+    public static ModifierStack GetContributingModifiers(this IEnumerable<IModifierProvider> providers, IQuery query, BattleEnvironment env, ModifierContext ctx)
     {
-        return this with { Providers = Providers.Add(modifier) };
+        return providers.Aggregate(ModifierStack.None,
+            (stack, mod) => stack + mod.GetContributingModifiers(query, env, ctx));
     }
 
-    /// <summary>
-    /// Returns a new ModifierCollection with the added modifiers.
-    /// </summary>
-    /// <param name="modifiers">Modifiers to append to the collection.</param>
-    /// <returns>A new ModifierCollection.</returns>
-    public ModifierCollection With(IEnumerable<IModifierProvider> modifiers)
+    public static ModifierStack GetContributingModifiers(this IEnumerable<IModifierRule> rules, IQuery query, BattleEnvironment env, ModifierContext ctx)
     {
-        return this with { Providers = Providers.AddRange(modifiers) };
-    }
-
-    public ModifierCollection With(IModifierRule rule)
-    {
-        return this with { Rules = Rules.Add(rule) };
-    }
-
-    public ModifierCollection With(IEnumerable<IModifierRule> rules)
-    {
-        return this with { Rules = Rules.AddRange(rules) };
-    }
-
-    public ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx)
-    {
-        return Providers.Aggregate(new ModifierStack(),
-            (stack, mod) => stack + mod.GetContributingModifiers(query, env, ctx)) +
-               ModifierRules.Aggregate(Rules, query, ctx);
+        return rules.Where(rule => rule.AppliesTo(query, ctx)).Select(rule => rule.ModifierStack)
+            .Aggregate((current, next) => current + next);
     }
 }

@@ -9,12 +9,12 @@ namespace FrogBattleV4.Core.Abilities;
 /// </summary>
 /// <param name="User">Entity using this link.</param>
 /// <param name="Selections">Currently selected targets.</param>
-/// <param name="Modifiers">Currently active modifiers.</param>
+/// <param name="Modifiers">Modifiers owned by the user at time of resolution.</param>
 /// <param name="CurrentShardIndex">Index of the currently resolving shard.</param>
 public sealed record LinkResolutionState(
     EntityUid User,
     IEnumerable<ShardTargetingContext> Selections,
-    ModifierCollection Modifiers,
+    IEnumerable<IModifierProvider> Modifiers,
     int CurrentShardIndex);
 
 /// <summary>
@@ -22,12 +22,7 @@ public sealed record LinkResolutionState(
 /// </summary>
 /// <param name="User">User of the shard.</param>
 /// <param name="Targeting">Target of the shard.</param>
-/// <param name="Modifier">Modifiers owned by the user at time of resolution.</param>
-public record ShardResolutionScope(
-    EntityUid User,
-    ShardTargetingContext Targeting,
-    // TODO (Nova): actually use bonus modifiers lmao
-    IModifierProvider Modifier);
+public record ShardResolutionScope(EntityUid User, ShardTargetingContext Targeting);
 
 public sealed class CommandBuilder
 {
