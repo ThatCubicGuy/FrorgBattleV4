@@ -1,21 +1,21 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/shard.json",
+  "$id": "${SCHEMAS_BASE_DIR}/shard.json",
   "title": "Ability",
   "description": "An ability shard for a character to use in battle.",
   "type": "object",
   "required": ["name", "description", "type"],
   "properties": {
     "requirements": {
-      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/shards/requirements.json"
+      "$ref": "${SCHEMAS_BASE_DIR}/shards/requirements.json"
     },
     "name": {
       "description": "Name of the shard.",
-      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/text-translatable.json"
+      "$ref": "${SCHEMAS_BASE_DIR}/text-translatable.json"
     },
     "description": {
       "description": "Description of what the shard does.",
-      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/text-translatable.json"
+      "$ref": "${SCHEMAS_BASE_DIR}/text-translatable.json"
     },
     "type": {
       "description": "Type of the shard. One of \"target\", \"empower\", \"affect\".",
@@ -35,7 +35,7 @@
           "const": "target"
         }
       },
-      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/shards/target-shard.json"
+      "$ref": "${SCHEMAS_BASE_DIR}/shards/target-shard.json"
     },
     {
       "properties": {
@@ -43,7 +43,7 @@
           "const": "empower"
         }
       },
-      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/shards/empower-shard.json"
+      "$ref": "${SCHEMAS_BASE_DIR}/shards/empower-shard.json"
     },
     {
       "properties": {
@@ -51,7 +51,7 @@
           "const": "affect"
         }
       },
-      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/shards/affect-shard.json"
+      "$ref": "${SCHEMAS_BASE_DIR}/shards/affect-shard.json"
     }
   ]
 }

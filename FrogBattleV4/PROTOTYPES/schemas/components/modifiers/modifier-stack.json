@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/modifiers/modifier-stack.json",
+  "$id": "${SCHEMAS_BASE_DIR}/components/modifiers/modifier-stack.json",
   "title": "Modifer stack",
   "description": "Describes a set of operations to apply in order: add_value -> add_base -> multiply -> final_add.",
   "type": "object",

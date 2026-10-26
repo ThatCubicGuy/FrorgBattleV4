@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/shards/target-shard.json",
+  "$id": "${SCHEMAS_BASE_DIR}/shards/target-shard.json",
   "title": "Target shard",
   "description": "A shard which selects the targets that other components will act upon.",
   "type": "object",
   "properties": {
     "targeting": {
       "description": "Targeting component to transform current target selection by.",
-      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/targeting.json"
+      "$ref": "${SCHEMAS_BASE_DIR}/components/targeting.json"
     }
   },
   "required": ["targeting"]

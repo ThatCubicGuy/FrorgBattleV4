@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/components/modifiers/stat-mod.json",
+  "$id": "${SCHEMAS_BASE_DIR}/components/modifiers/stat-mod.json",
   "title": "Stat modifier",
   "description": "A modifier that affects the value of a certain stat.",
   "type": "object",
   "properties": {
     "stat": {
       "description": "The stat whose value to modify.",
-      "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/ids/stats.json"
+      "$ref": "${SCHEMAS_BASE_DIR}/ids/stats.json"
     }
   },
   "required": ["stat"]

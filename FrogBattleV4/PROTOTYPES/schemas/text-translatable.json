@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/text-translatable.json",
+  "$id": "${SCHEMAS_BASE_DIR}/text-translatable.json",
   "$comment": "Schema used for various translatable text within other definitions.",
   "oneOf": [
     {
@@ -10,7 +10,7 @@
       "properties": {
         "text": {
           "description": "A string containing plain text to display directly.",
-          "type": "string"
+          "type${SCHEMAS_BASE_DIR}
         }
       }
     },
@@ -40,7 +40,7 @@
     }
   ],
   "properties": {
-    "extra": {
+    "extra": ${SCHEMAS_BASE_DIR}
       "description": "Optional. Extra text to append to this instance.",
       "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/text-translatable.json"
     }
