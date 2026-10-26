@@ -8,6 +8,7 @@ using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Modifiers;
+using FrogBattleV4.Core.Registries;
 using FrogBattleV4.Core.Selections;
 
 namespace FrogBattleV4.Core;
@@ -17,6 +18,8 @@ public partial class BattleManager : IBattle
 {
     private readonly SeededBattleRng _rng;
     private readonly CommandResolver _commandResolver;
+    private readonly FighterRegistry _fighterRegistry = FighterRegistry.Global;
+    private readonly ShardRegistry _shardRegistry = ShardRegistry.Global;
 
     public event EventHandler? BattleStarted;
     public event EventHandler? BattleEnded;
@@ -84,7 +87,7 @@ public partial class BattleManager : IBattle
 
     public BattleEnvironment GetEnvironment()
     {
-        return new BattleEnvironment(Entities, Teams);
+        return new BattleEnvironment(Entities, Teams, _fighterRegistry, _shardRegistry);
     }
 
     protected virtual void OnBattleStarted()

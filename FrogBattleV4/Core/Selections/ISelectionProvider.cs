@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core.Abilities;
@@ -13,6 +13,6 @@ public interface ISelectionProvider
     Task<PlayerTurnAction> GetSelectionAsync(PlayerActionRequest request, CancellationToken cancellationToken);
 }
 
-public sealed record PlayerTurnAction(IEnumerable<IShard> Link, EntityUid MainTarget);
+public sealed record PlayerTurnAction(ImmutableList<IShard> Link, EntityUid MainTarget);
 
 public sealed record PlayerActionRequest(EntityUid User, BattleEnvironment Environment);

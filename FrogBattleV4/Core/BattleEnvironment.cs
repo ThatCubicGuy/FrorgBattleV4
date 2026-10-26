@@ -1,19 +1,28 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Modifiers;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
+using FrogBattleV4.Core.Registries;
 
 namespace FrogBattleV4.Core;
 
 public record BattleEnvironment
 {
+    private readonly FighterRegistry _fighterRegistry;
+    private readonly ShardRegistry _shardRegistry;
+
     public BattleEnvironment(ImmutableDictionary<EntityUid, Entity> entities,
-        ImmutableDictionary<TeamUid, Team> teams)
+        ImmutableDictionary<TeamUid, Team> teams,
+        FighterRegistry fighterRegistry,
+        ShardRegistry shardRegistry)
     {
+        _fighterRegistry = fighterRegistry;
+        _shardRegistry = shardRegistry;
         Entities = entities;
         Teams = teams;
     }
@@ -34,11 +43,17 @@ public record BattleEnvironment
     /// </summary>
     /// <param name="entity">Entity to validate the predicate against.</param>
     /// <param name="predicate">Predicate to check.</param>
-    /// <returns></returns>
+    /// <returns>True if <paramref name="predicate"/> matches, false otherwise.</returns>
     public bool IsPredicate(EntityUid entity, EntityPredicate predicate)
     {
         EnsureExists(entity);
         return predicate.Matches(Entities[entity]);
+    }
+
+    public IEnumerable<ShardId> GetShards(EntityUid entity)
+    {
+        EnsureExists(entity);
+        return _fighterRegistry.Get(Entities[entity].Owner).Shards;
     }
 
     /// <summary>
@@ -50,6 +65,14 @@ public record BattleEnvironment
     {
         EnsureExists(entity);
         return Teams[Entities[entity].Team].GetOnFieldMembers();
+    }
+
+    public IEnumerable<EntityUid> GetEnemies(EntityUid entity)
+    {
+        EnsureExists(entity);
+        return Teams.Values
+            .SelectMany(team => team.GetOnFieldMembers())
+            .Except(Teams[Entities[entity].Team].GetOnFieldMembers());
     }
 
     /// <summary>

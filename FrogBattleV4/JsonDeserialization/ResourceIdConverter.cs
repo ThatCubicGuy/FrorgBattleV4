@@ -41,7 +41,7 @@ internal class ResourceIdConverter<TResourceId> : JsonConverter<TResourceId> whe
     }
 }
 
-internal interface IResourceId
+public interface IResourceId
 {
     ResourceId Value { get; init; }
 }
