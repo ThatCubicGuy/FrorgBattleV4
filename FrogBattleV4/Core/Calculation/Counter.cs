@@ -21,13 +21,16 @@ public class Counter
     /// <summary>
     /// Value at which the TriggerValueReached event is invoked.
     /// </summary>
+    [JsonPropertyName("trigger")]
     public long? TriggerValue { get; init; }
     
     /// <summary>
     /// Determines if the TriggerValueReached event should be triggered outside strict equality.
     /// </summary>
+    [JsonPropertyName("condition")]
     public TriggerType TriggerCondition { get; init; } = TriggerType.Equal;
 
+    [JsonPropertyName("max")]
     public long? MaxValue { get; init; }
 
     [JsonIgnore]
@@ -38,6 +41,9 @@ public class Counter
         {
             var oldValue = _currentValue;
             _currentValue = MaxValue.HasValue ? Math.Clamp(value, 0L, MaxValue.Value) : Math.Max(value, 0L);
+
+            if (_currentValue == oldValue) return;
+
             OnValueChanged(new ValueChangedEventArgs
             {
                 OldValue = oldValue,
@@ -46,8 +52,8 @@ public class Counter
             if (TriggerCondition switch
                 {
                     TriggerType.Equal => _currentValue == TriggerValue,
-                    TriggerType.LessThan => _currentValue <= TriggerValue,
-                    TriggerType.GreaterThan => _currentValue >= TriggerValue,
+                    TriggerType.Under => _currentValue <= TriggerValue,
+                    TriggerType.Over => _currentValue >= TriggerValue,
                     _ => false
                 })
             {
@@ -113,9 +119,9 @@ public class Counter
         [JsonStringEnumMemberName("equal")]
         Equal,
         [JsonStringEnumMemberName("under")]
-        LessThan,
+        Under,
         [JsonStringEnumMemberName("over")]
-        GreaterThan,
+        Over,
     }
 
     public class ValueChangedEventArgs : EventArgs

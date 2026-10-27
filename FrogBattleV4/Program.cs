@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using FrogBattleV4.Core;
 using FrogBattleV4.Core.Abilities;
+using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Registries;
 using FrogBattleV4.Core.Selections;
@@ -15,6 +18,24 @@ using FrogBattleV4.JsonDeserialization;
 // TODO: Everything lmao
 Console.WriteLine("Nothing here yet!");
 
+var ctr = new Counter
+{
+    DefaultValue = 0,
+    MaxValue = 20,
+    TriggerCondition = Counter.TriggerType.Over,
+    TriggerValue = 10
+};
+
+Console.Out.WriteLine(JsonSerializer.Serialize(ctr, AppSerializerContext.Default.Counter));
+
+var pool = new Pool
+{
+    Capacity = 100,
+    Value = 20,
+};
+
+Console.Out.WriteLine(JsonSerializer.Serialize(pool, AppSerializerContext.Default.Pool));
+
 var shardRegistry = RegistryLoader.CreateShards("frorgbattle").Load();
 
 Console.Out.WriteLine("Registered shards:");
@@ -24,7 +45,6 @@ foreach (var kvp in shardRegistry)
     Console.Out.WriteLine("(end)");
 }
 
-return;
 var fighter = new Fighter
 {
     Name = "Y/N",
@@ -42,13 +62,13 @@ foreach (var kvp in fighterRegistry)
     Console.Out.WriteLine("(end)");
 }
 
-// var console = new SetSelectionProvider();
-// var member = new FighterId(new ResourceId("frorgbattle", "fighter1"));
-// var manager = BattleManager.GetBuilder().AddTeam(console).AddMember(member).AddTeam(console).AddMember(member).Build();
-// var task = manager.RunAsync(CancellationToken.None);
-// Console.Out.WriteLine("Battle started");
-// await task;
-// Console.Out.WriteLine("Battle ended");
+var console = new SetSelectionProvider();
+var member = new FighterId(new ResourceId("frorgbattle", "fighter1"));
+var manager = BattleManager.GetBuilder().AddTeam(console).AddMember(member).AddTeam(console).AddMembers([member, member, member]).Build();
+var task = manager.RunAsync(CancellationToken.None);
+Console.Out.WriteLine("Battle started");
+await task;
+Console.Out.WriteLine("Battle ended");
 
 file static class Extensions
 {
@@ -92,6 +112,6 @@ file class SetSelectionProvider : ISelectionProvider
         var enemies = request.Environment
             .GetEnemies(request.User)
             .ToArray();
-        return Task.FromResult(new PlayerTurnAction([.. shards], enemies[0]));
+        return Task.FromResult(new PlayerTurnAction([.. shards], enemies[enemies.Length / 2]));
     }
 }

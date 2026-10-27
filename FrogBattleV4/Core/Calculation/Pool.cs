@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Calculation;
 
@@ -10,6 +11,7 @@ public class Pool
 
     public double Capacity { get; set; }
 
+    [JsonIgnore]
     public double Value
     {
         get => _currentValue;

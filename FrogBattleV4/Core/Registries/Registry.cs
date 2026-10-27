@@ -84,6 +84,7 @@ public static class RegistryLoader
         protected Loader(string ns)
         {
             _namespace = ns;
+            ReloadAllFiles();
         }
 
         protected abstract string BaseDirectoryName { get; }

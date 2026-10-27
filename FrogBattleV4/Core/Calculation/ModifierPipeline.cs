@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using FrogBattleV4.Core.Modifiers;
@@ -7,6 +8,16 @@ namespace FrogBattleV4.Core.Calculation;
 [Pure]
 public static class ModifierPipeline
 {
+    public static double CalculateStatic(this AttributeQuery query, IEnumerable<IModifierProvider> modifiers)
+    {
+        var subject = query.Subject;
+
+        var totalStack = modifiers.GetContributingModifiers(query, null!/*TODO*/,
+            new ModifierContext(subject, subject));
+
+        return totalStack.ApplyTo(0);
+    }
+
     /// <summary>
     /// Calculates the total value of a given query and returns it as a double.
     /// </summary>

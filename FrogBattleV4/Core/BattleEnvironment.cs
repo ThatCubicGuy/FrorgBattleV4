@@ -103,13 +103,19 @@ public record BattleEnvironment
     /// There exists no entity with ID <paramref name="entity"/>
     /// in the current context.
     /// </exception>
+    /// <exception cref="InvalidOperationException">DEBUG: ImmutableArray.IsDefault</exception>
     public IEnumerable<IModifierProvider> GetModifiers(EntityUid entity)
     {
         EnsureExists(entity);
         var data = Entities[entity];
+        var passiveMods = _fighterRegistry.Get(data.Owner).PassiveModifiers;
+        if (passiveMods.IsDefault)
+        {
+            throw new InvalidOperationException($"Passive modifiers of {entity} are in an invalid state. (default)");
+        }
         return ArenaModifiers
             .Concat(data.StatusEffects)
-            .Concat(_fighterRegistry.Get(data.Owner).PassiveModifiers)
+            .Concat(passiveMods)
             .Concat(Teams[data.Team].Modifiers);
     }
 

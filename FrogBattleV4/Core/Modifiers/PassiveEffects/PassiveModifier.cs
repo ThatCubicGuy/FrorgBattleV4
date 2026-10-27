@@ -24,7 +24,7 @@ public class PassiveModifier : IModifierProvider
     }
 
     [Pure]
-    public ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx)
+    public ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, in ModifierContext ctx)
     {
         return Modifiers.GetContributingModifiers(query, env, ctx) * GetStacks(query.Main, query.Other, env);
     }

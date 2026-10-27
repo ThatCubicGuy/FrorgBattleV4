@@ -17,5 +17,5 @@ public interface IModifierProvider
     /// <param name="ctx">ModifierContext of the current calculation.</param>
     /// <returns>A modifier stack revealing the final contribution.</returns>
     [Pure]
-    ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx);
+    ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, in ModifierContext ctx);
 }

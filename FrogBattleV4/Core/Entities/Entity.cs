@@ -13,15 +13,23 @@ namespace FrogBattleV4.Core.Entities;
 /// </summary>
 public class Entity : UniquelyIdentifiable<EntityUid>
 {
+    public static ImmutableDictionary<PoolName, Pool> BasePools() => new Dictionary<PoolName, Pool>
+    {
+        [PoolName.Hp] = new(),
+        [PoolName.Mana] = new(),
+        [PoolName.Energy] = new(),
+        [PoolName.Shield] = new(),
+        [PoolName.Overheal] = new(),
+    }.ToImmutableDictionary();
+
     private readonly List<StatusEffectInstance> _statusEffects = [];
-    private readonly Dictionary<PoolName, Pool> _pools = new(4);
+    private readonly ImmutableDictionary<PoolName, Pool> _pools = BasePools();
 
     public event EventHandler<DamageTakenEventArgs>? DamageTaken;
     public event EventHandler<EffectAddedEventArgs>? EffectAdded;
 
     public Entity()
     {
-        Pools = new ReadOnlyDictionary<PoolName, Pool>(_pools);
         StatusEffects = new ReadOnlyCollection<StatusEffectInstance>(_statusEffects);
     }
 
@@ -29,8 +37,15 @@ public class Entity : UniquelyIdentifiable<EntityUid>
     /// ResourceId of the behavior definition for this entity.
     /// </summary>
     public required FighterId Owner { get; init; }
+
     public required TeamUid Team { get; init; }
-    public ReadOnlyDictionary<PoolName, Pool> Pools { get; }
+
+    public ImmutableDictionary<PoolName, Pool> Pools
+    {
+        get => _pools;
+        init => _pools = _pools.AddRange(value);
+    }
+
     public ReadOnlyCollection<StatusEffectInstance> StatusEffects { get; }
 
     /// <summary>

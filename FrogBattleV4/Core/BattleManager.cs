@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core.Abilities;
+using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Entities;
@@ -49,7 +50,11 @@ public partial class BattleManager : IBattle
         // TODO (Nova): incomplete
         foreach (var uid in Entities.Keys)
         {
-            Scheduler.Schedule(uid, 100);
+            Scheduler.Schedule(uid, 10000 / new StatQuery
+            {
+                Subject = uid,
+                Stat = StatName.Spd
+            }.Calculate(GetEnvironment()));
         }
         OnBattleStarted();
         while (!cancellationToken.IsCancellationRequested && Scheduler.MoveNext())

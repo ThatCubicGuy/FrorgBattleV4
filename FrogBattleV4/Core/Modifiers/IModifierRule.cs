@@ -15,7 +15,8 @@ namespace FrogBattleV4.Core.Modifiers;
 // TODO (Nova): prefer not to inherit IModifierProvider interface here
 public interface IModifierRule : IModifierProvider
 {
-    ModifierStack IModifierProvider.GetContributingModifiers(IQuery query, BattleEnvironment env, ModifierContext ctx) => AppliesTo(query, ctx) ? ModifierStack : ModifierStack.None;
+    ModifierStack IModifierProvider.GetContributingModifiers(IQuery query, BattleEnvironment env,
+        in ModifierContext ctx) => AppliesTo(query, ctx) ? ModifierStack : ModifierStack.None;
 
     ModifierStack ModifierStack { get; }
 
