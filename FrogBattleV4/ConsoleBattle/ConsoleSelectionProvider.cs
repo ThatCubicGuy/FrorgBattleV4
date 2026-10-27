@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FrogBattleV4.Core.Abilities;
+using FrogBattleV4.Core;
 using FrogBattleV4.Core.Selections;
 
 namespace FrogBattleV4.ConsoleBattle;
@@ -16,18 +16,17 @@ public class ConsoleSelectionProvider : ISelectionProvider
         await Console.Out.WriteLineAsync("Select shards:");
         var shards = request.Environment
             .GetShards(request.User)
-            .Select(Core.Registries.ShardRegistry.Global.Get)
             .ToArray();
         foreach (var (i, shard) in shards.Index())
         {
-            await Console.Out.WriteLineAsync($"{i + 1}: {shard.Name}");
+            await Console.Out.WriteLineAsync($"{i + 1}: {shard.Value.Path}");
         }
 
-        var link = new List<IShard>();
+        var link = new List<ShardId>();
 
         while (true)
         {
-            await Console.Out.WriteAsync($"Shard: ");
+            await Console.Out.WriteAsync("Shard: ");
             var nextLine = await Console.In.ReadLineAsync(token);
 
             if (uint.TryParse(nextLine, out var selection) && selection <= shards.Length)
@@ -44,7 +43,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
 
         while (true)
         {
-            await Console.Out.WriteAsync($"Target: ");
+            await Console.Out.WriteAsync("Target: ");
             var nextLine = await Console.In.ReadLineAsync(token);
 
             if (int.TryParse(nextLine, out var selection) && selection <= shards.Length)

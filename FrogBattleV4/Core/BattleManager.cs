@@ -72,7 +72,7 @@ public partial class BattleManager : IBattle
             // You can submit a shard link that contains unusable shards,
             // but if said shards don't become usable by the time
             // they need to be executed, the shard link stops.
-            foreach (var shard in action.Link.TakeWhile(s => s.IsUsable(state, env)))
+            foreach (var shard in action.Link.Select(_shardRegistry.Get).TakeWhile(s => s.IsUsable(state, env)))
             {
                 shard.Resolve(ref state, env, builder, _rng);
                 state = state with

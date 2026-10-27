@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using FrogBattleV4.Core;
 using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Registries;
@@ -16,9 +15,8 @@ using FrogBattleV4.JsonDeserialization;
 // TODO: Everything lmao
 Console.WriteLine("Nothing here yet!");
 
-var shardRegistry = ShardRegistry.Global;
+var shardRegistry = RegistryLoader.CreateShards("frorgbattle").Load();
 
-shardRegistry.Replace(new ShardRegistry.Loader("frorgbattle").LoadAll());
 Console.Out.WriteLine("Registered shards:");
 foreach (var kvp in shardRegistry)
 {
@@ -26,6 +24,7 @@ foreach (var kvp in shardRegistry)
     Console.Out.WriteLine("(end)");
 }
 
+return;
 var fighter = new Fighter
 {
     Name = "Y/N",
@@ -34,9 +33,8 @@ var fighter = new Fighter
 
 Console.Out.WriteLine(JsonSerializer.Serialize(fighter, AppSerializerContext.Default.Fighter));
 
-var fighterRegistry = FighterRegistry.Global;
+var fighterRegistry = RegistryLoader.CreateFighters("frorgbattle").Load();
 
-fighterRegistry.Replace(new FighterRegistry.Loader("frorgbattle").LoadAll());
 Console.Out.WriteLine("Registered fighters:");
 foreach (var kvp in fighterRegistry)
 {
@@ -90,7 +88,6 @@ file class SetSelectionProvider : ISelectionProvider
     {
         var shards = request.Environment
             .GetShards(request.User)
-            .Select(ShardRegistry.Global.Get)
             .ToArray();
         var enemies = request.Environment
             .GetEnemies(request.User)

@@ -11,7 +11,7 @@ namespace FrogBattleV4.Core.Entities;
 /// <summary>
 /// Mutable in game data for any individual entity.
 /// </summary>
-public class Entity : Identifiable<EntityUid>
+public class Entity : UniquelyIdentifiable<EntityUid>
 {
     private readonly List<StatusEffectInstance> _statusEffects = [];
     private readonly Dictionary<PoolName, Pool> _pools = new(4);

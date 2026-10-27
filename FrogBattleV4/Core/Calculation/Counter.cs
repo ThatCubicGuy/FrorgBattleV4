@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Calculation;
 
@@ -10,6 +11,7 @@ public class Counter
     public event EventHandler<ValueChangedEventArgs>? ValueChanged;
     public event EventHandler? TriggerValueReached;
 
+    [JsonPropertyName("default")]
     public long DefaultValue
     {
         get => _defaultValue;
@@ -20,7 +22,15 @@ public class Counter
     /// Value at which the TriggerValueReached event is invoked.
     /// </summary>
     public long? TriggerValue { get; init; }
+    
+    /// <summary>
+    /// Determines if the TriggerValueReached event should be triggered outside strict equality.
+    /// </summary>
+    public TriggerType TriggerCondition { get; init; } = TriggerType.Equal;
 
+    public long? MaxValue { get; init; }
+
+    [JsonIgnore]
     public long CurrentValue
     {
         get => _currentValue;
@@ -33,14 +43,18 @@ public class Counter
                 OldValue = oldValue,
                 NewValue = _currentValue
             });
-            if (_currentValue == TriggerValue)
+            if (TriggerCondition switch
+                {
+                    TriggerType.Equal => _currentValue == TriggerValue,
+                    TriggerType.LessThan => _currentValue <= TriggerValue,
+                    TriggerType.GreaterThan => _currentValue >= TriggerValue,
+                    _ => false
+                })
             {
                 OnTriggerValueReached();
             }
         }
     }
-
-    public long? MaxValue { get; init; }
 
     /// <summary>
     /// Tries incrementing the counter.
@@ -88,6 +102,20 @@ public class Counter
     public void Reset()
     {
         CurrentValue = DefaultValue;
+    }
+
+    /// <summary>
+    /// Specifies inclusive comparisons against trigger value.
+    /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter<TriggerType>))]
+    public enum TriggerType
+    {
+        [JsonStringEnumMemberName("equal")]
+        Equal,
+        [JsonStringEnumMemberName("under")]
+        LessThan,
+        [JsonStringEnumMemberName("over")]
+        GreaterThan,
     }
 
     public class ValueChangedEventArgs : EventArgs

@@ -2,12 +2,12 @@ using System;
 
 namespace FrogBattleV4.Core;
 
-public abstract class Identifiable<TUid> where TUid : struct, IUniqueIdentifier<TUid>
+public abstract class UniquelyIdentifiable<TUid> where TUid : struct, IUniqueIdentifier<TUid>
 {
     public TUid Uid { get; } = new();
     public override string ToString() => $"ID #{Uid}";
     public sealed override int GetHashCode() => Uid.GetHashCode();
-    public sealed override bool Equals(object? obj) => obj is Identifiable<TUid> id && Uid.Equals(id.Uid);
+    public sealed override bool Equals(object? obj) => obj is UniquelyIdentifiable<TUid> id && Uid.Equals(id.Uid);
 }
 
 /// <summary>

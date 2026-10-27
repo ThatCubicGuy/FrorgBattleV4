@@ -13,6 +13,6 @@ public interface ISelectionProvider
     Task<PlayerTurnAction> GetSelectionAsync(PlayerActionRequest request, CancellationToken cancellationToken);
 }
 
-public sealed record PlayerTurnAction(ImmutableList<IShard> Link, EntityUid MainTarget);
+public sealed record PlayerTurnAction(ImmutableList<ShardId> Link, EntityUid MainTarget);
 
 public sealed record PlayerActionRequest(EntityUid User, BattleEnvironment Environment);

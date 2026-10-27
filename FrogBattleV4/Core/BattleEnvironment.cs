@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Modifiers;
@@ -13,13 +14,13 @@ namespace FrogBattleV4.Core;
 
 public record BattleEnvironment
 {
-    private readonly FighterRegistry _fighterRegistry;
-    private readonly ShardRegistry _shardRegistry;
+    private readonly Registry<FighterId, Fighter> _fighterRegistry;
+    private readonly Registry<ShardId, Shard> _shardRegistry;
 
     public BattleEnvironment(ImmutableDictionary<EntityUid, Entity> entities,
         ImmutableDictionary<TeamUid, Team> teams,
-        FighterRegistry fighterRegistry,
-        ShardRegistry shardRegistry)
+        Registry<FighterId, Fighter> fighterRegistry,
+        Registry<ShardId, Shard> shardRegistry)
     {
         _fighterRegistry = fighterRegistry;
         _shardRegistry = shardRegistry;

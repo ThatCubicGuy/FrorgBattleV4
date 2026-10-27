@@ -7,7 +7,7 @@ using FrogBattleV4.Core.Selections;
 
 namespace FrogBattleV4.Core.Combat;
 
-public class Team : Identifiable<TeamUid>
+public class Team : UniquelyIdentifiable<TeamUid>
 {
     private readonly List<EntityUid> _members = [];
     private readonly List<EntityUid> _offFieldMembers = [];
