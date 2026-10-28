@@ -8,7 +8,7 @@ public class Counter
     private readonly long _defaultValue;
     private long _currentValue;
 
-    public event EventHandler<ValueChangedEventArgs>? ValueChanged;
+    public event EventHandler<CounterValueChangedEventArgs>? ValueChanged;
     public event EventHandler? TriggerValueReached;
 
     [JsonPropertyName("default")]
@@ -44,7 +44,7 @@ public class Counter
 
             if (_currentValue == oldValue) return;
 
-            OnValueChanged(new ValueChangedEventArgs
+            OnValueChanged(new CounterValueChangedEventArgs
             {
                 OldValue = oldValue,
                 NewValue = _currentValue
@@ -124,13 +124,7 @@ public class Counter
         Over,
     }
 
-    public class ValueChangedEventArgs : EventArgs
-    {
-        public required long OldValue { get; init; }
-        public required long NewValue { get; init; }
-    }
-
-    protected virtual void OnValueChanged(ValueChangedEventArgs e)
+    protected virtual void OnValueChanged(CounterValueChangedEventArgs e)
     {
         ValueChanged?.Invoke(this, e);
     }
@@ -139,4 +133,10 @@ public class Counter
     {
         TriggerValueReached?.Invoke(this, EventArgs.Empty);
     }
+}
+
+public class CounterValueChangedEventArgs : EventArgs
+{
+    public required long OldValue { get; init; }
+    public required long NewValue { get; init; }
 }
