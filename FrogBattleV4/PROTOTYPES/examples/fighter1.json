@@ -2,6 +2,8 @@
   "name": "whats-her-face",
   "shards": [
     "frorgbattle:affect_shard_1",
+    "frorgbattle:empower_shard_1",
     "frorgbattle:target_shard_1"
-  ]
+  ],
+  "passive_modifiers": []
 }

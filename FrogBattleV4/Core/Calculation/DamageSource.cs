@@ -24,6 +24,7 @@ public readonly record struct DamageSource(string Identifier) : IExpandableEnum
     /// <param name="modifier">Modifier's damage source.</param>
     /// <returns>True if this damage can be boosted by a modifier of
     /// source <paramref name="modifier"/>, false otherwise.</returns>
+    [System.Diagnostics.Contracts.Pure]
     public bool Matches(DamageSource modifier) =>
         Identifier == modifier.Identifier || Identifier == All.Identifier || modifier.Identifier == All.Identifier;
 }

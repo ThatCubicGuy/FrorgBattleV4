@@ -1,11 +1,13 @@
+using System.Text.Json.Serialization;
 using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.Modifiers;
 
 public class DamageModifier : MutationModifier<DamageQuery>
 {
+    [JsonPropertyName("damage")]
     public required DamageData Data { get; init; }
-    public bool CritOnly { get; init; } = false;
+    public bool CritOnly { get; init; }
 
     protected override bool AppliesTo(DamageQuery query)
     {

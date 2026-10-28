@@ -10,6 +10,7 @@ public record DamageData(
     /// <param name="modifier">Modifier's damage data.</param>
     /// <returns>True if this damage can be boosted by a modifier of
     /// data <paramref name="modifier"/>, false otherwise.</returns>
+    [System.Diagnostics.Contracts.Pure]
     public bool Matches(DamageData modifier)
     {
         return Type.Matches(modifier.Type) && Source.Matches(modifier.Source);

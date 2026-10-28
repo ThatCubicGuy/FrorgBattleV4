@@ -114,7 +114,7 @@ public static class RegistryLoader
         /// <param name="skipInvalidFiles">Whether invalid files should be skipped or throw an exception.</param>
         /// <exception cref="JsonException">One of the files was invalid and <paramref name="skipInvalidFiles"/> is false.</exception>
         /// <exception cref="InvalidOperationException">A duplicate shard was encountered after resolving filenames to resource IDs.</exception>
-        public void ReloadAllFiles(bool skipInvalidFiles = true)
+        public void ReloadAllFiles(bool skipInvalidFiles = false)
         {
             _items.Clear();
             foreach (var file in Directory.EnumerateFiles(BaseDirectoryName, "*", SearchOption.TopDirectoryOnly))

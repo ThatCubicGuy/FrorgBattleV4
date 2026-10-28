@@ -19,6 +19,7 @@
       "default": "this"
     },
     "modifier_type": {
+      "description": "The type of the modifier rule.",
       "type": "string",
       "enum": [
         "stat",
@@ -35,7 +36,7 @@
       "oneOf": [
         {
           "properties": {
-            "type": {
+            "modifier_type": {
               "const": "stat"
             }
           },
@@ -43,7 +44,7 @@
         },
         {
           "properties": {
-            "type": {
+            "modifier_type": {
               "const": "damage_property"
             }
           },
@@ -51,7 +52,7 @@
         },
         {
           "properties": {
-            "type": {
+            "modifier_type": {
               "const": "pool_property"
             }
           },
@@ -75,7 +76,7 @@
       "oneOf": [
         {
           "properties": {
-            "type": {
+            "modifier_type": {
               "const": "damage"
             }
           },
@@ -83,7 +84,7 @@
         },
         {
           "properties": {
-            "type": {
+            "modifier_type": {
               "const": "mutation"
             }
           },

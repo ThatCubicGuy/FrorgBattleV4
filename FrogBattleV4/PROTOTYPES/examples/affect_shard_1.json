@@ -1,9 +1,11 @@
 {
   "type": "affect",
-  "command_components": [
+  "components": [
     {
       "type": "attack",
       "formula": {
+        "type": "flat",
+        "amount": 250,
         "rank_falloff": 0.2
       },
       "data": {
@@ -21,10 +23,16 @@
     "maximum_rank": 99,
     "filter": null
   },
-  "modifiers": {
-    "rules": [],
-    "providers": []
-  },
+  "modifiers": [
+    {
+      "modifier_type": "damage",
+      "direction": "outgoing",
+      "entity": "this",
+      "values": {
+        "add_base_percent": -0.30
+      }
+    }
+  ],
   "name": "Affect Shard",
   "description": "Affect shard hardcoded for testing.",
   "function": "attack",

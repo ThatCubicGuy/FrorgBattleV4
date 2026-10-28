@@ -36,6 +36,7 @@ public interface IModifierRule : IModifierProvider
 /// <typeparam name="TQuery">Type of the query this modifier applies to.</typeparam>
 public abstract class ModifierRule<TQuery> : IModifierRule where TQuery : IQuery
 {
+    [JsonPropertyName("values")]
     public required ModifierStack ModifierStack { get; init; }
 
     bool IModifierRule.AppliesTo(IQuery query, in ModifierContext ctx)
@@ -57,6 +58,7 @@ public abstract class AttributeModifier<TQuery> : ModifierRule<TQuery> where TQu
     /// <summary>
     /// Determines whether this modifier applies to the holder or the target.
     /// </summary>
+    [JsonPropertyName("entity")]
     public required AffectedSide AffectedSide { get; init; }
 
     protected sealed override bool MatchesRelationship(TQuery query, in ModifierContext ctx)
@@ -83,6 +85,7 @@ public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQue
     /// <summary>
     /// Determines whether this modifier applies to the holder or the target.
     /// </summary>
+    [JsonPropertyName("entity")]
     public required AffectedSide AffectedSide { get; init; }
     /// <summary>
     /// Determines whether this modifier applies to incoming or outgoing mutations.

@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core;
 using FrogBattleV4.Core.Abilities;
-using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.Abilities.ShardClasses;
+using FrogBattleV4.Core.Abilities.Targeting;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Registries;
 using FrogBattleV4.Core.Selections;
@@ -18,23 +19,21 @@ using FrogBattleV4.JsonDeserialization;
 // TODO: Everything lmao
 Console.WriteLine("Nothing here yet!");
 
-var ctr = new Counter
+Console.Out.WriteLine(JsonSerializer.Serialize(
+    new AffectShard
+    {
+        Name = "W", Description = "X", Function = ShardFunction.Attack,
+        Targeting = new AreaOfEffectTargeting { RankPenalty = 1 },
+        Components = []
+    }, AppSerializerContext.Default.AffectShard));
+
+var fighter = new Fighter
 {
-    DefaultValue = 0,
-    MaxValue = 20,
-    TriggerCondition = Counter.TriggerType.Over,
-    TriggerValue = 10
+    Name = "Y/N",
+    Shards = []
 };
 
-Console.Out.WriteLine(JsonSerializer.Serialize(ctr, AppSerializerContext.Default.Counter));
-
-var pool = new Pool
-{
-    Capacity = 100,
-    Value = 20,
-};
-
-Console.Out.WriteLine(JsonSerializer.Serialize(pool, AppSerializerContext.Default.Pool));
+Console.Out.WriteLine(JsonSerializer.Serialize(fighter, AppSerializerContext.Default.Fighter));
 
 var shardRegistry = RegistryLoader.CreateShards("frorgbattle").Load();
 
@@ -44,14 +43,6 @@ foreach (var kvp in shardRegistry)
     Console.Out.WriteLine($"{kvp.Value.GetDetails()}");
     Console.Out.WriteLine("(end)");
 }
-
-var fighter = new Fighter
-{
-    Name = "Y/N",
-    Shards = [.. shardRegistry.Select(kvp => kvp.Key)]
-};
-
-Console.Out.WriteLine(JsonSerializer.Serialize(fighter, AppSerializerContext.Default.Fighter));
 
 var fighterRegistry = RegistryLoader.CreateFighters("frorgbattle").Load();
 
@@ -83,7 +74,6 @@ file static class Extensions
     {
         return $"""
                 {shard.GetType().Name} "{shard.Name}" - {shard.Description}
-                Requirements: [{string.Join(", ", shard.Requirements.Select(req => req.GetDetails()))}]
                 """;
     }
 
@@ -102,16 +92,43 @@ file static class Extensions
     }
 }
 
-file class SetSelectionProvider : ISelectionProvider
+file class SetSelectionProvider : ISelectionProvider, IComparer<ShardId>
 {
     public Task<PlayerTurnAction> GetSelectionAsync(PlayerActionRequest request, CancellationToken cancellationToken)
     {
         var shards = request.Environment
             .GetShards(request.User)
+            .Order(this)
             .ToArray();
         var enemies = request.Environment
             .GetEnemies(request.User)
             .ToArray();
         return Task.FromResult(new PlayerTurnAction([.. shards], enemies[enemies.Length / 2]));
     }
+
+    private static int OrderShards(ShardId a, ShardId b)
+    {
+        var left = ShardRegistry.Global.Get(a);
+        var right = ShardRegistry.Global.Get(b);
+
+        var leftPriority = left switch
+        {
+            TargetShard => 0,
+            EmpowerShard => 1,
+            AffectShard => 2,
+            _ => -1
+        };
+
+        var rightPriority = right switch
+        {
+            TargetShard => 0,
+            EmpowerShard => 1,
+            AffectShard => 2,
+            _ => -1
+        };
+
+        return leftPriority - rightPriority;
+    }
+
+    int IComparer<ShardId>.Compare(ShardId x, ShardId y) => OrderShards(x, y);
 }
