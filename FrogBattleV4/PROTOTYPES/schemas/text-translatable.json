@@ -10,7 +10,7 @@
       "properties": {
         "text": {
           "description": "A string containing plain text to display directly.",
-          "type${SCHEMAS_BASE_DIR}
+          "type": "string"
         }
       }
     },
@@ -40,7 +40,7 @@
     }
   ],
   "properties": {
-    "extra": ${SCHEMAS_BASE_DIR}
+    "extra": {
       "description": "Optional. Extra text to append to this instance.",
       "$ref": "/c:/Users/Alex/source/repos/FrorgBattleV4/FrogBattleV4/PROTOTYPES/schemas/text-translatable.json"
     }
