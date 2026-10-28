@@ -6,7 +6,7 @@ namespace FrogBattleV4.Core.Modifiers;
 /// <summary>
 /// Represents a smarter ModifierStack that determines to which kind of queries to apply.
 /// </summary>
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "modifier_type")]
 [JsonDerivedType(typeof(StatModifier), "stat")]
 [JsonDerivedType(typeof(DamageModifier), "damage")]
 [JsonDerivedType(typeof(PoolMutModifier), "mutation")]
