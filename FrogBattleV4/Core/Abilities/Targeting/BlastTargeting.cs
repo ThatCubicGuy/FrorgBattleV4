@@ -9,7 +9,9 @@ namespace FrogBattleV4.Core.Abilities.Targeting;
 /// </summary>
 public class BlastTargeting : IShardTargeting
 {
-    // Select targets up to Radius slots away from the main target.
+    /// <summary>
+    /// Maximum distance from the main target to select new targets.
+    /// </summary>
     public int Radius { get; init; } = 1;
 
     /// <summary>
@@ -17,15 +19,9 @@ public class BlastTargeting : IShardTargeting
     /// </summary>
     public int RankPenaltyPerSlot { get; init; } = 1;
 
-    /// <summary>
-    /// The maximum rank that targets can have to be eligible for selection.
-    /// </summary>
-    public int MaximumRank { get; init; } = 99;
-
     public TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env)
     {
         var (target, rank) = targeting;
-        if (rank > MaximumRank) return TargetingInstruction.Empty;
 
         var allies = env.GetNeighbors(target).ToList();
         var idx = allies.IndexOf(target);
@@ -37,7 +33,6 @@ public class BlastTargeting : IShardTargeting
             {
                 Target = member,
                 Rank = rank + Math.Abs(idx - i) * RankPenaltyPerSlot,
-            })
-            .Where(targeting => targeting.Rank <= MaximumRank));
+            }));
     }
 }
