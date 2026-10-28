@@ -76,10 +76,10 @@ public record ModifierStack(
 
     public override string ToString()
     {
-        return $"Additive: {BaseAddValue}," +
-               $" BasePercent: {AddBasePercent}," +
-               $" MultiplyTotal: {MultiplyTotal}," +
-               $" FinalAdditive: {FinalAddValue}";
+        return $"{BaseAddValue:+0;-0;0}, " +
+               $"{AddBasePercent:+0.##%;-0.##%;0%}, " +
+               $"x{MultiplyTotal:0.0}, " +
+               $"{FinalAddValue:+0;-0;0}";
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public record ModifierStack(
         MultiplyTotal = left.MultiplyTotal * right.MultiplyTotal,
         FinalAddValue = left.FinalAddValue + right.FinalAddValue,
     };
-    
+
     /// <summary>
     /// Multiplies a modifier stack by a scalar.
     /// </summary>
