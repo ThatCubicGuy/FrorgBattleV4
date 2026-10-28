@@ -16,9 +16,5 @@
   <ItemGroup>
     <ProjectReference Include="..\FrogBattleV4\FrogBattleV4.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Core\Abilities\Components\Targeting\" />
-  </ItemGroup>
   
 </Project>
