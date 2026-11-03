@@ -11,7 +11,7 @@ public class DamageModifier : MutationModifier<DamageQuery>
 
     protected override bool AppliesTo(DamageQuery query)
     {
-        return (!CritOnly || query.IsCrit) && query.Data.Matches(Data);
+        return (!CritOnly || query.IsCrit) && Data.Permits(query.Data);
     }
 }
 
@@ -22,6 +22,6 @@ public class DamageStatModifier : AttributeModifier<DamageStatQuery>
 
     protected override bool AppliesTo(DamageStatQuery query)
     {
-        return query.Channel == Channel && query.Data.Matches(Data);
+        return query.Channel == Channel && Data.Permits(query.Data);
     }
 }

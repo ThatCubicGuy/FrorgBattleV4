@@ -5,16 +5,13 @@ public record DamageData(
     DamageSource Source = default)
 {
     /// <summary>
-    /// Determines whether damage with this data can be boosted by a modifier of data <paramref name="modifier"/>.
+    /// Determines whether a modifier of this data can boost damage from data <paramref name="data"/>.
     /// </summary>
-    /// <param name="modifier">Modifier's damage data.</param>
-    /// <returns>True if this damage can be boosted by a modifier of
-    /// data <paramref name="modifier"/>, false otherwise.</returns>
+    /// <param name="data">Damage data.</param>
+    /// <returns>True if a modifier of this data can boost damage from
+    /// data <paramref name="data"/>, false otherwise.</returns>
     [System.Diagnostics.Contracts.Pure]
-    public bool Matches(DamageData modifier)
-    {
-        return Type.Matches(modifier.Type) && Source.Matches(modifier.Source);
-    }
+    public bool Permits(DamageData data) => Type.Permits(data.Type) && Source.Permits(data.Source);
 }
 
 public enum DamageStatChannel

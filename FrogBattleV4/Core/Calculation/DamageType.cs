@@ -22,12 +22,11 @@ public readonly record struct DamageType(string Identifier) : IExpandableEnum
     #endregion
 
     /// <summary>
-    /// Determines whether damage with this type can be boosted by a modifier of type <paramref name="modifier"/>.
+    /// Determines whether a modifier of this type can boost damage from type <paramref name="type"/>.
     /// </summary>
-    /// <param name="modifier">Modifier's damage type.</param>
-    /// <returns>True if this damage can be boosted by a modifier of
-    /// type <paramref name="modifier"/>, false otherwise.</returns>
+    /// <param name="type">Damage type.</param>
+    /// <returns>True if a modifier of this type can boost damage from
+    /// type <paramref name="type"/>, false otherwise.</returns>
     [System.Diagnostics.Contracts.Pure]
-    public bool Matches(DamageType modifier) =>
-        Identifier == modifier.Identifier || Identifier == All.Identifier || modifier.Identifier == All.Identifier;
+    public bool Permits(DamageType type) => this == type || this == All || type == All;
 }

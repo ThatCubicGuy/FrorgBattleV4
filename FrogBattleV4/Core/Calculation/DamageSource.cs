@@ -19,12 +19,11 @@ public readonly record struct DamageSource(string Identifier) : IExpandableEnum
     #endregion
 
     /// <summary>
-    /// Determines whether damage from this source can be boosted by a modifier of source <paramref name="modifier"/>.
+    /// Determines whether a modifier of this source can boost damage from source <paramref name="source"/>.
     /// </summary>
-    /// <param name="modifier">Modifier's damage source.</param>
-    /// <returns>True if this damage can be boosted by a modifier of
-    /// source <paramref name="modifier"/>, false otherwise.</returns>
+    /// <param name="source">Damage source.</param>
+    /// <returns>True if a modifier of this source can boost damage from
+    /// source <paramref name="source"/>, false otherwise.</returns>
     [System.Diagnostics.Contracts.Pure]
-    public bool Matches(DamageSource modifier) =>
-        Identifier == modifier.Identifier || Identifier == All.Identifier || modifier.Identifier == All.Identifier;
+    public bool Permits(DamageSource source) => this == source || this == All || source == All;
 }
