@@ -1,8 +1,8 @@
 namespace FrogBattleV4.Core.Calculation;
 
 public record DamageData(
-    DamageType Type,
-    DamageSource Source)
+    DamageType Type = default,
+    DamageSource Source = default)
 {
     /// <summary>
     /// Determines whether damage with this data can be boosted by a modifier of data <paramref name="modifier"/>.

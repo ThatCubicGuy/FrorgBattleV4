@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core;
 using FrogBattleV4.Core.Abilities;
+using FrogBattleV4.Core.Abilities.Reactions;
 using FrogBattleV4.Core.Abilities.ShardClasses;
 using FrogBattleV4.Core.Abilities.Targeting;
+using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Registries;
 using FrogBattleV4.Core.Selections;
@@ -19,80 +22,68 @@ using FrogBattleV4.JsonDeserialization;
 // TODO: Everything lmao
 Console.WriteLine("Nothing here yet!");
 
-Console.Out.WriteLine(JsonSerializer.Serialize(
-    new AffectShard
+var elation = new CounterName("elation");
+
+var counters = new Dictionary<CounterName, Counter>
+{
+    [elation] = new()
     {
-        Name = "W", Description = "X", Function = ShardFunction.Attack,
-        Targeting = new AreaOfEffectTargeting { RankPenalty = 1 },
-        Components = [],
-    }, AppSerializerContext.Default.AffectShard));
+        MaxValue = 20,
+        DefaultValue = 0,
+        TriggerValue = 3,
+    },
+}.ToImmutableDictionary();
 
 var fighter = new Fighter
 {
-    Name = "Y/N",
-    Shards = [],
+    Name = "Lunar Hero Lucine",
+    Shards = [
+        new ShardId(new ResourceId("frorgbattle", "affect_shard_1")),
+        new ShardId(new ResourceId("frorgbattle", "target_shard_1")),
+        new ShardId(new ResourceId("frorgbattle", "empower_shard_1")),
+    ],
+    Counters = counters,
+    PassiveModifiers = [],
+    Reactions = [
+        new DirectDamageTakenReaction
+        {
+            Predicate = new DamageData(DamageType.All, DamageSource.Link),
+            Functions = [
+                new ModifyCounterReactionFunction
+                {
+                    Counter = elation,
+                    Operation = ModifyCounterReactionFunction.CounterOperation.Increment,
+                },
+            ],
+        },
+    ],
 };
 
-Console.Out.WriteLine(JsonSerializer.Serialize(fighter, AppSerializerContext.Default.Fighter));
-
-var shardRegistry = ShardRegistry.Global;
-
 Console.Out.WriteLine("Registered shards:");
-foreach (var kvp in shardRegistry)
+foreach (var kvp in ShardRegistry.Global)
 {
     Console.Out.WriteLine($"{kvp.Value.GetDetails()}");
     Console.Out.WriteLine("(end)");
 }
-
-var fighterRegistry = FighterRegistry.Global;
 
 Console.Out.WriteLine("Registered fighters:");
-foreach (var kvp in fighterRegistry)
+foreach (var kvp in FighterRegistry.Global)
 {
     Console.Out.WriteLine($"{kvp.Value.GetDetails()}");
     Console.Out.WriteLine("(end)");
 }
 
-var console = new SetSelectionProvider();
+var provider = new SetSelectionProvider();
 var member = new FighterId(new ResourceId("frorgbattle", "fighter1"));
-var manager = BattleManager.GetBuilder().AddTeam(console).AddMember(member).AddMember(member).AddTeam(console).AddMembers([member, member, member]).Build();
-manager.DamageTaken += (_, e) =>
-    Console.Out.WriteLine($"Damage taken: {e.Amount}, data: {e.Data}, sender: {e.Sender}, target: {e.Target}");
-var task = manager.RunAsync(CancellationToken.None);
-Console.Out.WriteLine("Battle started");
-await task;
-Console.Out.WriteLine("Battle ended");
+var manager = BattleManager.GetBuilder().AddTeam(provider).AddMember(member).AddMember(member).AddTeam(provider).AddMembers([member, member, member]).Build();
 
-file static class Extensions
+manager.BattleStarted += Extensions.HandleBattleStarted;
+manager.DamageTaken += (_, args) =>
 {
-    public static string GetDetails(this Fighter fighter)
-    {
-        return $"""
-                Fighter "{fighter.Name}": [{string.Join(", ", fighter.Shards)}]
-                """;
-    }
+    Console.Out.WriteLine($"{args.Amount} damage taken by {args.Target} from {args.Sender}!");
+};
 
-    public static string GetDetails(this Shard shard)
-    {
-        return $"""
-                {shard.GetType().Name} "{shard.Name}" - {shard.Description}
-                """;
-    }
-
-    public static string GetDetails(this IShardRequirement requirement)
-    {
-        return $"""
-                {requirement.GetType().Name}
-                """;
-    }
-
-    public static string GetDetails(this IShardCommandComponent shardCommand)
-    {
-        return $"""
-                S
-                """;
-    }
-}
+await manager.RunAsync(CancellationToken.None);
 
 file class SetSelectionProvider : ISelectionProvider, IComparer<ShardId>
 {
@@ -133,4 +124,54 @@ file class SetSelectionProvider : ISelectionProvider, IComparer<ShardId>
     }
 
     int IComparer<ShardId>.Compare(ShardId x, ShardId y) => OrderShards(x, y);
+}
+
+file static class Extensions
+{
+    public static string GetDetails(this Fighter fighter)
+    {
+        return $"""
+                Fighter "{fighter.Name}": [{string.Join(", ", fighter.Shards)}]
+                """;
+    }
+
+    public static string GetDetails(this Shard shard)
+    {
+        return $"""
+                {shard.GetType().Name} "{shard.Name}" - {shard.Description}
+                """;
+    }
+
+    public static string GetDetails(this IShardRequirement requirement)
+    {
+        return $"""
+                {requirement.GetType().Name}
+                """;
+    }
+
+    public static string GetDetails(this IShardCommandComponent shardCommand)
+    {
+        return $"""
+                S
+                """;
+    }
+
+    public static void HandleBattleStarted(object? sender, EventArgs args)
+    {
+        foreach (var kvp in (sender as BattleManager)!.Entities)
+        {
+            var counter = kvp.Value.Counters[new CounterName("elation")];
+
+            counter.ValueChanged += (o, _) =>
+            {
+                if (o is not Counter ctr) return;
+
+                Console.Out.WriteLine($"Value changed for counter of {kvp.Key} to {ctr.CurrentValue}!");
+            };
+            counter.TriggerValueReached += (_, _) =>
+            {
+                Console.Out.WriteLine($"Trigger value reached for entity {kvp.Key}!");
+            };
+        }
+    }
 }

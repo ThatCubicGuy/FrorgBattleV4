@@ -1,43 +1,30 @@
 {
-  "name": "whats-her-face",
+  "name": "Lunar Hero Lucit",
   "shards": [
     "frorgbattle:affect_shard_1",
     "frorgbattle:empower_shard_1",
     "frorgbattle:target_shard_1"
   ],
+  "pools": {},
+  "counters": {
+    "elation": {
+      "max": 10,
+      "trigger": 2
+    }
+  },
   "passive_modifiers": [],
   "reactions": [
     {
-      "trigger": "damage_dealt",
+      "trigger": "damage_taken",
       "predicate": {
-        "type": "bullet",
         "source": "link"
       },
       "functions": [
         {
-          "function": "heal",
-          "entity": "this",
-          "ratio": 0.4
+          "function": "modify_counter",
+          "counter": "elation",
+          "operation": "increment"
         }
-      ]
-    },
-    {
-      "trigger": "shard_used",
-      "shard": "frorgbattle:affect_shard_1",
-      "functions": [
-        {
-          "function": "execute_link",
-          "link": [
-            "frorgbattle:affect_shard_1"
-          ]
-        }
-      ]
-    },
-    {
-      "trigger": "link_used",
-      "match": "exact / subset / elements",
-      "functions": [
-
       ]
     }
   ]
