@@ -2,19 +2,16 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core;
 using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Abilities.Reactions;
 using FrogBattleV4.Core.Abilities.ShardClasses;
-using FrogBattleV4.Core.Abilities.Targeting;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Registries;
 using FrogBattleV4.Core.Selections;
-using FrogBattleV4.JsonDeserialization;
 
 // using var game = new FrogBattleV4.FrogBattle();
 // game.Run();
@@ -45,8 +42,9 @@ var fighter = new Fighter
     Counters = counters,
     PassiveModifiers = [],
     Reactions = [
-        new DirectDamageTakenReaction
+        new DamageTakenReaction
         {
+            Target = ReactionEntity.This,
             Predicate = new DamageData(DamageType.All, DamageSource.Link),
             Functions = [
                 new ModifyCounterReactionFunction
@@ -75,7 +73,10 @@ foreach (var kvp in FighterRegistry.Global)
 
 var provider = new SetSelectionProvider();
 var member = new FighterId(new ResourceId("frorgbattle", "fighter1"));
-var manager = BattleManager.GetBuilder().AddTeam(provider).AddMember(member).AddMember(member).AddTeam(provider).AddMembers([member, member, member]).Build();
+var manager = BattleManager.GetBuilder()
+    .AddTeam(provider).AddMembers([member, member])
+    .AddTeam(provider).AddMembers([member, member, member])
+    .Build();
 
 manager.BattleStarted += Extensions.HandleBattleStarted;
 
@@ -83,43 +84,39 @@ await manager.RunAsync(CancellationToken.None);
 
 file class SetSelectionProvider : ISelectionProvider, IComparer<ShardId>
 {
+    private static readonly Random Rng = new();
     public Task<PlayerTurnAction> GetSelectionAsync(PlayerActionRequest request, CancellationToken cancellationToken)
     {
         var shards = request.Environment
             .GetShards(request.User)
-            .Order(this)
+            .OrderBy(GetShardPriority)
             .ToArray();
         var enemies = request.Environment
             .GetEnemies(request.User)
             .ToArray();
+        Randomize(shards);
         return Task.FromResult(new PlayerTurnAction([.. shards], enemies[enemies.Length / 2]));
     }
 
-    private static int OrderShards(ShardId a, ShardId b)
+    private static int GetShardPriority(ShardId shard)
     {
-        var left = ShardRegistry.Global.Get(a);
-        var right = ShardRegistry.Global.Get(b);
-
-        var leftPriority = left switch
+        return ShardRegistry.Global.Get(shard) switch
         {
             TargetShard => 0,
             EmpowerShard => 1,
             AffectShard => 2,
             _ => -1,
         };
-
-        var rightPriority = right switch
-        {
-            TargetShard => 0,
-            EmpowerShard => 1,
-            AffectShard => 2,
-            _ => -1,
-        };
-
-        return leftPriority - rightPriority;
     }
 
-    int IComparer<ShardId>.Compare(ShardId x, ShardId y) => OrderShards(x, y);
+    private static void Randomize(ShardId[] shards)
+    {
+        var idx = Array.FindIndex(shards, shard => ShardRegistry.Global.Get(shard) is AffectShard);
+        var span = new Span<ShardId>(shards, idx, shards.Length - idx);
+        Rng.Shuffle(span);
+    }
+
+    int IComparer<ShardId>.Compare(ShardId x, ShardId y) => GetShardPriority(x) - GetShardPriority(y);
 }
 
 file static class Extensions

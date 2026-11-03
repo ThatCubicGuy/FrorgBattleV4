@@ -63,10 +63,10 @@ public record BattleEnvironment
     /// <param name="entity">Entity to validate the predicate against.</param>
     /// <param name="predicate">Predicate to check.</param>
     /// <returns>True if <paramref name="predicate"/> matches, false otherwise.</returns>
-    public bool IsPredicate(EntityUid entity, EntityPredicate predicate)
+    public bool IsPredicate(EntityUid entity, EntityPredicate? predicate)
     {
         EnsureExists(entity);
-        return predicate.Evaluate(Entities[entity]);
+        return predicate.SafeEvaluate(Entities[entity]);
     }
 
     /// <summary>

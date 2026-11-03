@@ -1,0 +1,30 @@
+{
+  "type": "affect",
+  "components": [
+    {
+      "type": "attack",
+      "formula": {
+        "type": "flat",
+        "amount": 150,
+        "rank_falloff": 0.1
+      },
+      "data": {
+        "type": "bullet",
+        "source": "link"
+      },
+      "properties": {
+        "can_crit": false
+      }
+    }
+  ],
+  "targeting": {
+    "type": "filter",
+    "rank_penalty": 0,
+    "max_rank": 3
+  },
+  "modifiers": [],
+  "name": "Attack (Bullet)",
+  "description": "Do some bullet damage.",
+  "function": "attack",
+  "requirements": []
+}

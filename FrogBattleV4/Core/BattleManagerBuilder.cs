@@ -135,12 +135,7 @@ public sealed partial class BattleManager
         {
             public EntityUid CurrentEntity { get; set; }
 
-            public void Visit(DirectDamageTakenReaction reaction)
-            {
-                manager.DamageTaken += DelegateGenerator(reaction);
-            }
-
-            public void Visit(DirectDamageDealtReaction reaction)
+            public void Visit(DamageTakenReaction reaction)
             {
                 manager.DamageTaken += DelegateGenerator(reaction);
             }
@@ -150,15 +145,15 @@ public sealed partial class BattleManager
                 manager.PoolMutated += DelegateGenerator(reaction);
             }
 
+            public void Visit(EffectAppliedReaction reaction)
+            {
+                manager.EffectApplied += DelegateGenerator(reaction);
+            }
+
             public void Visit(CounterTriggeredReaction reaction)
             {
                 manager.Entities[CurrentEntity].Counters[reaction.Counter].TriggerValueReached +=
                     DelegateGenerator(reaction);
-            }
-
-            public void Visit(TeammateAttackedReaction reaction)
-            {
-                manager.DamageTaken += DelegateGenerator(reaction);
             }
 
             private EventHandler DelegateGenerator(Reaction reaction)

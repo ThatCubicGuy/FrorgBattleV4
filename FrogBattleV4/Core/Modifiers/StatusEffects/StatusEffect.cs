@@ -8,12 +8,20 @@ public class StatusEffect
     public required StatusEffectId Id { get; init; }
     public required string DisplayName { get; init; }
     public string? Description { get; init; }
+    public EffectType Type { get; init; }
     public ImmutableArray<IModifierRule> ModifierRules { get; init; } = [];
     public ImmutableArray<IMutatorComponent> Mutators { get; init; } = [];
     public EffectFlags Properties { get; init; } = EffectFlags.None;
 
     public required int MaxStacks { get; init; }
     public int MaxDuration { get; init; }
+}
+
+public enum EffectType
+{
+    None,
+    Buff,
+    Debuff,
 }
 
 [Flags]

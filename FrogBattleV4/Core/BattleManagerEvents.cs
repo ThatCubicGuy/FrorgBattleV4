@@ -4,17 +4,26 @@ using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core;
 
+// Note: There are some inconsistencies in event naming relating to who is the subject
 public sealed partial class BattleManager
 {
     public event EventHandler? BattleStarted;
     public event EventHandler? BattleEnded;
+    // the target took damage from the sender
     public event EventHandler<DamageTakenEventArgs>? DamageTaken;
+    // the target received healing from the sender
     public event EventHandler<HealingReceivedEventArgs>? HealingReceived;
+    // the sender mutated the pool of the target
     public event EventHandler<PoolMutatedEventArgs>? PoolMutated;
+    // the sender applied an effect to the target
     public event EventHandler<EffectAppliedEventArgs>? EffectApplied;
+    // the sender removed an effect from the target
     public event EventHandler<EffectRemovedEventArgs>? EffectRemoved; 
+    // the target resisted an effect from the sender
     public event EventHandler<EffectResistedEventArgs>? EffectResisted;
+    // the sender advanced the turn of the target
     public event EventHandler<TurnAdvancedEventArgs>? TurnAdvanced;
+    // the sender queued a turn for the target
     public event EventHandler<TurnQueuedEventArgs>? TurnQueued;
 
     private void OnBattleStarted()
@@ -29,7 +38,7 @@ public sealed partial class BattleManager
 
     private void OnDamageTaken(DamageTakenEventArgs e)
     {
-        Logger.WriteLine($"{e.Amount} damage taken by {e.Target} from {e.Sender}!");
+        Logger.WriteLine($"{e.Amount} damage dealt by {e.Sender} to {e.Target}!");
         DamageTaken?.Invoke(this, e);
     }
 

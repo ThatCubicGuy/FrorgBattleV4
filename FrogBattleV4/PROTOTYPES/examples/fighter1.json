@@ -1,21 +1,23 @@
 {
   "name": "Lunar Hero Lucit",
   "shards": [
-    "frorgbattle:affect_shard_1",
+    "frorgbattle:attack_slash",
+    "frorgbattle:attack_bullet",
     "frorgbattle:empower_shard_1",
     "frorgbattle:target_shard_1"
   ],
   "pools": {},
   "counters": {
     "elation": {
-      "max": 10,
-      "trigger": 2
+      "max": 5,
+      "trigger": 3
     }
   },
   "passive_modifiers": [],
   "reactions": [
     {
       "trigger": "damage_taken",
+      "target": "this",
       "predicate": {
         "source": "link"
       },
@@ -24,6 +26,20 @@
           "function": "modify_counter",
           "counter": "elation",
           "operation": "increment"
+        }
+      ]
+    },
+    {
+      "trigger": "damage_taken",
+      "sender": "this",
+      "predicate": {
+        "source": "link"
+      },
+      "functions": [
+        {
+          "function": "modify_counter",
+          "counter": "elation",
+          "operation": "decrement"
         }
       ]
     }

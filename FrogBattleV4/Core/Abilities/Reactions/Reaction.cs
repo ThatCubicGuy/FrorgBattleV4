@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics.Contracts;
 
 namespace FrogBattleV4.Core.Abilities.Reactions;
 
@@ -42,6 +43,7 @@ public abstract class Reaction<TEventArgs> : IReaction where TEventArgs : EventA
         }
     }
 
+    [Pure]
     protected abstract bool Matches(EntityUid holder, BattleEnvironment env, TEventArgs args);
 
     public abstract void Accept(IReactionVisitor visitor);

@@ -2,12 +2,12 @@ using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Abilities.Reactions;
 
+// TODO (Nova): rename types and discriminator values
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "trigger")]
-[JsonDerivedType(typeof(DirectDamageTakenReaction), "damage_taken")]
-[JsonDerivedType(typeof(DirectDamageDealtReaction), "damage_dealt")]
+[JsonDerivedType(typeof(DamageTakenReaction), "damage_taken")]
 [JsonDerivedType(typeof(PoolMutatedReaction), "pool_mutated")]
+[JsonDerivedType(typeof(EffectAppliedReaction), "effect_applied")]
 [JsonDerivedType(typeof(CounterTriggeredReaction), "counter_triggered")]
-[JsonDerivedType(typeof(TeammateAttackedReaction), "teammate_attacked")]
 public interface IReaction
 {
     void Accept(IReactionVisitor visitor);
@@ -15,9 +15,8 @@ public interface IReaction
 
 public interface IReactionVisitor
 {
-    void Visit(DirectDamageTakenReaction reaction);
-    void Visit(DirectDamageDealtReaction reaction);
+    void Visit(DamageTakenReaction reaction);
     void Visit(PoolMutatedReaction reaction);
+    void Visit(EffectAppliedReaction reaction);
     void Visit(CounterTriggeredReaction reaction);
-    void Visit(TeammateAttackedReaction reaction);
 }

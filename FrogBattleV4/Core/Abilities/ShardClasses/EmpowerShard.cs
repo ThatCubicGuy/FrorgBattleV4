@@ -16,7 +16,7 @@ public class EmpowerShard : Shard
     {
         state = state with
         {
-            Modifiers = state.Modifiers.Concat(Modifiers)
+            Modifiers = state.Modifiers.Concat(Modifiers),
         };
     }
 }

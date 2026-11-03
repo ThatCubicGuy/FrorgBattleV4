@@ -18,21 +18,6 @@ public abstract class ReactionFunction
     public abstract void HandleEvent(EntityUid holder, BattleEnvironment env, EventArgs args);
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter<FunctionTarget>))]
-public enum FunctionTarget
-{
-    [JsonStringEnumMemberName("this")]
-    This,
-    [JsonStringEnumMemberName("sender")]
-    Sender,
-    [JsonStringEnumMemberName("target")]
-    Target,
-    [JsonStringEnumMemberName("allies")]
-    Allies,
-    [JsonStringEnumMemberName("enemies")]
-    Enemies,
-}
-
 public abstract class CommandReactionFunction : ReactionFunction
 {
     [JsonPropertyName("entity")]

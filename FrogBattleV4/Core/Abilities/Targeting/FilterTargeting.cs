@@ -34,7 +34,7 @@ public class FilterTargeting : IShardTargeting
     public TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env)
     {
         var (target, rank) = targeting;
-        if (rank <= MaximumRank && (Filter is null || env.IsPredicate(target, Filter)))
+        if (rank <= MaximumRank && env.IsPredicate(target, Filter))
             return TargetingInstruction.From(targeting with { Rank = rank + RankPenalty });
 
         return TargetingInstruction.Empty;

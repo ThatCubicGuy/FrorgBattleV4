@@ -8,6 +8,43 @@
     "name": {
       "description": "Name of the character.",
       "$ref": "${SCHEMAS_BASE_DIR}/text-translatable.json"
+    },
+    "shards": {
+      "description": "Shards available to this character each turn.",
+      "type": "array",
+      "items": {
+        "$ref": "${SCHEMAS_BASE_DIR}/shard.json"
+      }
+    },
+    "pools": {
+      "description": "Dictionary of additional pools specific to this character.",
+      "type": "object",
+      "$comment": "TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+      "items": {
+        "$ref": "${SCHEMAS_BASE_DIR}/pool.json"
+      }
+    },
+    "counters": {
+      "description": "Dictionary of additional counters specific to this character.",
+      "type": "object",
+      "$comment": "TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+      "items": {
+        "$ref": "${SCHEMAS_BASE_DIR}/counter.json"
+      }
+    },
+    "passive_modifiers": {
+      "description": "Conditional modifiers for this fighter.",
+      "type": "array",
+      "items": {
+        "$ref": "${SCHEMAS_BASE_DIR}/components/passive_modifier.json"
+      }
+    },
+    "reactions": {
+      "description": "Reactions that this fighter can launch when certain events happen.",
+      "type": "array",
+      "items": {
+        "$ref": "${SCHEMAS_BASE_DIR}/reaction.json"
+      }
     }
   }
 }
