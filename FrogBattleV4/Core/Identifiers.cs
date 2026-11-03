@@ -21,12 +21,12 @@ public readonly record struct EntityUid() : IUniqueIdentifier<EntityUid>
 {
     private static long _idCounter;
     private long Id { get; } = checked(++_idCounter);
-    public override string ToString() => $"EntityUid #{Id}";
+    public override string ToString() => $"#{Id}";
 }
 
 public readonly record struct TeamUid() : IUniqueIdentifier<TeamUid>
 {
     private static long _idCounter;
     private long Id { get; } = checked(++_idCounter);
-    public override string ToString() => $"TeamUid #{Id}";
+    public override string ToString() => $"Team #{Id}";
 }
