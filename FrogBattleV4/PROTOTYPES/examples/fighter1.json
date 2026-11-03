@@ -5,5 +5,40 @@
     "frorgbattle:empower_shard_1",
     "frorgbattle:target_shard_1"
   ],
-  "passive_modifiers": []
+  "passive_modifiers": [],
+  "reactions": [
+    {
+      "trigger": "damage_dealt",
+      "predicate": {
+        "type": "bullet",
+        "source": "link"
+      },
+      "functions": [
+        {
+          "function": "heal",
+          "entity": "this",
+          "ratio": 0.4
+        }
+      ]
+    },
+    {
+      "trigger": "shard_used",
+      "shard": "frorgbattle:affect_shard_1",
+      "functions": [
+        {
+          "function": "execute_link",
+          "link": [
+            "frorgbattle:affect_shard_1"
+          ]
+        }
+      ]
+    },
+    {
+      "trigger": "link_used",
+      "match": "exact / subset / elements",
+      "functions": [
+
+      ]
+    }
+  ]
 }

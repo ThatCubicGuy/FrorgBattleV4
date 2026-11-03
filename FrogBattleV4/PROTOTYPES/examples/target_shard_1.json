@@ -5,7 +5,8 @@
   "function": "target",
   "targeting": {
     "type": "blast",
-    "radius": 1
+    "radius": 1,
+    "penalty": 1
   },
   "requirements": []
 }

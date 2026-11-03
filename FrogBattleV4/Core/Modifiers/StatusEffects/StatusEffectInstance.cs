@@ -10,7 +10,7 @@ public class StatusEffectInstance : IModifierProvider
 {
     private int _turns;
     private int _stacks;
-    public required StatusEffectDefinition Definition { get; init; }
+    public required StatusEffect Definition { get; init; }
     public required EntityUid Applicant { get; init; }
     public required EntityUid Holder { get; init; }
 

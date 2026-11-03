@@ -66,9 +66,18 @@ public record BattleEnvironment
     public bool IsPredicate(EntityUid entity, EntityPredicate predicate)
     {
         EnsureExists(entity);
-        return predicate.Matches(Entities[entity]);
+        return predicate.Evaluate(Entities[entity]);
     }
 
+    /// <summary>
+    /// Returns the shards that the specified entity can use on a turn.
+    /// </summary>
+    /// <param name="entity">Entity UID.</param>
+    /// <exception cref="InvalidOperationException">
+    /// There exists no entity with ID <paramref name="entity"/>
+    /// in the current environment.
+    /// </exception>
+    /// <returns>A collection of every shard this entity has available.</returns>
     public IEnumerable<ShardId> GetShards(EntityUid entity)
     {
         EnsureExists(entity);
@@ -79,6 +88,10 @@ public record BattleEnvironment
     /// Returns every member from the same field (on the same "line") as <paramref name="entity"/>.
     /// </summary>
     /// <param name="entity">Entity UID.</param>
+    /// <exception cref="InvalidOperationException">
+    /// There exists no entity with ID <paramref name="entity"/>
+    /// in the current environment.
+    /// </exception>
     /// <returns>Every member from the same field as the given entity.</returns>
     public IEnumerable<EntityUid> GetNeighbors(EntityUid entity)
     {
@@ -91,7 +104,7 @@ public record BattleEnvironment
         EnsureExists(entity);
         return Teams.Values
             .SelectMany(team => team.GetOnFieldMembers())
-            .Except(Teams[Entities[entity].Team].GetOnFieldMembers());
+            .Except(GetNeighbors(entity));
     }
 
     /// <summary>
@@ -101,7 +114,7 @@ public record BattleEnvironment
     /// <returns>A collection containing every modifier relevant to the given entity.</returns>
     /// <exception cref="InvalidOperationException">
     /// There exists no entity with ID <paramref name="entity"/>
-    /// in the current context.
+    /// in the current environment.
     /// </exception>
     /// <exception cref="InvalidOperationException">DEBUG: ImmutableArray.IsDefault</exception>
     public IEnumerable<IModifierProvider> GetModifiers(EntityUid entity)
@@ -124,15 +137,37 @@ public record BattleEnvironment
     /// </summary>
     /// <param name="entity">Entity UID.</param>
     /// <param name="pool">Pool ID.</param>
-    /// <returns>A double representing the current value of the pool.</returns>
+    /// <returns>
+    /// A double representing the current value of the pool,
+    /// or zero if this entity does not have the specified pool.
+    /// </returns>
     /// <exception cref="InvalidOperationException">
     /// There exists no entity with ID <paramref name="entity"/>
-    /// in the current context.
+    /// in the current environment.
     /// </exception>
     public double GetPoolValue(EntityUid entity, PoolName pool)
     {
         EnsureExists(entity);
-        return Entities[entity].Pools[pool].Value;
+        return Entities[entity].Pools.GetValueOrDefault(pool)?.Value ?? 0;
+    }
+
+    /// <summary>
+    /// Returns a mutable reference to a counter belonging to the specified entity.
+    /// </summary>
+    /// <param name="entity">Entity UID.</param>
+    /// <param name="counter">Counter ID.</param>
+    /// <returns>
+    /// A mutable counter that belongs to the given entity,
+    /// or null if this entity does not have the specified counter.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// There exists no entity with ID <paramref name="entity"/>
+    /// in the current environment.
+    /// </exception>
+    public Counter? GetCounter(EntityUid entity, CounterName counter)
+    {
+        EnsureExists(entity);
+        return Entities[entity].Counters.GetValueOrDefault(counter);
     }
 
     public IEnumerable<StatusEffectInstance> GetStatusEffects(EntityUid entity)

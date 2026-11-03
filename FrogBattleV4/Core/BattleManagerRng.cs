@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace FrogBattleV4.Core;
 
-public partial class BattleManager
+public sealed partial class BattleManager
 {
     private class SeededBattleRng(int seed) : IBattleRng
     {

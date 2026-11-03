@@ -6,35 +6,34 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using FrogBattleV4.Core.Abilities;
+using FrogBattleV4.Core.Entities;
+using FrogBattleV4.Core.Modifiers.StatusEffects;
 using FrogBattleV4.JsonDeserialization;
 
 namespace FrogBattleV4.Core.Registries;
 
-public class Registry<TKey, TValue>(FrozenDictionary<TKey, TValue> items) : IEnumerable<KeyValuePair<TKey, TValue>> where TKey : struct, IResourceId
+// the stupid registry system
+public class Registry<TKey, TValue>(FrozenDictionary<TKey, TValue> items)
+    : IEnumerable<KeyValuePair<TKey, TValue>> where TKey : struct, IResourceId
 {
-    private FrozenDictionary<TKey, TValue> _items = items;
-
     public TValue Get(TKey key) => TryGet(key, out var value)
         ? value
         : throw new KeyNotFoundException($"Key {key} does not exist in the registry.");
 
-    public bool TryGet(TKey key, [MaybeNullWhen(false)] out TValue item) => _items.TryGetValue(key, out item);
+    public bool TryGet(TKey key, [MaybeNullWhen(false)] out TValue item) => items.TryGetValue(key, out item);
 
-    /// <summary>
-    /// Replace the entire registry with the given value.
-    /// </summary>
-    /// <param name="items">New registry to store.</param>
-    public void Replace(FrozenDictionary<TKey, TValue> items) => _items = items;
-
-    public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => _items.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_items).GetEnumerator();
+    public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => items.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)items).GetEnumerator();
 }
 
 /// <summary>
 /// Defines methods for creating registry loaders for different kinds of items.
 /// </summary>
-public static class RegistryLoader
+public static class DeferredRegistry
 {
+    private const bool SkipInvalidFiles = false;
+
     /// <summary>
     /// Creates a new shard registry factory.
     /// </summary>
@@ -49,59 +48,77 @@ public static class RegistryLoader
     /// <returns>A deferred shard register.</returns>
     public static Fighters CreateFighters(string ns) => new(ns);
 
-    public class Shards : Loader<ShardId, Abilities.Shard>
+    /// <summary>
+    /// Creates a new status effect registry factory.
+    /// </summary>
+    /// <param name="ns">Namespace for every status effect in the registry.</param>
+    /// <returns>A deferred status effect register.</returns>
+    public static StatusEffects CreateStatusEffects(string ns) => new(ns);
+
+    public class Shards : Loader<ShardId, Shard>
     {
-        internal Shards(string ns) : base(ns)
+        internal Shards(string ns) : base(ns, BaseDirectoryName)
         {
         }
 
-        protected override string BaseDirectoryName => "shards";
-        protected override JsonTypeInfo<Abilities.Shard> TypeInfo => AppSerializerContext.Default.Shard;
+        private static string BaseDirectoryName => "shards";
+        protected override JsonTypeInfo<Shard> TypeInfo => AppSerializerContext.Default.Shard;
 
-        public override ShardRegistry Load()
+        public FrozenDictionary<ShardId, Shard> LoadAll()
         {
-            return new ShardRegistry(GenerateFrozenDictionary());
+            return LoadAllFiles(BaseDirectoryName, SkipInvalidFiles).ToFrozenDictionary();
         }
     }
 
-    public class Fighters : Loader<FighterId, Entities.Fighter>
+    public class Fighters : Loader<FighterId, Fighter>
     {
-        internal Fighters(string ns) : base(ns)
+        internal Fighters(string ns) : base(ns, BaseDirectoryName)
         {
         }
 
-        protected override string BaseDirectoryName => "fighters";
-        protected override JsonTypeInfo<Entities.Fighter> TypeInfo => AppSerializerContext.Default.Fighter;
+        private static string BaseDirectoryName => "fighters";
+        protected override JsonTypeInfo<Fighter> TypeInfo => AppSerializerContext.Default.Fighter;
 
-        public override FighterRegistry Load() => new(GenerateFrozenDictionary());
+        public FrozenDictionary<FighterId, Fighter> LoadAll()
+        {
+            return LoadAllFiles(BaseDirectoryName, SkipInvalidFiles).ToFrozenDictionary();
+        }
     }
 
+    public class StatusEffects : Loader<StatusEffectId, StatusEffect>
+    {
+        internal StatusEffects(string ns) : base(ns, BaseDirectoryName)
+        {
+        }
+
+        private static string BaseDirectoryName => "status_effects";
+        protected override JsonTypeInfo<StatusEffect> TypeInfo => AppSerializerContext.Default.StatusEffect;
+
+        public FrozenDictionary<StatusEffectId, StatusEffect> LoadAll()
+        {
+            return LoadAllFiles(BaseDirectoryName, SkipInvalidFiles).ToFrozenDictionary();
+        }
+    }
+
+    // TODO (Nova): Loaders shouldn't directly create a new registry if they are namespaced
     public abstract class Loader<TKey, TValue> where TKey : struct, IResourceId
     {
         private readonly Dictionary<TKey, TValue> _items = new();
         private readonly string _namespace;
 
-        protected Loader(string ns)
+        protected Loader(string ns, string baseDir)
         {
             _namespace = ns;
-            ReloadAllFiles();
         }
 
-        protected abstract string BaseDirectoryName { get; }
         protected abstract JsonTypeInfo<TValue> TypeInfo { get; }
-
-        /// <summary>
-        /// Loads a new registry with the values registered so far in this loader.
-        /// </summary>
-        /// <returns>A new registry.</returns>
-        public abstract Registry<TKey, TValue> Load();
 
         /// <summary>
         /// Registers a value to the registry loader.
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        /// <returns></returns>
+        /// <returns>This instance of loader.</returns>
         public Loader<TKey, TValue> Register(TKey key, TValue value)
         {
             _items.Add(key, value);
@@ -111,20 +128,25 @@ public static class RegistryLoader
         /// <summary>
         /// Searches the base folder and loads every valid file found.
         /// </summary>
+        /// <param name="directory"></param>
         /// <param name="skipInvalidFiles">Whether invalid files should be skipped or throw an exception.</param>
-        /// <exception cref="JsonException">One of the files was invalid and <paramref name="skipInvalidFiles"/> is false.</exception>
-        /// <exception cref="InvalidOperationException">A duplicate shard was encountered after resolving filenames to resource IDs.</exception>
-        public void ReloadAllFiles(bool skipInvalidFiles = false)
+        /// <exception cref="JsonException">
+        /// One of the files was invalid and <paramref name="skipInvalidFiles"/> is false.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// A duplicate ID was encountered after resolving filenames to resource IDs.
+        /// </exception>
+        protected Dictionary<TKey, TValue> LoadAllFiles(string directory, bool skipInvalidFiles = false)
         {
-            _items.Clear();
-            foreach (var file in Directory.EnumerateFiles(BaseDirectoryName, "*", SearchOption.TopDirectoryOnly))
+            var items = new Dictionary<TKey, TValue>();
+            foreach (var file in Directory.EnumerateFiles(directory, "*", SearchOption.TopDirectoryOnly))
             {
                 try
                 {
                     var item = JsonSerializer.Deserialize(File.ReadAllText(file), TypeInfo)
                                ?? throw new JsonException($"Failed to load JSON file: {file}");
                     var key = GetKey(file);
-                    if (!_items.TryAdd(key, item))
+                    if (!items.TryAdd(key, item))
                     {
                         throw new InvalidOperationException($"Duplicate resource ID: \"{key}\" (from file \"{file}\")");
                     }
@@ -135,6 +157,8 @@ public static class RegistryLoader
                     Logger.WriteLine(e.Message);
                 }
             }
+
+            return items;
         }
 
         protected FrozenDictionary<TKey, TValue> GenerateFrozenDictionary() => _items.ToFrozenDictionary();

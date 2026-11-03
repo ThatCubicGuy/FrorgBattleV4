@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -9,41 +8,43 @@ using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Entities;
+using FrogBattleV4.Core.Modifiers.StatusEffects;
 using FrogBattleV4.Core.Registries;
 using FrogBattleV4.Core.Selections;
 
 namespace FrogBattleV4.Core;
 
 // TODO: Full revamp
-public partial class BattleManager : IBattle
+public sealed partial class BattleManager
 {
     private readonly SeededBattleRng _rng;
     private readonly CommandResolver _commandResolver;
-    private readonly FighterRegistry _fighterRegistry = FighterRegistry.Global;
-    private readonly ShardRegistry _shardRegistry = ShardRegistry.Global;
+    private readonly FighterRegistry _fighterRegistry;
+    private readonly ShardRegistry _shardRegistry;
+    private readonly StatusEffectRegistry _statusEffectRegistry;
 
-    public event EventHandler? BattleStarted;
-    public event EventHandler? BattleEnded;
-
-    private BattleManager(ImmutableDictionary<EntityUid, Entity> entities, ImmutableDictionary<TeamUid, Team> teams)
+    private BattleManager(
+        ImmutableDictionary<EntityUid, Entity> entities,
+        ImmutableDictionary<TeamUid, Team> teams,
+        FighterRegistry fighterRegistry,
+        ShardRegistry shardRegistry,
+        StatusEffectRegistry statusEffectRegistry)
     {
         CreationTime = DateTime.UtcNow.Ticks;
         _rng = new SeededBattleRng(CreationTime.GetHashCode());
         _commandResolver = new CommandResolver(this);
+        _fighterRegistry = fighterRegistry;
+        _shardRegistry = shardRegistry;
+        _statusEffectRegistry = statusEffectRegistry;
         Entities = entities;
         Teams = teams;
     }
 
-    public long CreationTime { get; private set; }
-    public TurnScheduler Scheduler { get; } = new();
-
     public ImmutableDictionary<EntityUid, Entity> Entities { get; private set; }
     public ImmutableDictionary<TeamUid, Team> Teams { get; private set; }
 
-    public static Builder GetBuilder()
-    {
-        return new Builder();
-    }
+    public long CreationTime { get; }
+    private TurnScheduler Scheduler { get; } = new();
 
     public async Task RunAsync(CancellationToken cancellationToken)
     {
@@ -53,9 +54,10 @@ public partial class BattleManager : IBattle
             Scheduler.Schedule(uid, 10000 / new StatQuery
             {
                 Subject = uid,
-                Stat = StatName.Spd
+                Stat = StatName.Spd,
             }.Calculate(GetEnvironment()));
         }
+
         OnBattleStarted();
         while (!cancellationToken.IsCancellationRequested && Scheduler.MoveNext())
         {
@@ -70,7 +72,7 @@ public partial class BattleManager : IBattle
                 {
                     Target = action.MainTarget,
                     Rank = 0,
-                }
+                },
             ], [], 0);
 
             var builder = new CommandBuilder();
@@ -82,7 +84,7 @@ public partial class BattleManager : IBattle
                 shard.Resolve(ref state, env, builder, _rng);
                 state = state with
                 {
-                    CurrentShardIndex = state.CurrentShardIndex + 1
+                    CurrentShardIndex = state.CurrentShardIndex + 1,
                 };
             }
 
@@ -92,111 +94,12 @@ public partial class BattleManager : IBattle
         OnBattleEnded();
     }
 
+    /// <summary>
+    /// Returns a new battle environment populated with the current entities and teams, and no subjective modifiers.
+    /// </summary>
+    /// <returns>A new <see cref="BattleEnvironment"/> instance.</returns>
     public BattleEnvironment GetEnvironment()
     {
         return new BattleEnvironment(Entities, Teams, _fighterRegistry, _shardRegistry);
     }
-
-    protected virtual void OnBattleStarted()
-    {
-        BattleStarted?.Invoke(this, EventArgs.Empty);
-    }
-
-    protected virtual void OnBattleEnded()
-    {
-        BattleEnded?.Invoke(this, EventArgs.Empty);
-    }
-
-    public class Builder
-    {
-        private readonly Dictionary<EntityUid, Entity> _fighters = [];
-        private readonly List<Team> _teams = [];
-
-        internal Builder()
-        {
-        }
-
-        /// <summary>
-        /// Adds a new team to the builder with the given selection provider.
-        /// </summary>
-        /// <param name="provider">An object that will resolve selection requests for this team.</param>
-        /// <returns>This builder instance.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="provider"/> is null.</exception>
-        public Builder AddTeam(ISelectionProvider provider)
-        {
-            ArgumentNullException.ThrowIfNull(provider);
-            if (_teams.Count > 0 && !_teams[^1].GetAllMembers().Any())
-            {
-                throw new InvalidOperationException("Cannot add a team when the previous team contains no members.");
-            }
-
-            _teams.Add(new Team(provider));
-            return this;
-        }
-
-        /// <summary>
-        /// Adds a member to the last added team of this builder.
-        /// </summary>
-        /// <param name="member">Member to add to the team.</param>
-        /// <returns>This builder instance.</returns>
-        /// <exception cref="InvalidOperationException">No team was added yet.</exception>
-        public Builder AddMember(FighterId member)
-        {
-            if (_teams.Count == 0)
-            {
-                throw new InvalidOperationException("Cannot add members when there are no teams.");
-            }
-
-            var team = _teams[^1];
-            var data = new Entity
-            {
-                Owner = member,
-                Team = team.Uid,
-            };
-            _fighters[data.Uid] = data;
-            team.AddMember(data.Uid);
-            return this;
-        }
-
-        /// <summary>
-        /// Adds multiple members to the last added team of this builder.
-        /// </summary>
-        /// <param name="members">Members to add to the team.</param>
-        /// <returns>This builder instance.</returns>
-        /// <exception cref="InvalidOperationException">No team was added yet.</exception>
-        public Builder AddMembers(IEnumerable<FighterId> members)
-        {
-            if (_teams.Count == 0)
-            {
-                throw new InvalidOperationException("Cannot add members when there are no teams.");
-            }
-
-            foreach (var member in members)
-            {
-                AddMember(member);
-            }
-
-            return this;
-        }
-
-        public BattleManager Build()
-        {
-            if (_teams.Count < 2)
-            {
-                throw new InvalidOperationException("Cannot build a battle with less than two teams.");
-            }
-
-            return new BattleManager(_fighters.ToImmutableDictionary(), _teams.ToImmutableDictionary(t => t.Uid));
-        }
-    }
-}
-
-public interface IBattle
-{
-    Task RunAsync(CancellationToken cancellationToken);
-}
-
-public class CommandLaunchedEventArgs : EventArgs
-{
-    public required BattleCommand Command { get; init; }
 }

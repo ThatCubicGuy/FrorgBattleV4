@@ -24,18 +24,18 @@ Console.Out.WriteLine(JsonSerializer.Serialize(
     {
         Name = "W", Description = "X", Function = ShardFunction.Attack,
         Targeting = new AreaOfEffectTargeting { RankPenalty = 1 },
-        Components = []
+        Components = [],
     }, AppSerializerContext.Default.AffectShard));
 
 var fighter = new Fighter
 {
     Name = "Y/N",
-    Shards = []
+    Shards = [],
 };
 
 Console.Out.WriteLine(JsonSerializer.Serialize(fighter, AppSerializerContext.Default.Fighter));
 
-var shardRegistry = RegistryLoader.CreateShards("frorgbattle").Load();
+var shardRegistry = ShardRegistry.Global;
 
 Console.Out.WriteLine("Registered shards:");
 foreach (var kvp in shardRegistry)
@@ -44,7 +44,7 @@ foreach (var kvp in shardRegistry)
     Console.Out.WriteLine("(end)");
 }
 
-var fighterRegistry = RegistryLoader.CreateFighters("frorgbattle").Load();
+var fighterRegistry = FighterRegistry.Global;
 
 Console.Out.WriteLine("Registered fighters:");
 foreach (var kvp in fighterRegistry)
@@ -55,7 +55,9 @@ foreach (var kvp in fighterRegistry)
 
 var console = new SetSelectionProvider();
 var member = new FighterId(new ResourceId("frorgbattle", "fighter1"));
-var manager = BattleManager.GetBuilder().AddTeam(console).AddMember(member).AddTeam(console).AddMembers([member, member, member]).Build();
+var manager = BattleManager.GetBuilder().AddTeam(console).AddMember(member).AddMember(member).AddTeam(console).AddMembers([member, member, member]).Build();
+manager.DamageTaken += (_, e) =>
+    Console.Out.WriteLine($"Damage taken: {e.Amount}, data: {e.Data}, sender: {e.Sender}, target: {e.Target}");
 var task = manager.RunAsync(CancellationToken.None);
 Console.Out.WriteLine("Battle started");
 await task;
@@ -116,7 +118,7 @@ file class SetSelectionProvider : ISelectionProvider, IComparer<ShardId>
             TargetShard => 0,
             EmpowerShard => 1,
             AffectShard => 2,
-            _ => -1
+            _ => -1,
         };
 
         var rightPriority = right switch
@@ -124,7 +126,7 @@ file class SetSelectionProvider : ISelectionProvider, IComparer<ShardId>
             TargetShard => 0,
             EmpowerShard => 1,
             AffectShard => 2,
-            _ => -1
+            _ => -1,
         };
 
         return leftPriority - rightPriority;

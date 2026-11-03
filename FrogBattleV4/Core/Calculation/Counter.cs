@@ -3,13 +3,26 @@ using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Calculation;
 
-public class Counter
+public sealed class Counter()
 {
     private readonly long _defaultValue;
     private long _currentValue;
 
-    public event EventHandler<CounterValueChangedEventArgs>? ValueChanged;
     public event EventHandler? TriggerValueReached;
+    internal event EventHandler<ValueChangedEventArgs>? ValueChanged;
+
+    /// <summary>
+    /// Instantiates a new instance of a counter with the max value, default value,
+    /// trigger value, and trigger condition of another, and CurrentValue = 0.
+    /// </summary>
+    /// <param name="other">Counter to copy.</param>
+    public Counter(Counter other) : this()
+    {
+        DefaultValue = other.DefaultValue;
+        TriggerValue = other.TriggerValue;
+        TriggerCondition = other.TriggerCondition;
+        MaxValue = other.MaxValue;
+    }
 
     [JsonPropertyName("default")]
     public long DefaultValue
@@ -44,17 +57,17 @@ public class Counter
 
             if (_currentValue == oldValue) return;
 
-            OnValueChanged(new CounterValueChangedEventArgs
+            OnValueChanged(new ValueChangedEventArgs
             {
                 OldValue = oldValue,
-                NewValue = _currentValue
+                NewValue = _currentValue,
             });
             if (TriggerCondition switch
                 {
                     TriggerType.Equal => _currentValue == TriggerValue,
-                    TriggerType.Under => _currentValue <= TriggerValue,
-                    TriggerType.Over => _currentValue >= TriggerValue,
-                    _ => false
+                    TriggerType.Below => _currentValue <= TriggerValue,
+                    TriggerType.Above => _currentValue >= TriggerValue,
+                    _ => false,
                 })
             {
                 OnTriggerValueReached();
@@ -118,25 +131,25 @@ public class Counter
     {
         [JsonStringEnumMemberName("equal")]
         Equal,
-        [JsonStringEnumMemberName("under")]
-        Under,
-        [JsonStringEnumMemberName("over")]
-        Over,
+        [JsonStringEnumMemberName("below")]
+        Below,
+        [JsonStringEnumMemberName("above")]
+        Above,
     }
 
-    protected virtual void OnValueChanged(CounterValueChangedEventArgs e)
+    private void OnValueChanged(ValueChangedEventArgs e)
     {
         ValueChanged?.Invoke(this, e);
     }
 
-    protected virtual void OnTriggerValueReached()
+    private void OnTriggerValueReached()
     {
         TriggerValueReached?.Invoke(this, EventArgs.Empty);
     }
-}
 
-public class CounterValueChangedEventArgs : EventArgs
-{
-    public required long OldValue { get; init; }
-    public required long NewValue { get; init; }
+    internal class ValueChangedEventArgs : EventArgs
+    {
+        public required long OldValue { get; init; }
+        public required long NewValue { get; init; }
+    }
 }

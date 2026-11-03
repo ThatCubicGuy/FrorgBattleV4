@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
@@ -11,27 +10,19 @@ namespace FrogBattleV4.Core.Entities;
 /// <summary>
 /// Mutable in game data for any individual entity.
 /// </summary>
-public class Entity : UniquelyIdentifiable<EntityUid>
+public class Entity(Fighter definition) : UniquelyIdentifiable<EntityUid>
 {
-    public static ImmutableDictionary<PoolName, Pool> BasePools() => new Dictionary<PoolName, Pool>
-    {
-        [PoolName.Hp] = new(),
-        [PoolName.Mana] = new(),
-        [PoolName.Energy] = new(),
-        [PoolName.Shield] = new(),
-        [PoolName.Overheal] = new(),
-    }.ToImmutableDictionary();
+    /// <summary>
+    /// Determines the order in which fighter pools absorb damage.
+    /// </summary>
+    private static readonly ImmutableArray<PoolName> DamagePriority =
+    [
+        PoolName.Shield,
+        PoolName.Overheal,
+        PoolName.Hp,
+    ];
 
-    private readonly List<StatusEffectInstance> _statusEffects = [];
-    private readonly ImmutableDictionary<PoolName, Pool> _pools = BasePools();
-
-    public event EventHandler<DamageTakenEventArgs>? DamageTaken;
-    public event EventHandler<EffectAddedEventArgs>? EffectAdded;
-
-    public Entity()
-    {
-        StatusEffects = new ReadOnlyCollection<StatusEffectInstance>(_statusEffects);
-    }
+    private readonly Dictionary<StatusEffectId, StatusEffectInstance> _statusEffects = [];
 
     /// <summary>
     /// ResourceId of the behavior definition for this entity.
@@ -40,31 +31,15 @@ public class Entity : UniquelyIdentifiable<EntityUid>
 
     public required TeamUid Team { get; init; }
 
-    public ImmutableDictionary<PoolName, Pool> Pools
-    {
-        get => _pools;
-        init => _pools = _pools.AddRange(value);
-    }
+    public ImmutableDictionary<PoolName, Pool> Pools { get; } = BasePools(definition.Pools);
+    public ImmutableDictionary<CounterName, Counter> Counters { get; } = BaseCounters(definition.Counters);
 
-    public ReadOnlyCollection<StatusEffectInstance> StatusEffects { get; }
-
-    /// <summary>
-    /// Determines the order in which fighter pools absorb damage.
-    /// </summary>
-    private static readonly ImmutableArray<PoolName> DamagePriority =
-    [
-        PoolName.Shield,
-        PoolName.Overheal,
-        PoolName.Hp
-    ];
+    public IReadOnlyCollection<StatusEffectInstance> StatusEffects => _statusEffects.Values;
 
     public void TakeDamage(double damage, DamageData damageData)
     {
-        var args = new DamageTakenEventArgs
-        {
-            Amount = damage,
-            Data = damageData
-        };
+        // Barriers block all damage taken in one instance
+        if (Counters[CounterName.Barrier].TryDecrement()) return;
 
         // Go down the line of damage-taking pools
         foreach (var poolId in DamagePriority)
@@ -84,8 +59,23 @@ public class Entity : UniquelyIdentifiable<EntityUid>
             // If damage was greater than the pool value, we keep going
             Pools[poolId].Value = 0;
         }
+    }
 
-        OnDamageTaken(args);
+    public void TakeHealing(double healing, HealData healData)
+    {
+        var hpPool = Pools[PoolName.Hp];
+
+        // Calculate how much we can saturate the HP pool
+        var maxHealing = hpPool.Capacity - hpPool.Value;
+
+        // If we overflow max HP and this healing supports Overheal, add to the Overheal pool
+        if (healing > maxHealing && healData.Overheals)
+        {
+            Pools[PoolName.Overheal].Value += healing - maxHealing;
+        }
+
+        // Add to HP pool irrespective of the above conditions.
+        hpPool.Value += healing;
     }
 
     // TODO (Nova): don't like this way of implementing this functionality
@@ -97,44 +87,67 @@ public class Entity : UniquelyIdentifiable<EntityUid>
         }
     }
 
+    public bool TryGetStatusEffect(StatusEffectId id, [MaybeNullWhen(false)] out StatusEffectInstance instance) =>
+        _statusEffects.TryGetValue(id, out instance);
+
     public void AddStatusEffect(StatusEffectInstance effect)
     {
-        _statusEffects.Add(effect);
-
-        OnEffectAdded(new EffectAddedEventArgs
+        var id = effect.Definition.Id;
+        if (_statusEffects.TryGetValue(id, out var instance))
         {
-            Definition = effect.Definition,
-            Turns = effect.Turns,
-            Stacks = effect.Stacks
-        });
+            instance.Stacks += effect.Stacks;
+            instance.Turns = effect.Turns;
+            return;
+        }
+
+        _statusEffects[id] = effect;
     }
 
-    public void RemoveStatusEffect(StatusEffectId effectId)
+    public bool RemoveStatusEffect(StatusEffectId effect) => _statusEffects.Remove(effect);
+
+    /// <summary>
+    /// Returns a new set of default pools (Hp, Mana, Energy, Shield, Overheal) with extra pools appended.
+    /// </summary>
+    /// <param name="others">Extra pools to append.</param>
+    /// <returns>An ImmutableDictionary containing a new set of pools.</returns>
+    private static ImmutableDictionary<PoolName, Pool> BasePools(
+        ImmutableDictionary<PoolName, Pool> others)
     {
+        var result = new Dictionary<PoolName, Pool>
+        {
+            [PoolName.Hp] = new(),
+            [PoolName.Mana] = new(),
+            [PoolName.Energy] = new(),
+            [PoolName.Shield] = new(),
+            [PoolName.Overheal] = new(),
+        };
 
-        _statusEffects.RemoveAll(sei => sei.ShouldRemove());
+        foreach (var kvp in others)
+        {
+            result.Add(kvp.Key, new Pool(kvp.Value));
+        }
+
+        return result.ToImmutableDictionary();
     }
 
-    protected virtual void OnDamageTaken(DamageTakenEventArgs e)
+    /// <summary>
+    /// Returns a new set of default counters (Barrier) with extra counters appended.
+    /// </summary>
+    /// <param name="others">Extra counters to append.</param>
+    /// <returns>An ImmutableDictionary containing a new set of counters.</returns>
+    private static ImmutableDictionary<CounterName, Counter> BaseCounters(
+        ImmutableDictionary<CounterName, Counter> others)
     {
-        DamageTaken?.Invoke(this, e);
+        var result = new Dictionary<CounterName, Counter>
+        {
+            [CounterName.Barrier] = new(),
+        };
+
+        foreach (var kvp in others)
+        {
+            result.Add(kvp.Key, new Counter(kvp.Value));
+        }
+
+        return result.ToImmutableDictionary();
     }
-
-    protected virtual void OnEffectAdded(EffectAddedEventArgs e)
-    {
-        EffectAdded?.Invoke(this, e);
-    }
-}
-
-public class DamageTakenEventArgs : EventArgs
-{
-    public required double Amount { get; init; }
-    public required DamageData Data { get; init; }
-}
-
-public class EffectAddedEventArgs
-{
-    public required StatusEffectDefinition Definition { get; init; }
-    public required int Turns { get; init; }
-    public required int Stacks { get; init; }
 }

@@ -7,6 +7,6 @@ namespace FrogBattleV4.Core.Combat.Commands;
 /// </summary>
 public class ApplyEffectCommand : BattleCommand<ApplyEffectData>
 {
-    public required double ApplicationChance { get; set; }
+    public required double ApplicationChance { get; init; }
     public override void Accept(ICommandVisitor visitor) => visitor.Visit(this);
 }

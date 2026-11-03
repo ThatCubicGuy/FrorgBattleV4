@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core;
+using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Selections;
 
 namespace FrogBattleV4.ConsoleBattle;
@@ -48,7 +49,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
 
             if (int.TryParse(nextLine, out var selection) && selection <= shards.Length)
             {
-                return new PlayerTurnAction(link.ToImmutableList(),
+                return new PlayerTurnAction(link.ToImmutableArray(),
                     request.Environment.GetEnemies(request.User).ElementAt(selection - 1));
             }
 

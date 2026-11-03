@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core;
+using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Selections;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

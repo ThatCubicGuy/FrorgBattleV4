@@ -19,17 +19,19 @@
   ],
   "targeting": {
     "type": "filter",
-    "rank_penalty": 0,
-    "maximum_rank": 99,
-    "filter": null
+    "rank_penalty": 0
   },
   "modifiers": [
     {
       "modifier_type": "damage",
       "direction": "outgoing",
       "entity": "this",
+      "damage": {
+	      "type": "bullet",
+	      "source": "link"
+      },
       "values": {
-        "add_base_percent": -0.30
+        "add_base_percent": 0.30
       }
     }
   ],

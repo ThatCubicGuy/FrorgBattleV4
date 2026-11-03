@@ -3,10 +3,10 @@ using System.Collections.Immutable;
 
 namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 
-public class StatusEffectDefinition
+public class StatusEffect
 {
     public required StatusEffectId Id { get; init; }
-    public required string Name { get; init; }
+    public required string DisplayName { get; init; }
     public string? Description { get; init; }
     public ImmutableArray<IModifierRule> ModifierRules { get; init; } = [];
     public ImmutableArray<IMutatorComponent> Mutators { get; init; } = [];

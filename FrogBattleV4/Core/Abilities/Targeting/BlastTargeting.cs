@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Abilities.Targeting;
 
@@ -17,6 +18,7 @@ public class BlastTargeting : IShardTargeting
     /// <summary>
     /// How much the rank increases for each slot away from the main target.
     /// </summary>
+    [JsonPropertyName("penalty")]
     public int RankPenaltyPerSlot { get; init; } = 1;
 
     public TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env)

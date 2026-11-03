@@ -3,7 +3,8 @@ using FrogBattleV4.Core.Abilities;
 
 namespace FrogBattleV4.Core.Registries;
 
-public class ShardRegistry(FrozenDictionary<ShardId, Shard> items) : Registry<ShardId, Shard>(items)
+public class ShardRegistry(FrozenDictionary<ShardId, Shard> items)
+    : Registry<ShardId, Shard>(items)
 {
-    public static readonly ShardRegistry Global = RegistryLoader.CreateShards("frorgbattle").Load();
+    public static readonly ShardRegistry Global = new(DeferredRegistry.CreateShards("frorgbattle").LoadAll());
 }

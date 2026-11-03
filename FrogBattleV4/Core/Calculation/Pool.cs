@@ -3,11 +3,18 @@ using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Calculation;
 
-public class Pool
+public sealed class Pool()
 {
     private double _currentValue;
 
-    public event EventHandler<PoolValueChangedEventArgs>? ValueChanged;
+    /// <summary>
+    /// Instantiates a new instance of a pool with the capacity of another and CurrentValue = 0.
+    /// </summary>
+    /// <param name="other">Pool to copy.</param>
+    public Pool(Pool other) : this()
+    {
+        Capacity = other.Capacity;
+    }
 
     public double Capacity { get; set; }
 
@@ -15,26 +22,6 @@ public class Pool
     public double Value
     {
         get => _currentValue;
-        set
-        {
-            var oldValue = _currentValue;
-            _currentValue = Math.Clamp(value, 0, Capacity);
-            OnValueChanged(new PoolValueChangedEventArgs
-            {
-                OldValue = oldValue,
-                NewValue = _currentValue
-            });
-        }
+        set => _currentValue = Math.Clamp(value, 0, Capacity);
     }
-
-    protected virtual void OnValueChanged(PoolValueChangedEventArgs e)
-    {
-        ValueChanged?.Invoke(this, e);
-    }
-}
-
-public class PoolValueChangedEventArgs : EventArgs
-{
-    public required double OldValue { get; init; }
-    public required double NewValue { get; init; }
 }

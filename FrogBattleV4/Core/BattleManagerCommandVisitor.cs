@@ -1,46 +1,65 @@
-using System;
 using System.Linq;
 using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core;
 
-public partial class BattleManager
+public sealed partial class BattleManager
 {
-    public event EventHandler<EntityUid>? EffectResisted;
-
-    protected virtual void OnEffectResisted(EntityUid e)
+    private class CommandResolver(BattleManager manager) : ICommandVisitor
     {
-        EffectResisted?.Invoke(this, e);
-    }
-
-    private class CommandResolver : ICommandVisitor
-    {
-        private readonly Core.BattleManager _manager;
-
-        public CommandResolver(Core.BattleManager manager)
-        {
-            _manager = manager;
-        }
-
         public void Visit(DamageCommand command)
         {
-            var (_, target) = command.Relation;
-            var data = command.Data;
+            var (actor, target) = command.Relation;
+            var damageData = command.Data;
+            var damage = manager._rng.Chance(command.CriticalChance)
+                ? command.CriticalAmount
+                : command.NormalAmount;
 
-            _manager.Entities[target]
-                .TakeDamage(_manager._rng.Chance(command.CriticalChance)
-                        ? command.CriticalAmount
-                        : command.NormalAmount,
-                    data);
+            manager.Entities[target].TakeDamage(damage, damageData);
+
+            manager.OnDamageTaken(new DamageTakenEventArgs
+            {
+                Sender = actor,
+                Target = target,
+                Amount = damage,
+                Data = damageData,
+            });
+        }
+
+        public void Visit(HealCommand command)
+        {
+            var (actor, target) = command.Relation;
+            var healData = command.Data;
+            var healing = command.Amount;
+
+            manager.Entities[target].TakeHealing(healing, healData);
+
+            manager.OnHealingReceived(new HealingReceivedEventArgs
+            {
+                Sender = actor,
+                Target = target,
+                Amount = healing,
+                Data = healData,
+            });
         }
 
         public void Visit(MutateCommand command)
         {
-            var (_, target) = command.Relation;
+            var (actor, target) = command.Relation;
             var data = command.Data;
+            var oldValue = manager.Entities[target].Pools[data.TargetPool].Value;
 
-            _manager.Entities[target].Pools[data.TargetPool].Value += command.TotalAmount;
+            manager.Entities[target].Pools[data.TargetPool].Value += command.TotalAmount;
+
+            manager.OnPoolMutated(new PoolMutatedEventArgs
+            {
+                Sender = actor,
+                Target = target,
+                Pool = data.TargetPool,
+                OldValue = oldValue,
+                NewValue = manager.Entities[target].Pools[data.TargetPool].Value,
+            });
         }
 
         public void Visit(ApplyEffectCommand command)
@@ -48,58 +67,98 @@ public partial class BattleManager
             var (actor, target) = command.Relation;
             var data = command.Data;
 
-            if (!_manager._rng.Chance(command.ApplicationChance))
+            if (!manager._rng.Chance(command.ApplicationChance))
             {
-                _manager.OnEffectResisted(target);
+                manager.OnEffectResisted(new EffectResistedEventArgs
+                {
+                    Sender = actor,
+                    Target = target,
+                });
                 return;
             }
 
-            _manager.Entities[target].AddStatusEffect(new StatusEffectInstance
+            var definition = manager._statusEffectRegistry.Get(data.Effect);
+
+            manager.Entities[target].AddStatusEffect(new StatusEffectInstance
             {
                 Applicant = actor,
                 Holder = target,
-                Definition = data.Effect,
+                Definition = definition,
                 Stacks = data.AddedStacks,
-                Turns = data.InitialTurns
+                Turns = data.InitialTurns,
+            });
+
+            manager.OnEffectApplied(new EffectAppliedEventArgs
+            {
+                Sender = actor,
+                Target = target,
+                Id = definition.Id,
+                Stacks = data.AddedStacks,
+                Turns = data.InitialTurns,
             });
         }
 
         public void Visit(RemoveEffectCommand command)
         {
-            var (_, target) = command.Relation;
+            var (actor, target) = command.Relation;
             var data = command.Data;
 
-            foreach (var effect in _manager.Entities[target].StatusEffects.Where(data.Predicate))
-            {
-                if (effect.Definition.Properties.HasFlag(EffectFlags.Unremovable)) continue;
+            var effectsToRemove = manager.Entities[target].StatusEffects
+                .Where(effect => data.Predicate(effect) &&
+                                 !effect.Definition.Properties.HasFlag(EffectFlags.Unremovable))
+                // Use ToList() to avoid CollectionChanged exceptions at runtime
+                .ToList();
 
-                if (effect.Definition.Properties.HasFlag(EffectFlags.RemoveStack))
+            foreach (var instance in effectsToRemove)
+            {
+                if (!manager.Entities[target].TryGetStatusEffect(instance.Definition.Id, out var effect)) continue;
+                if (instance.Definition.Properties.HasFlag(EffectFlags.RemoveStack))
                 {
-                    var eff = _manager.Entities[target].StatusEffects
-                        .SingleOrDefault(sei => sei.Definition.Id == effect.Definition.Id);
-                    if (eff != null) eff.Stacks -= data.RemovedStacks;
+                    effect.Stacks -= data.RemovedStacks;
                 }
-                else
+                else effect.Stacks = 0;
+
+                if (effect.ShouldRemove() && manager.Entities[target].RemoveStatusEffect(instance.Definition.Id))
                 {
-                    _manager.Entities[target].RemoveStatusEffect(effect.Definition.Id);
+                    manager.OnEffectRemoved(new EffectRemovedEventArgs
+                    {
+                        Sender = actor,
+                        Target = target,
+                        Id = instance.Definition.Id,
+                        TurnsLeft = instance.Turns,
+                        Stacks = instance.Stacks,
+                    });
                 }
             }
         }
 
         public void Visit(AdvanceTurnCommand command)
         {
-            var (_, target) = command.Relation;
+            var (actor, target) = command.Relation;
             var data = command.Data;
 
-            _manager.Scheduler.AdvanceEntity(target, data.AdvancePercent);
+            manager.Scheduler.AdvanceEntity(target, data.AdvancePercent);
+
+            manager.OnTurnAdvanced(new TurnAdvancedEventArgs
+            {
+                Sender = actor,
+                Target = target,
+                AdvanceAmount = data.AdvancePercent,
+            });
         }
 
         public void Visit(QueueTurnCommand command)
         {
-            var (_, target) = command.Relation;
+            var (actor, target) = command.Relation;
             var data = command.Data;
 
-            _manager.Scheduler.Schedule(target, data.BaseActionValue);
+            manager.Scheduler.Schedule(target, data.BaseActionValue);
+
+            manager.OnTurnQueued(new TurnQueuedEventArgs
+            {
+                Sender = actor,
+                Target = target,
+            });
         }
     }
 }

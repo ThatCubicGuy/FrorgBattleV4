@@ -1,7 +1,7 @@
 namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 
 public record ApplyEffectData(
-    StatusEffectDefinition Effect,
+    StatusEffectId Effect,
     int InitialTurns,
     int AddedStacks = 1);
 

@@ -3,6 +3,7 @@ namespace FrogBattleV4.Core.Combat.Commands;
 public interface ICommandVisitor
 {
     void Visit(DamageCommand command);
+    void Visit(HealCommand command);
     void Visit(MutateCommand command);
     void Visit(ApplyEffectCommand command);
     void Visit(RemoveEffectCommand command);

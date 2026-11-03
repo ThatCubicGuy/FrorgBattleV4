@@ -6,4 +6,5 @@ namespace FrogBattleV4.JsonDeserialization;
 [JsonSerializable(typeof(Core.TextTranslatable))]
 [JsonSerializable(typeof(Core.Entities.Fighter))]
 [JsonSerializable(typeof(Core.Abilities.Shard))]
+[JsonSerializable(typeof(Core.Modifiers.StatusEffects.StatusEffect))]
 internal partial class AppSerializerContext : JsonSerializerContext;

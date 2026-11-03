@@ -18,7 +18,7 @@ public class AttackComponent : IShardCommandComponent
         var ctx = new RelationContext
         {
             Actor = scope.User,
-            Target = scope.Targeting.Target
+            Target = scope.Targeting.Target,
         };
         builder.Emit(new DamageCommand
         {
@@ -27,24 +27,24 @@ public class AttackComponent : IShardCommandComponent
                 BaseValue = baseValue,
                 Data = Data,
                 IsCrit = false,
-                Context = ctx
+                Context = ctx,
             }.Calculate(env),
             CriticalAmount = new DamageQuery
             {
                 BaseValue = baseValue,
                 Data = Data,
                 IsCrit = Properties.CanCrit,
-                Context = ctx
+                Context = ctx,
             }.Calculate(env),
             CriticalChance = Properties.CanCrit ? new DamageStatQuery
             {
                 Data = Data,
                 Channel = DamageStatChannel.CritRate,
                 Subject = scope.User,
-                Reference = scope.Targeting.Target
+                Reference = scope.Targeting.Target,
             }.Calculate(env) : 0,
             Data = Data,
-            Relation = ctx
+            Relation = ctx,
         });
     }
 }
