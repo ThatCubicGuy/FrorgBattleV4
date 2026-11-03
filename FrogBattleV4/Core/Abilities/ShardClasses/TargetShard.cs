@@ -15,7 +15,7 @@ public class TargetShard : Shard
         {
             Selections = state.Selections.SelectMany(targeting =>
                 // TODO (Nova): Maybe get rid of RNG here as well?
-                Targeting.GenerateInstruction(targeting, env).Resolve(rng))
+                Targeting.GenerateInstruction(targeting, env).Resolve(rng)),
         };
     }
 }

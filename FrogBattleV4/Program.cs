@@ -78,10 +78,6 @@ var member = new FighterId(new ResourceId("frorgbattle", "fighter1"));
 var manager = BattleManager.GetBuilder().AddTeam(provider).AddMember(member).AddMember(member).AddTeam(provider).AddMembers([member, member, member]).Build();
 
 manager.BattleStarted += Extensions.HandleBattleStarted;
-manager.DamageTaken += (_, args) =>
-{
-    Console.Out.WriteLine($"{args.Amount} damage taken by {args.Target} from {args.Sender}!");
-};
 
 await manager.RunAsync(CancellationToken.None);
 

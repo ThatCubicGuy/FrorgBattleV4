@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace FrogBattleV4.Core.Abilities.Targeting;
 
 /// <summary>
@@ -16,11 +18,12 @@ public class FilterTargeting : IShardTargeting
     /// <summary>
     /// Additional rank added to each selected target after filtering.
     /// </summary>
-    public int RankPenalty { get; init; } = 0;
+    public int RankPenalty { get; init; }
 
     /// <summary>
     /// The maximum rank that targets can have to be eligible for selection.
     /// </summary>
+    [JsonPropertyName("max_rank")]
     public int MaximumRank { get; init; } = 99;
 
     /// <summary>

@@ -6,7 +6,7 @@ namespace FrogBattleV4.Core;
 /// <summary>
 /// Predicate for an entity to be matched against.
 /// </summary>
-public class EntityPredicate : ObjectPredicate<Entity>
+public class EntityPredicate : GamePredicate<Entity>
 {
     public FighterId? Id { get; init; }
     public ShardId[]? Shards { get; init; }

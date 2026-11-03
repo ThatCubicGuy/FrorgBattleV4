@@ -18,14 +18,14 @@ public class AffectShard : Shard
     {
         var user = state.User;
         var selections = state.Selections.SelectMany(targeting =>
-            Targeting.GenerateInstruction(targeting, env).Resolve(rng));
+            Targeting.GenerateInstruction(targeting, env).Resolve(rng)).ToArray();
 
         var mods = state.Modifiers.Concat(Modifiers);
         var moddedEnv = env.WithSubjectMods(mods);
 
-        foreach (var targeting in selections)
+        foreach (var commandComponent in Components)
         {
-            foreach (var commandComponent in Components)
+            foreach (var targeting in selections)
             {
                 commandComponent.GenerateCommands(new ShardResolutionScope(user, targeting), moddedEnv, builder);
             }
