@@ -19,9 +19,9 @@ public class DamageOverTimeMutator : IMutatorComponent
             Relation = new RelationContext
             {
                 Actor = effect.Applicant,
-                Target = effect.Holder
+                Target = effect.Holder,
             },
-            Data = Data
+            Data = Data,
         });
     }
 }

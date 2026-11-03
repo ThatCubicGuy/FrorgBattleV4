@@ -53,7 +53,7 @@ public record BattleEnvironment
     {
         return this with
         {
-            SubjectiveModifiers = SubjectiveModifiers.AddRange(modifiers)
+            SubjectiveModifiers = SubjectiveModifiers.AddRange(modifiers),
         };
     }
 

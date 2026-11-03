@@ -32,7 +32,7 @@ public static class ModifierPipeline
         {
             AttributeQuery q => q.CalculateAttribute(env),
             CommandQuery q => q.CalculateCommand(env),
-            _ => throw new System.NotSupportedException($"Query {query.GetType().FullName} not supported.")
+            _ => throw new System.NotSupportedException($"Query {query.GetType().FullName} not supported."),
         };
     }
 

@@ -27,10 +27,10 @@ public class SingleCost : CostComponent
             {
                 BaseValue = Formula.Resolve(state.User, env),
                 Data = _data,
-                Context = ctx
+                Context = ctx,
             }.Calculate(env),
             Data = _data,
-            Relation = ctx
+            Relation = ctx,
         };
     }
 }

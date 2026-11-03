@@ -69,7 +69,7 @@ public abstract class AttributeModifier<TQuery> : ModifierRule<TQuery> where TQu
         {
             AffectedSide.This => ctx.Holder == subject,
             AffectedSide.Other => ctx.Holder == reference,
-            _ => throw new System.NotSupportedException($"{AffectedSide} not supported")
+            _ => throw new System.NotSupportedException($"{AffectedSide} not supported"),
         } && ctx.Subject == subject;
     }
 }
@@ -100,7 +100,7 @@ public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQue
             MutationDirection.Outgoing => (query.Context.Actor, query.Context.Target),
             // Incoming-type mods modify target's stats
             MutationDirection.Incoming => (query.Context.Target, query.Context.Actor),
-            _ => throw new System.NotSupportedException($"{Direction} not supported")
+            _ => throw new System.NotSupportedException($"{Direction} not supported"),
         };
         var expectedHolder = AffectedSide switch
         {
@@ -108,7 +108,7 @@ public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQue
             AffectedSide.This => affected,
             // Other's stats are modified
             AffectedSide.Other => other,
-            _ => throw new System.NotSupportedException($"{AffectedSide} not supported")
+            _ => throw new System.NotSupportedException($"{AffectedSide} not supported"),
         };
 
         return ctx.Subject == affected && ctx.Holder == expectedHolder;
@@ -130,7 +130,7 @@ public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQue
             (AffectedSide.Other, MutationDirection.Incoming) // Attacker's incoming penalty modifiers
                 => ctx.Holder == actor && ctx.Subject == target,
 
-            _ => throw new System.NotSupportedException($"Combination of {AffectedSide} and {Direction} not supported")
+            _ => throw new System.NotSupportedException($"Combination of {AffectedSide} and {Direction} not supported"),
         };
     }
 }
@@ -157,7 +157,7 @@ public enum AffectedSide
     /// The effects of this modifier will affect the other. (e.g. holder's DamageRes PENALTY)
     /// </summary>
     [JsonStringEnumMemberName("other")]
-    Other
+    Other,
 }
 
 /// <summary>

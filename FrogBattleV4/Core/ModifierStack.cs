@@ -27,7 +27,7 @@ public record ModifierStack(
         ModifierOperation.AddBasePercent => AddBasePercent,
         ModifierOperation.MultiplyTotal => MultiplyTotal,
         ModifierOperation.FinalAddValue => FinalAddValue,
-        _ => throw new ArgumentOutOfRangeException(nameof(operation), $"Invalid ModifierOperation! ({operation})")
+        _ => throw new ArgumentOutOfRangeException(nameof(operation), $"Invalid ModifierOperation! ({operation})"),
     };
 
     /// <summary>

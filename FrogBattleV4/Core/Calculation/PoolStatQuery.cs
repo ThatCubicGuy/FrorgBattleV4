@@ -11,5 +11,5 @@ public sealed class PoolStatQuery : AttributeQuery
 
 public enum PoolStatChannel
 {
-    Max
+    Max,
 }

@@ -18,7 +18,7 @@ public record ConditionCollection(ImmutableList<IConditionComponent> Conditions)
             AccumulationType.Max => contributions.Max(),
             AccumulationType.Sum => contributions.Sum(),
             _ => throw new InvalidEnumArgumentException(nameof(Accumulation),
-                (int)Accumulation, typeof(AccumulationType))
+                (int)Accumulation, typeof(AccumulationType)),
         };
     }
 }
@@ -40,5 +40,5 @@ public enum AccumulationType
     /// Adds up the values of each separate condition.
     /// </summary>
     [JsonStringEnumMemberName("sum")]
-    Sum
+    Sum,
 }

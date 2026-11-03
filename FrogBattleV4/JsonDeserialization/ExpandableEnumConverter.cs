@@ -27,7 +27,7 @@ internal partial class ExpandableEnumConverter<TName> : JsonConverter<TName> whe
 
         return new TName
         {
-            Identifier = result
+            Identifier = result,
         };
     }
 
@@ -47,7 +47,7 @@ internal partial class ExpandableEnumConverter<TName> : JsonConverter<TName> whe
 
         return new TName
         {
-            Identifier = result
+            Identifier = result,
         };
     }
 

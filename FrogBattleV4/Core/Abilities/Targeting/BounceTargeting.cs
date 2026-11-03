@@ -14,7 +14,7 @@ public class BounceTargeting : IShardTargeting
             .WithRandom(env.GetNeighbors(target).Select(entity => new ShardTargetingContext
                 {
                     Target = entity,
-                    Rank = rank + RankPenalty
+                    Rank = rank + RankPenalty,
                 }), Count);
     }
 }

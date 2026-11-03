@@ -40,7 +40,7 @@ public class TurnScheduler
             throw new ArgumentException("Turn does not exist!", nameof(turn));
         _timeline.Enqueue(turn, currentPriority with
         {
-            ActionValue = Math.Max(_now, currentPriority.ActionValue - turn.BaseActionValue * percentValue)
+            ActionValue = Math.Max(_now, currentPriority.ActionValue - turn.BaseActionValue * percentValue),
         });
     }
 

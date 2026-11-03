@@ -15,7 +15,7 @@ internal class TextConverter : JsonConverter<TextTranslatable>
             JsonTokenType.StartObject => JsonSerializer.Deserialize<TextDto>(ref reader, options),
             JsonTokenType.StartArray => throw new NotImplementedException(),
             JsonTokenType.String => new TextDto { Text = reader.GetString() },
-            _ => null
+            _ => null,
         } ?? throw new JsonException("Expected one of array, text object, or string.");
 
         if (dto.Translate is not null)

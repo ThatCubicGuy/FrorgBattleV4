@@ -20,18 +20,18 @@ internal class ResourceIdConverter<TResourceId> : JsonConverter<TResourceId> whe
             ? new ResourceId
             {
                 Namespace = value.Split(':')[0],
-                Path = value.Split(':')[1]
+                Path = value.Split(':')[1],
             }
             // If the identifier has no namespace, assume default.
             : new ResourceId
             {
                 Namespace = "frorgbattle",
-                Path = value
+                Path = value,
             };
 
         return new TResourceId
         {
-            Value = id
+            Value = id,
         };
     }
 

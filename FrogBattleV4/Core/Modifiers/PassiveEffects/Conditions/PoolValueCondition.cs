@@ -61,7 +61,7 @@ public class PoolValueCondition : IConditionComponent
             {
                 Pool = Pool,
                 Channel = PoolStatChannel.Max,
-                Subject = subject
+                Subject = subject,
             }.Calculate(env);
         }
 

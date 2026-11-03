@@ -174,7 +174,7 @@ public static class DeferredRegistry
 
             return new TKey
             {
-                Value = new ResourceId(_namespace, filename)
+                Value = new ResourceId(_namespace, filename),
             };
         }
     }

@@ -7,5 +7,5 @@ public record MutateData(
 public enum PoolMutChannel
 {
     Cost,
-    Regen
+    Regen,
 }
