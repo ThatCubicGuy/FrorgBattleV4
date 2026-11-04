@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core;
 using FrogBattleV4.Core.Abilities;
-using FrogBattleV4.Core.Abilities.Reactions;
 using FrogBattleV4.Core.Abilities.ShardClasses;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Entities;
@@ -18,44 +17,6 @@ using FrogBattleV4.Core.Selections;
 
 // TODO: Everything lmao
 Console.WriteLine("Nothing here yet!");
-
-var elation = new CounterName("elation");
-
-var counters = new Dictionary<CounterName, Counter>
-{
-    [elation] = new()
-    {
-        MaxValue = 20,
-        DefaultValue = 0,
-        TriggerValue = 3,
-    },
-}.ToImmutableDictionary();
-
-var fighter = new Fighter
-{
-    Name = "Lunar Hero Lucine",
-    Shards = [
-        new ShardId(new ResourceId("frorgbattle", "affect_shard_1")),
-        new ShardId(new ResourceId("frorgbattle", "target_shard_1")),
-        new ShardId(new ResourceId("frorgbattle", "empower_shard_1")),
-    ],
-    Counters = counters,
-    PassiveModifiers = [],
-    Reactions = [
-        new DamageTakenReaction
-        {
-            Target = ReactionEntity.This,
-            Predicate = new DamageData(DamageType.All, DamageSource.Link),
-            Functions = [
-                new ModifyCounterReactionFunction
-                {
-                    Counter = elation,
-                    Operation = ModifyCounterReactionFunction.CounterOperation.Increment,
-                },
-            ],
-        },
-    ],
-};
 
 Console.Out.WriteLine("Registered shards:");
 foreach (var kvp in ShardRegistry.Global)
@@ -132,20 +93,6 @@ file static class Extensions
     {
         return $"""
                 {shard.GetType().Name} "{shard.Name}" - {shard.Description}
-                """;
-    }
-
-    public static string GetDetails(this IShardRequirement requirement)
-    {
-        return $"""
-                {requirement.GetType().Name}
-                """;
-    }
-
-    public static string GetDetails(this IShardCommandComponent shardCommand)
-    {
-        return $"""
-                S
                 """;
     }
 

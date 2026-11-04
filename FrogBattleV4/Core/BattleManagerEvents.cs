@@ -38,7 +38,6 @@ public sealed partial class BattleManager
 
     private void OnDamageTaken(DamageTakenEventArgs e)
     {
-        Logger.WriteLine($"{e.Amount} damage dealt by {e.Sender} to {e.Target}!");
         DamageTaken?.Invoke(this, e);
     }
 

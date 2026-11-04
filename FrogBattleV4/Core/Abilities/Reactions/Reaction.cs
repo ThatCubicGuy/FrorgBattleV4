@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics.Contracts;
+using FrogBattleV4.Core.Abilities.Reactions.Functions;
 
 namespace FrogBattleV4.Core.Abilities.Reactions;
 

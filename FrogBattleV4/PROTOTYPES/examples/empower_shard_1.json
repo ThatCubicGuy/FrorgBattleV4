@@ -11,8 +11,8 @@
       "entity": "this",
       "direction": "outgoing",
       "values": {
-        "base_add_value": 10,
-        "add_base_percent": 0,
+        "base_add_value": 0,
+        "add_base_percent": 0.1,
         "multiply_total": 1,
         "final_add_value": 0
       }
