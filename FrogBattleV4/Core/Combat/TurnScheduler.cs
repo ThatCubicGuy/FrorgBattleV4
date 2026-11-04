@@ -4,16 +4,42 @@ using System.Linq;
 
 namespace FrogBattleV4.Core.Combat;
 
+// TODO (Nova): need redesign to enable predetermined selection requests
 public class TurnScheduler
 {
-    private readonly PriorityQueue<ScheduledTurn, PriorityKey> _timeline = new();
+    private readonly PriorityQueue<ScheduledTurn, PriorityKey> _turnTimeline = new();
+    private readonly Queue<InstantAction> _actionTimeline = new();
     private long _globalSequence;
     private double _now;
+    // Initialize with null! to retain nullability annotations when setting _current
+    private IAction _current = null!;
 
     /// <summary>
     /// The last dequeued turn of the scheduler.
     /// </summary>
-    public EntityUid Current { get; private set; }
+    public IAction Current => _current ??
+                              throw new InvalidOperationException(
+                                  "Cannot get current action before moving at least one turn.");
+
+    /// <summary>
+    /// Dequeues a turn from the timeline and sets it as the current turn.
+    /// </summary>
+    /// <returns>True if there are still turns remaining, false if there is nothing left.</returns>
+    public bool MoveNext()
+    {
+        if (_actionTimeline.TryDequeue(out var action))
+        {
+            _current = action;
+            return true;
+        }
+
+        if (!_turnTimeline.TryDequeue(out var turn, out var priority))
+            return false;
+
+        _current = turn;
+        _now = priority.ActionValue;
+        return true;
+    }
 
     /// <summary>
     /// Advances every turn of an entity by a percentage of its base action value.
@@ -22,10 +48,36 @@ public class TurnScheduler
     /// <param name="advancePercent">Percentage to advance by.</param>
     public void AdvanceEntity(EntityUid entity, double advancePercent)
     {
-        foreach (var turn in _timeline.UnorderedItems.Select(tuple => tuple.Element).Where(turn => turn.Actor == entity))
-        {
-            Advance(turn, advancePercent);
-        }
+        var turn = _turnTimeline.UnorderedItems
+            .Select(tuple => tuple.Element)
+            .SingleOrDefault(turn => turn.Actor == entity);
+
+        if (turn is not null) Advance(turn, advancePercent);
+    }
+
+    /// <summary>
+    /// Schedules the given turn.
+    /// </summary>
+    /// <param name="turn">Action to schedule.</param>
+    public void Schedule(ScheduledTurn turn)
+    {
+        _turnTimeline.Enqueue(turn, new PriorityKey(_now + turn.BaseActionValue, _globalSequence++));
+    }
+
+    /// <summary>
+    /// Enqueues an instant action into the action queue.
+    /// </summary>
+    /// <param name="action">Action to enqueue.</param>
+    public void EnqueueInstant(InstantAction action)
+    {
+        _actionTimeline.Enqueue(action);
+    }
+
+    public IOrderedEnumerable<TimelineItem> GetOrderedActions()
+    {
+        return _turnTimeline.UnorderedItems
+            .Select(tuple => new TimelineItem(tuple.Element.Actor, tuple.Priority.ActionValue - _now))
+            .OrderBy(item => item.CurrentActionValue);
     }
 
     /// <summary>
@@ -36,56 +88,16 @@ public class TurnScheduler
     /// <exception cref="ArgumentException">Turn is not part of the timeline.</exception>
     private void Advance(ScheduledTurn turn, double percentValue)
     {
-        if (!_timeline.Remove(turn, out turn!, out var currentPriority))
+        if (!_turnTimeline.Remove(turn, out turn!, out var priority))
             throw new ArgumentException("Turn does not exist!", nameof(turn));
-        _timeline.Enqueue(turn, currentPriority with
+        _turnTimeline.Enqueue(turn, priority with
         {
-            ActionValue = Math.Max(_now, currentPriority.ActionValue - turn.BaseActionValue * percentValue),
+            ActionValue = Math.Max(_now, priority.ActionValue - turn.BaseActionValue * percentValue),
         });
     }
 
-    /// <summary>
-    /// Schedules the given entity to act after <paramref name="baseActionValue"/>.
-    /// </summary>
-    /// <param name="entity">Entity UID.</param>
-    /// <param name="baseActionValue">Action value after which the entity will act.</param>
-    public void Schedule(EntityUid entity, double baseActionValue)
-    {
-        _timeline.Enqueue(new ScheduledTurn(entity, baseActionValue),
-            new PriorityKey(_now + baseActionValue, _globalSequence++));
-    }
+    public readonly record struct TimelineItem(EntityUid Actor, double CurrentActionValue);
 
-    /// <summary>
-    /// Clears the turn queue.
-    /// </summary>
-    public void Clear()
-    {
-        _timeline.Clear();
-    }
-
-    /// <summary>
-    /// Dequeues a turn from the timeline and sets it as the current turn.
-    /// </summary>
-    /// <returns>True if there are still turns remaining, false if there is nothing left.</returns>
-    public bool MoveNext()
-    {
-        if (!_timeline.TryDequeue(out var turn, out var priority))
-            return false;
-        Current = turn.Actor;
-        _now = priority.ActionValue;
-        return true;
-    }
-
-    public IOrderedEnumerable<TimelineItem> GetOrderedActions()
-    {
-        return _timeline.UnorderedItems
-            .Select(tuple => new TimelineItem(tuple.Element.Actor, tuple.Priority.ActionValue - _now))
-            .OrderBy(item => item.CurrentActionValue);
-    }
-
-    public record TimelineItem(EntityUid Actor, double CurrentActionValue);
-
-    private readonly record struct ScheduledTurn(EntityUid Actor, double BaseActionValue);
     private readonly record struct PriorityKey(double ActionValue, long Sequence) : IComparable<PriorityKey>
     {
         public int CompareTo(PriorityKey other)

@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.Combat;
 
 namespace FrogBattleV4.Core.Abilities.Reactions.Functions;
 
@@ -11,6 +12,6 @@ public class ExecuteLinkReactionFunction : CommandReactionFunction
     {
         // TODO (Nova)
         var result = GetRelation(holder, env, args).Select(target =>
-            new Selections.PlayerTurnAction(Shards, target.Target));
+            new TurnDecision(Shards, target.Target));
     }
 }

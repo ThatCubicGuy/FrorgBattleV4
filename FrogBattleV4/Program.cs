@@ -8,9 +8,10 @@ using FrogBattleV4.Core;
 using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Abilities.ShardClasses;
 using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Registries;
-using FrogBattleV4.Core.Selections;
+using FrogBattleV4.Core.Decisions;
 
 // using var game = new FrogBattleV4.FrogBattle();
 // game.Run();
@@ -32,7 +33,7 @@ foreach (var kvp in FighterRegistry.Global)
     Console.Out.WriteLine("(end)");
 }
 
-var provider = new SetSelectionProvider();
+var provider = new SetDecisionProvider();
 var member = new FighterId(new ResourceId("frorgbattle", "fighter1"));
 var manager = BattleManager.GetBuilder()
     .AddTeam(provider).AddMembers([member, member])
@@ -43,10 +44,10 @@ manager.BattleStarted += Extensions.HandleBattleStarted;
 
 await manager.RunAsync(CancellationToken.None);
 
-file class SetSelectionProvider : ISelectionProvider, IComparer<ShardId>
+file class SetDecisionProvider : IDecisionProvider, IComparer<ShardId>
 {
     private static readonly Random Rng = new();
-    public Task<PlayerTurnAction> GetSelectionAsync(PlayerActionRequest request, CancellationToken cancellationToken)
+    public Task<TurnDecision> GetSelectionAsync(PlayerDecisionRequest request, CancellationToken cancellationToken)
     {
         var shards = request.Environment
             .GetShards(request.User)
@@ -56,7 +57,7 @@ file class SetSelectionProvider : ISelectionProvider, IComparer<ShardId>
             .GetEnemies(request.User)
             .ToArray();
         Randomize(shards);
-        return Task.FromResult(new PlayerTurnAction([.. shards], enemies[enemies.Length / 2]));
+        return Task.FromResult(new TurnDecision([.. shards], enemies[enemies.Length / 2]));
     }
 
     private static int GetShardPriority(ShardId shard)

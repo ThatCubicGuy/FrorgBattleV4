@@ -6,13 +6,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core;
 using FrogBattleV4.Core.Abilities;
-using FrogBattleV4.Core.Selections;
+using FrogBattleV4.Core.Combat;
+using FrogBattleV4.Core.Decisions;
 
 namespace FrogBattleV4.ConsoleBattle;
 
-public class ConsoleSelectionProvider : ISelectionProvider
+public class ConsoleDecisionProvider : IDecisionProvider
 {
-    public async Task<PlayerTurnAction> GetSelectionAsync(PlayerActionRequest request, CancellationToken token)
+    public async Task<TurnDecision> GetSelectionAsync(PlayerDecisionRequest request, CancellationToken token)
     {
         await Console.Out.WriteLineAsync("Select shards:");
         var shards = request.Environment
@@ -49,7 +50,7 @@ public class ConsoleSelectionProvider : ISelectionProvider
 
             if (int.TryParse(nextLine, out var selection) && selection <= shards.Length)
             {
-                return new PlayerTurnAction(link.ToImmutableArray(),
+                return new TurnDecision(link.ToImmutableArray(),
                     request.Environment.GetEnemies(request.User).ElementAt(selection - 1));
             }
 

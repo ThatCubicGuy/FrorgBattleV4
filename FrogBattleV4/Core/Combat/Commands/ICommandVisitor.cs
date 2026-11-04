@@ -8,5 +8,5 @@ public interface ICommandVisitor
     void Visit(ApplyEffectCommand command);
     void Visit(RemoveEffectCommand command);
     void Visit(AdvanceTurnCommand command);
-    void Visit(QueueTurnCommand command);
+    void Visit(EnqueueActionCommand command);
 }

@@ -1,4 +1,5 @@
 using System.Linq;
+using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 
@@ -147,14 +148,14 @@ public sealed partial class BattleManager
             });
         }
 
-        public void Visit(QueueTurnCommand command)
+        public void Visit(EnqueueActionCommand command)
         {
             var (actor, target) = command.Relation;
             var data = command.Data;
 
-            manager.Scheduler.Schedule(target, data.BaseActionValue);
+            manager.Scheduler.EnqueueInstant(new InstantAction(target, data.Decision));
 
-            manager.OnTurnQueued(new TurnQueuedEventArgs
+            manager.OnTurnQueued(new ActionEnqueuedEventArgs
             {
                 Sender = actor,
                 Target = target,

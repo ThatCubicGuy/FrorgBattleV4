@@ -2,8 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core;
+using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Entities;
-using FrogBattleV4.Core.Selections;
+using FrogBattleV4.Core.Decisions;
 using JetBrains.Annotations;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -13,7 +14,7 @@ namespace FrogBattleV4.Tests.Core;
 [TestSubject(typeof(BattleManager.Builder))]
 public class BattleManagerBuilderTest
 {
-    private static readonly ISelectionProvider FakeProvider = new FakeSelectionProvider();
+    private static readonly IDecisionProvider FakeProvider = new FakeDecisionProvider();
 
     [TestMethod]
     public void AddTeam_WhenPreviousContainsNoMembers_ThrowsInvalidOperationException()
@@ -55,9 +56,9 @@ public class BattleManagerBuilderTest
         builder.Build();
     }
 
-    private class FakeSelectionProvider : ISelectionProvider
+    private class FakeDecisionProvider : IDecisionProvider
     {
-        public Task<PlayerTurnAction> GetSelectionAsync(PlayerActionRequest request,
+        public Task<TurnDecision> GetSelectionAsync(PlayerDecisionRequest request,
             CancellationToken cancellationToken)
         {
             throw new NotImplementedException();

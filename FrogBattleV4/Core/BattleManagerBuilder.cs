@@ -6,7 +6,7 @@ using FrogBattleV4.Core.Abilities.Reactions;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Registries;
-using FrogBattleV4.Core.Selections;
+using FrogBattleV4.Core.Decisions;
 
 namespace FrogBattleV4.Core;
 
@@ -40,7 +40,7 @@ public sealed partial class BattleManager
         /// <param name="provider">An object that will resolve selection requests for this team.</param>
         /// <returns>This builder instance.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="provider"/> is null.</exception>
-        public Builder AddTeam(ISelectionProvider provider)
+        public Builder AddTeam(IDecisionProvider provider)
         {
             ArgumentNullException.ThrowIfNull(provider);
             if (_teams.Count > 0 && !_teams[^1].GetAllMembers().Any())

@@ -10,11 +10,10 @@ using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 using FrogBattleV4.Core.Registries;
-using FrogBattleV4.Core.Selections;
+using FrogBattleV4.Core.Decisions;
 
 namespace FrogBattleV4.Core;
 
-// TODO: Full revamp
 public sealed partial class BattleManager
 {
     private readonly SeededBattleRng _rng;
@@ -51,35 +50,41 @@ public sealed partial class BattleManager
         // TODO (Nova): incomplete
         foreach (var uid in Entities.Keys)
         {
-            Scheduler.Schedule(uid, 10000 / new StatQuery
+            Scheduler.Schedule(new ScheduledTurn(uid, 10000 / new StatQuery
             {
                 Subject = uid,
                 Stat = StatName.Spd,
-            }.Calculate(GetEnvironment()));
+            }.Calculate(GetEnvironment()), Teams[Entities[uid].Team].Provider));
         }
 
         OnBattleStarted();
         while (!cancellationToken.IsCancellationRequested && Scheduler.MoveNext())
         {
             var env = GetEnvironment();
-            var actor = Scheduler.Current;
+            var action = Scheduler.Current;
+            var builder = new CommandBuilder();
 
-            var action = await Teams[Entities[actor].Team].Provider.GetSelectionAsync(
-                new PlayerActionRequest(actor, env), cancellationToken);
+            // Tick current's start mutators
+            Entities[action.Actor].Tick(TurnMoment.Start, builder);
 
-            var state = new LinkResolutionState(actor, [
+            // Mutator commands are executed separately
+            builder.Build(_commandResolver);
+
+            var decision = await action.GetDecisionAsync(env, cancellationToken);
+
+            var state = new LinkResolutionState(action.Actor, [
                 new ShardTargetingContext
                 {
-                    Target = action.MainTarget,
+                    Target = decision.MainTarget,
                     Rank = 0,
                 },
             ], [], 0);
 
-            var builder = new CommandBuilder();
+            builder = new CommandBuilder();
             // You can submit a shard link that contains unusable shards,
             // but if said shards don't become usable by the time
             // they need to be executed, the shard link stops.
-            foreach (var shard in action.Link.Select(_shardRegistry.Get).TakeWhile(s => s.IsUsable(state, env)))
+            foreach (var shard in decision.Link.Select(_shardRegistry.Get).TakeWhile(s => s.IsUsable(state, env)))
             {
                 shard.Resolve(ref state, env, builder, _rng);
                 state = state with
@@ -89,6 +94,20 @@ public sealed partial class BattleManager
             }
 
             builder.Build(_commandResolver);
+
+            // Tick current's end mutators
+            Entities[action.Actor].Tick(TurnMoment.End, builder);
+
+            // Mutator commands are executed separately
+            builder.Build(_commandResolver);
+
+            // TODO (Nova): requeue turns
+        }
+
+        if (cancellationToken.IsCancellationRequested)
+        {
+            // Maybe some other potential logic for cancellation
+            return;
         }
 
         OnBattleEnded();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using FrogBattleV4.Core.Modifiers;
-using FrogBattleV4.Core.Selections;
+using FrogBattleV4.Core.Decisions;
 
 namespace FrogBattleV4.Core.Combat;
 
@@ -11,14 +11,14 @@ public class Team : UniquelyIdentifiable<TeamUid>
 {
     private readonly List<EntityUid> _members = [];
     private readonly List<EntityUid> _offFieldMembers = [];
-    public Team(ISelectionProvider playerSelectionProvider, IEnumerable<IModifierProvider>? modifiers = null)
+    public Team(IDecisionProvider playerDecisionProvider, IEnumerable<IModifierProvider>? modifiers = null)
     {
-        ArgumentNullException.ThrowIfNull(playerSelectionProvider);
-        Provider = playerSelectionProvider;
+        ArgumentNullException.ThrowIfNull(playerDecisionProvider);
+        Provider = playerDecisionProvider;
         Modifiers = modifiers?.ToImmutableList() ?? ImmutableList<IModifierProvider>.Empty;
     }
 
-    public ISelectionProvider Provider { get; }
+    public IDecisionProvider Provider { get; }
     public ImmutableList<IModifierProvider> Modifiers { get; private set; }
 
     public IEnumerable<EntityUid> GetOnFieldMembers() => _members;

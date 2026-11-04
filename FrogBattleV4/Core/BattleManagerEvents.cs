@@ -24,7 +24,7 @@ public sealed partial class BattleManager
     // the sender advanced the turn of the target
     public event EventHandler<TurnAdvancedEventArgs>? TurnAdvanced;
     // the sender queued a turn for the target
-    public event EventHandler<TurnQueuedEventArgs>? TurnQueued;
+    public event EventHandler<ActionEnqueuedEventArgs>? TurnQueued;
 
     private void OnBattleStarted()
     {
@@ -71,7 +71,7 @@ public sealed partial class BattleManager
         TurnAdvanced?.Invoke(this, e);
     }
 
-    private void OnTurnQueued(TurnQueuedEventArgs e)
+    private void OnTurnQueued(ActionEnqueuedEventArgs e)
     {
         TurnQueued?.Invoke(this, e);
     }
@@ -120,4 +120,4 @@ public class TurnAdvancedEventArgs : BattleCommandEventArgs
     public required double AdvanceAmount { get; init; }
 }
 
-public class TurnQueuedEventArgs : BattleCommandEventArgs;
+public class ActionEnqueuedEventArgs : BattleCommandEventArgs;
