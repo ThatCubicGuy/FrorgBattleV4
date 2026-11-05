@@ -19,7 +19,7 @@ public sealed partial class BattleManager
 
     public class Builder
     {
-        private readonly Dictionary<EntityUid, Entity> _fighters = [];
+        private readonly Dictionary<EntityUid, EntityInstance> _fighters = [];
         private readonly List<Team> _teams = [];
         private readonly FighterRegistry _fighterRegistry;
         private readonly ShardRegistry _shardRegistry;
@@ -67,13 +67,13 @@ public sealed partial class BattleManager
 
             var definition = _fighterRegistry.Get(member);
             var team = _teams[^1];
-            var data = new Entity(definition)
+            var instance = new EntityInstance(definition, team)
             {
                 Owner = member,
                 Team = team.Uid,
             };
-            _fighters[data.Uid] = data;
-            team.AddMember(data.Uid);
+            _fighters[instance.Uid] = instance;
+            team.AddMember(instance.Uid);
             return this;
         }
 

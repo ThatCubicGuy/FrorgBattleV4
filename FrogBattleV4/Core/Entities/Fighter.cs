@@ -9,6 +9,7 @@ namespace FrogBattleV4.Core.Entities;
 public class Fighter
 {
     public required string Name { get; init; }
+    public required ImmutableDictionary<StatName, double> Stats { get; init; }
     public required ImmutableArray<ShardId> Shards { get; init; }
     public ImmutableArray<PassiveModifier> PassiveModifiers { get; init; } = [];
     public ImmutableArray<IReaction> Reactions { get; init; } = [];

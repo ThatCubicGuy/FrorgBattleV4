@@ -6,14 +6,14 @@ namespace FrogBattleV4.Core;
 /// <summary>
 /// Predicate for an entity to be matched against.
 /// </summary>
-public class EntityPredicate : GamePredicate<Entity>
+public class EntityPredicate : IGamePredicate<EntityInstance>
 {
     public FighterId? Id { get; init; }
     public ShardId[]? Shards { get; init; }
 
     // TODO (Nova): Expand predicate
 
-    public override bool Evaluate(Entity target)
+    public virtual bool Evaluate(EntityInstance target)
     {
         return (Id?.Equals(target.Owner) ?? true);
     }

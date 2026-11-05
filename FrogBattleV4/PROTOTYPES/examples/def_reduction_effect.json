@@ -1,0 +1,16 @@
+{
+  "name": "DEF Reduction",
+  "max_stacks": 3,
+  "modifiers": [
+    {
+      "modifier_type": "stat",
+      "stat": "def",
+      "entity": "this",
+      "values": {
+        "add_base_percent": -0.3,
+        "multiply_total": 1
+      }
+    }
+  ],
+  "mutators": []
+}

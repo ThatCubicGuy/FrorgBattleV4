@@ -10,14 +10,20 @@ public class StatusEffectInstance : IModifierProvider
 {
     private int _turns;
     private int _stacks;
+    public required StatusEffectId Id { get; init; }
     public required StatusEffect Definition { get; init; }
     public required EntityUid Applicant { get; init; }
     public required EntityUid Holder { get; init; }
 
+    public bool IsBuff => Definition.Type == StatusEffectType.Buff;
+    public bool IsDebuff => Definition.Type == StatusEffectType.Debuff;
+
     public int Turns
     {
         get => _turns;
-        set => _turns = Math.Clamp(value, 0, Definition.MaxDuration);
+        set => _turns = Definition.MaxDuration.HasValue
+            ? Math.Clamp(value, 0, Definition.MaxDuration.Value)
+            : Math.Max(value, 0);
     }
 
     public int Stacks
@@ -27,14 +33,15 @@ public class StatusEffectInstance : IModifierProvider
     }
 
     [Pure]
-    public bool ShouldRemove() => Stacks <= 0 || (Turns <= 0 && !Definition.Properties.HasFlag(EffectFlags.Infinite));
+    public bool ShouldRemove() => Stacks <= 0 || (Turns <= 0 && !Definition.Properties.HasFlag(StatusEffectFlags.Infinite));
 
     public void OnTick(TurnMoment moment, CommandBuilder builder)
     {
-        if (moment == (Definition.Properties.HasFlag(EffectFlags.StartTick) ? TurnMoment.Start : TurnMoment.End))
+        if (moment == (Definition.Properties.HasFlag(StatusEffectFlags.StartTick) ? TurnMoment.Start : TurnMoment.End))
         {
             Turns -= 1;
         }
+
         foreach (var mutator in Definition.Mutators)
         {
             mutator.Tick(moment, this, builder);
@@ -44,6 +51,6 @@ public class StatusEffectInstance : IModifierProvider
     [Pure]
     public ModifierStack GetContributingModifiers(IQuery query, BattleEnvironment env, in ModifierContext ctx)
     {
-        return Definition.ModifierRules.GetContributingModifiers(query, env, ctx) * Stacks;
+        return Definition.Modifiers.GetContributingModifiers(query, env, ctx) * Stacks;
     }
 }

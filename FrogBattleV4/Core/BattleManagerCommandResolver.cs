@@ -74,6 +74,7 @@ public sealed partial class BattleManager
                 {
                     Sender = actor,
                     Target = target,
+                    EffectId = data.Effect,
                 });
                 return;
             }
@@ -84,6 +85,7 @@ public sealed partial class BattleManager
             {
                 Applicant = actor,
                 Holder = target,
+                Id = data.Effect,
                 Definition = definition,
                 Stacks = data.AddedStacks,
                 Turns = data.InitialTurns,
@@ -93,7 +95,8 @@ public sealed partial class BattleManager
             {
                 Sender = actor,
                 Target = target,
-                Id = definition.Id,
+                EffectId = data.Effect,
+                EffectType = definition.Type,
                 Stacks = data.AddedStacks,
                 Turns = data.InitialTurns,
             });
@@ -105,27 +108,27 @@ public sealed partial class BattleManager
             var data = command.Data;
 
             var effectsToRemove = manager.Entities[target].StatusEffects
-                .Where(effect => data.Predicate(effect) &&
-                                 !effect.Definition.Properties.HasFlag(EffectFlags.Unremovable))
+                .Where(effect => data.Predicate.Evaluate(effect) &&
+                                 !effect.Definition.Properties.HasFlag(StatusEffectFlags.Unremovable))
                 // Use ToList() to avoid CollectionChanged exceptions at runtime
                 .ToList();
 
             foreach (var instance in effectsToRemove)
             {
-                if (!manager.Entities[target].TryGetStatusEffect(instance.Definition.Id, out var effect)) continue;
-                if (instance.Definition.Properties.HasFlag(EffectFlags.RemoveStack))
+                if (!manager.Entities[target].TryGetStatusEffect(instance.Id, out var effect)) continue;
+                if (instance.Definition.Properties.HasFlag(StatusEffectFlags.RemoveStack))
                 {
                     effect.Stacks -= data.RemovedStacks;
                 }
                 else effect.Stacks = 0;
 
-                if (effect.ShouldRemove() && manager.Entities[target].RemoveStatusEffect(instance.Definition.Id))
+                if (effect.ShouldRemove() && manager.Entities[target].RemoveStatusEffect(instance.Id))
                 {
                     manager.OnEffectRemoved(new EffectRemovedEventArgs
                     {
                         Sender = actor,
                         Target = target,
-                        Id = instance.Definition.Id,
+                        EffectId = instance.Id,
                         TurnsLeft = instance.Turns,
                         Stacks = instance.Stacks,
                     });
@@ -155,7 +158,7 @@ public sealed partial class BattleManager
 
             manager.Scheduler.EnqueueInstant(new InstantAction(target, data.Decision));
 
-            manager.OnTurnQueued(new ActionEnqueuedEventArgs
+            manager.OnActionEnqueued(new ActionEnqueuedEventArgs
             {
                 Sender = actor,
                 Target = target,

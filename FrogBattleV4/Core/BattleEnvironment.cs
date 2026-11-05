@@ -16,23 +16,24 @@ public record BattleEnvironment
 {
     private readonly Registry<FighterId, Fighter> _fighterRegistry;
     private readonly Registry<ShardId, Shard> _shardRegistry;
+    private readonly ImmutableDictionary<EntityUid, EntityInstance> _entities;
+    private readonly ImmutableDictionary<TeamUid, Team> _teams;
+    private readonly ImmutableList<IModifierProvider> _arenaModifiers;
 
-    public BattleEnvironment(ImmutableDictionary<EntityUid, Entity> entities,
+    public BattleEnvironment(ImmutableDictionary<EntityUid, EntityInstance> entities,
         ImmutableDictionary<TeamUid, Team> teams,
         Registry<FighterId, Fighter> fighterRegistry,
-        Registry<ShardId, Shard> shardRegistry)
+        Registry<ShardId, Shard> shardRegistry,
+        ImmutableList<IModifierProvider> arenaModifiers)
     {
         _fighterRegistry = fighterRegistry;
         _shardRegistry = shardRegistry;
-        Entities = entities;
-        Teams = teams;
+        _arenaModifiers = arenaModifiers;
+        _entities = entities;
+        _teams = teams;
     }
 
     #region Properties
-
-    private ImmutableDictionary<EntityUid, Entity> Entities { get; }
-    private ImmutableDictionary<TeamUid, Team> Teams { get; }
-    private ImmutableList<IModifierProvider> ArenaModifiers { get; init; } = ImmutableList<IModifierProvider>.Empty;
 
     /// <summary>
     /// Subjective modifiers are modifiers that should only apply to the current user.
@@ -66,7 +67,7 @@ public record BattleEnvironment
     public bool IsPredicate(EntityUid entity, EntityPredicate? predicate)
     {
         EnsureExists(entity);
-        return predicate.SafeEvaluate(Entities[entity]);
+        return predicate.SafeEvaluate(_entities[entity]);
     }
 
     /// <summary>
@@ -81,7 +82,7 @@ public record BattleEnvironment
     public IEnumerable<ShardId> GetShards(EntityUid entity)
     {
         EnsureExists(entity);
-        return _fighterRegistry.Get(Entities[entity].Owner).Shards;
+        return _fighterRegistry.Get(_entities[entity].Owner).Shards;
     }
 
     /// <summary>
@@ -96,13 +97,13 @@ public record BattleEnvironment
     public IEnumerable<EntityUid> GetNeighbors(EntityUid entity)
     {
         EnsureExists(entity);
-        return Teams[Entities[entity].Team].GetOnFieldMembers();
+        return _teams[_entities[entity].Team].GetOnFieldMembers();
     }
 
     public IEnumerable<EntityUid> GetEnemies(EntityUid entity)
     {
         EnsureExists(entity);
-        return Teams.Values
+        return _teams.Values
             .SelectMany(team => team.GetOnFieldMembers())
             .Except(GetNeighbors(entity));
     }
@@ -120,16 +121,13 @@ public record BattleEnvironment
     public IEnumerable<IModifierProvider> GetModifiers(EntityUid entity)
     {
         EnsureExists(entity);
-        var data = Entities[entity];
-        var passiveMods = _fighterRegistry.Get(data.Owner).PassiveModifiers;
-        if (passiveMods.IsDefault)
-        {
-            throw new InvalidOperationException($"Passive modifiers of {entity} are in an invalid state. (default)");
-        }
-        return ArenaModifiers
+        var data = _entities[entity];
+        var passiveMods = data.PassiveModifiers;
+
+        return _arenaModifiers
             .Concat(data.StatusEffects)
             .Concat(passiveMods)
-            .Concat(Teams[data.Team].Modifiers);
+            .Concat(_teams[data.Team].Modifiers);
     }
 
     /// <summary>
@@ -148,7 +146,7 @@ public record BattleEnvironment
     public double GetPoolValue(EntityUid entity, PoolName pool)
     {
         EnsureExists(entity);
-        return Entities[entity].Pools.GetValueOrDefault(pool)?.Value ?? 0;
+        return _entities[entity].Pools.GetValueOrDefault(pool)?.Value ?? 0;
     }
 
     /// <summary>
@@ -167,18 +165,18 @@ public record BattleEnvironment
     public Counter? GetCounter(EntityUid entity, CounterName counter)
     {
         EnsureExists(entity);
-        return Entities[entity].Counters.GetValueOrDefault(counter);
+        return _entities[entity].Counters.GetValueOrDefault(counter);
     }
 
     public IEnumerable<StatusEffectInstance> GetStatusEffects(EntityUid entity)
     {
         EnsureExists(entity);
-        return Entities[entity].StatusEffects;
+        return _entities[entity].StatusEffects;
     }
 
     private void EnsureExists(EntityUid entity)
     {
-        if (!Entities.ContainsKey(entity)) throw new EntityMissingException(entity);
+        if (!_entities.ContainsKey(entity)) throw new EntityMissingException(entity);
     }
 
     #endregion
@@ -191,7 +189,10 @@ public record BattleEnvironment
     /// <param name="entity">The EntityUid that didn't match any entity in the current context.</param>
     public class EntityMissingException(EntityUid entity) : Exception
     {
-        public EntityUid Entity { get; } = entity;
+        private readonly EntityUid _entity = entity;
+
+        public EntityUid Entity => _entity;
+
         public override string Message => $"Entity {Entity} does not exist in the current battle!";
     }
 
@@ -201,8 +202,13 @@ public record BattleEnvironment
     /// <param name="limit">The limit that was exceeded.</param>
     public class EntityLimitException(EntityUid entity, long limit) : Exception
     {
-        public EntityUid Entity { get; } = entity;
-        public long Limit { get; } = limit;
+        private readonly EntityUid _entity = entity;
+        private readonly long _limit = limit;
+
+        public EntityUid Entity => _entity;
+
+        public long Limit => _limit;
+
         public override string Message => $"Entity {Entity} exceeded limit of {Limit} entities!";
     }
 

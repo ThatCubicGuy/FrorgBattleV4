@@ -18,6 +18,7 @@ public interface IModifierRule : IModifierProvider
     ModifierStack IModifierProvider.GetContributingModifiers(IQuery query, BattleEnvironment env,
         in ModifierContext ctx) => AppliesTo(query, ctx) ? ModifierStack : ModifierStack.None;
 
+    [JsonPropertyName("values")]
     ModifierStack ModifierStack { get; }
 
     /// <summary>
@@ -59,7 +60,7 @@ public abstract class AttributeModifier<TQuery> : ModifierRule<TQuery> where TQu
     /// Determines whether this modifier applies to the holder or the target.
     /// </summary>
     [JsonPropertyName("entity")]
-    public required AffectedSide AffectedSide { get; init; }
+    public AffectedSide AffectedSide { get; init; } = AffectedSide.This;
 
     protected sealed override bool MatchesRelationship(TQuery query, in ModifierContext ctx)
     {
@@ -86,7 +87,7 @@ public abstract class MutationModifier<TQuery> : ModifierRule<TQuery> where TQue
     /// Determines whether this modifier applies to the holder or the target.
     /// </summary>
     [JsonPropertyName("entity")]
-    public required AffectedSide AffectedSide { get; init; }
+    public AffectedSide AffectedSide { get; init; } = AffectedSide.This;
     /// <summary>
     /// Determines whether this modifier applies to incoming or outgoing mutations.
     /// </summary>

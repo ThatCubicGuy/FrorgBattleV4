@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Modifiers;
 using FrogBattleV4.Core.Decisions;
 
@@ -11,6 +12,8 @@ public class Team : UniquelyIdentifiable<TeamUid>
 {
     private readonly List<EntityUid> _members = [];
     private readonly List<EntityUid> _offFieldMembers = [];
+    private readonly Pool _manaPool = new(1000);
+
     public Team(IDecisionProvider playerDecisionProvider, IEnumerable<IModifierProvider>? modifiers = null)
     {
         ArgumentNullException.ThrowIfNull(playerDecisionProvider);
@@ -45,5 +48,23 @@ public class Team : UniquelyIdentifiable<TeamUid>
             throw new InvalidOperationException("Cannot remove a nonexistent member.");
 
         _members.Remove(entity);
+    }
+
+    /// <summary>
+    /// Returns a list of pools common for all entities on this team.
+    /// </summary>
+    /// <returns>A collection of key-value pairs corresponding to the common pools of this team.</returns>
+    internal IEnumerable<KeyValuePair<PoolName, Pool>> GetCommonPools()
+    {
+        yield return new KeyValuePair<PoolName, Pool>(PoolName.Mana, _manaPool);
+    }
+
+    /// <summary>
+    /// Returns a list of counters common for all entities on this team.
+    /// </summary>
+    /// <returns>A collection of key-value pairs corresponding to the common counters of this team.</returns>
+    internal IEnumerable<KeyValuePair<CounterName, Counter>> GetCommonCounters()
+    {
+        yield break;
     }
 }

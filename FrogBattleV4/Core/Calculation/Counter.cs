@@ -36,13 +36,17 @@ public sealed class Counter()
     /// </summary>
     [JsonPropertyName("trigger")]
     public long? TriggerValue { get; init; }
-    
+
     /// <summary>
     /// Determines if the TriggerValueReached event should be triggered outside strict equality.
     /// </summary>
     [JsonPropertyName("condition")]
-    public TriggerType TriggerCondition { get; init; } = TriggerType.Equal;
+    public TriggerType TriggerCondition { get; init; } = TriggerType.Above;
 
+    /// <summary>
+    /// Maximum value that the counter stops increasing at.
+    /// Null means no limit.
+    /// </summary>
     [JsonPropertyName("max")]
     public long? MaxValue { get; init; }
 
@@ -62,13 +66,9 @@ public sealed class Counter()
                 OldValue = oldValue,
                 NewValue = _currentValue,
             });
-            if (TriggerCondition switch
-                {
-                    TriggerType.Equal => _currentValue == TriggerValue,
-                    TriggerType.Below => _currentValue <= TriggerValue,
-                    TriggerType.Above => _currentValue >= TriggerValue,
-                    _ => false,
-                })
+
+            // Avoid invoking TriggerValueReached event continuously
+            if (IsTrigger(_currentValue) && !IsTrigger(oldValue))
             {
                 OnTriggerValueReached();
             }
@@ -123,18 +123,26 @@ public sealed class Counter()
         CurrentValue = DefaultValue;
     }
 
+    private bool IsTrigger(long value)
+    {
+        return TriggerCondition switch
+        {
+            TriggerType.Equal => value == TriggerValue,
+            TriggerType.Below => value <= TriggerValue,
+            TriggerType.Above => value >= TriggerValue,
+            _ => false,
+        };
+    }
+
     /// <summary>
     /// Specifies inclusive comparisons against trigger value.
     /// </summary>
     [JsonConverter(typeof(JsonStringEnumConverter<TriggerType>))]
     public enum TriggerType
     {
-        [JsonStringEnumMemberName("equal")]
-        Equal,
-        [JsonStringEnumMemberName("below")]
-        Below,
-        [JsonStringEnumMemberName("above")]
-        Above,
+        [JsonStringEnumMemberName("equal")] Equal,
+        [JsonStringEnumMemberName("below")] Below,
+        [JsonStringEnumMemberName("above")] Above,
     }
 
     private void OnValueChanged(ValueChangedEventArgs e)

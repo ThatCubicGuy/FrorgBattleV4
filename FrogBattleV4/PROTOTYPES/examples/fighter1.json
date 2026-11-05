@@ -1,8 +1,14 @@
 {
   "name": "Lunar Hero Lucit",
+  "stats": {
+    "max_hp": 400000,
+    "atk": 1000,
+    "def": 400,
+    "max_energy": 120
+  },
   "shards": [
     "frorgbattle:attack_slash",
-    "frorgbattle:attack_bullet",
+    "frorgbattle:debuff_shard_1",
     "frorgbattle:empower_shard_1",
     "frorgbattle:target_shard_1"
   ],

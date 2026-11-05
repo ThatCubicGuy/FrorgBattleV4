@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
-using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Entities;
-using FrogBattleV4.Core.Modifiers.StatusEffects;
 using FrogBattleV4.Core.Registries;
-using FrogBattleV4.Core.Decisions;
 
 namespace FrogBattleV4.Core;
 
@@ -23,7 +20,7 @@ public sealed partial class BattleManager
     private readonly StatusEffectRegistry _statusEffectRegistry;
 
     private BattleManager(
-        ImmutableDictionary<EntityUid, Entity> entities,
+        ImmutableDictionary<EntityUid, EntityInstance> entities,
         ImmutableDictionary<TeamUid, Team> teams,
         FighterRegistry fighterRegistry,
         ShardRegistry shardRegistry,
@@ -32,14 +29,15 @@ public sealed partial class BattleManager
         CreationTime = DateTime.UtcNow.Ticks;
         _rng = new SeededBattleRng(CreationTime.GetHashCode());
         _commandResolver = new CommandResolver(this);
+
+        Entities = entities;
+        Teams = teams;
         _fighterRegistry = fighterRegistry;
         _shardRegistry = shardRegistry;
         _statusEffectRegistry = statusEffectRegistry;
-        Entities = entities;
-        Teams = teams;
     }
 
-    public ImmutableDictionary<EntityUid, Entity> Entities { get; private set; }
+    public ImmutableDictionary<EntityUid, EntityInstance> Entities { get; private set; }
     public ImmutableDictionary<TeamUid, Team> Teams { get; private set; }
 
     public long CreationTime { get; }
@@ -58,17 +56,26 @@ public sealed partial class BattleManager
         }
 
         OnBattleStarted();
+        IAction previous = null!;
         while (!cancellationToken.IsCancellationRequested && Scheduler.MoveNext())
         {
             var env = GetEnvironment();
             var action = Scheduler.Current;
-            var builder = new CommandBuilder();
 
-            // Tick current's start mutators
-            Entities[action.Actor].Tick(TurnMoment.Start, builder);
+            var mutatorBuilder = new CommandBuilder();
+
+            // Tick previous entity's end mutators
+            if (previous is not null) Entities[previous.Actor].Tick(TurnMoment.End, mutatorBuilder);
+            // Tick current entity's start mutators
+            Entities[action.Actor].Tick(TurnMoment.Start, mutatorBuilder);
 
             // Mutator commands are executed separately
-            builder.Build(_commandResolver);
+            mutatorBuilder.Build(_commandResolver);
+
+            OnTurnStarted(new TurnEventArgs
+            {
+                Actor = action.Actor,
+            });
 
             var decision = await action.GetDecisionAsync(env, cancellationToken);
 
@@ -80,26 +87,20 @@ public sealed partial class BattleManager
                 },
             ], [], 0);
 
-            builder = new CommandBuilder();
+            var turnCommandBuilder = new CommandBuilder();
             // You can submit a shard link that contains unusable shards,
             // but if said shards don't become usable by the time
             // they need to be executed, the shard link stops.
             foreach (var shard in decision.Link.Select(_shardRegistry.Get).TakeWhile(s => s.IsUsable(state, env)))
             {
-                shard.Resolve(ref state, env, builder, _rng);
+                shard.Resolve(ref state, env, turnCommandBuilder, _rng);
                 state = state with
                 {
                     CurrentShardIndex = state.CurrentShardIndex + 1,
                 };
             }
 
-            builder.Build(_commandResolver);
-
-            // Tick current's end mutators
-            Entities[action.Actor].Tick(TurnMoment.End, builder);
-
-            // Mutator commands are executed separately
-            builder.Build(_commandResolver);
+            turnCommandBuilder.Build(_commandResolver);
 
             // TODO (Nova): requeue turns
         }
@@ -119,6 +120,6 @@ public sealed partial class BattleManager
     /// <returns>A new <see cref="BattleEnvironment"/> instance.</returns>
     public BattleEnvironment GetEnvironment()
     {
-        return new BattleEnvironment(Entities, Teams, _fighterRegistry, _shardRegistry);
+        return new BattleEnvironment(Entities, Teams, _fighterRegistry, _shardRegistry, [/*TODO*/]);
     }
 }

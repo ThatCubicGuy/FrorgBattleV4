@@ -1,31 +1,35 @@
 using System;
 using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 
 public class StatusEffect
 {
-    public required StatusEffectId Id { get; init; }
+    [JsonPropertyName("name")]
     public required string DisplayName { get; init; }
     public string? Description { get; init; }
-    public EffectType Type { get; init; }
-    public ImmutableArray<IModifierRule> ModifierRules { get; init; } = [];
+    public int MaxStacks { get; init; } = 1;
+    public int? MaxDuration { get; init; }
+    public StatusEffectType Type { get; init; } = StatusEffectType.None;
+    public StatusEffectFlags Properties { get; init; } = StatusEffectFlags.None;
+    public ImmutableArray<IModifierRule> Modifiers { get; init; } = [];
     public ImmutableArray<IMutatorComponent> Mutators { get; init; } = [];
-    public EffectFlags Properties { get; init; } = EffectFlags.None;
-
-    public required int MaxStacks { get; init; }
-    public int MaxDuration { get; init; }
 }
 
-public enum EffectType
+[JsonConverter(typeof(JsonStringEnumConverter<StatusEffectType>))]
+public enum StatusEffectType
 {
+    [JsonStringEnumMemberName("none")]
     None,
+    [JsonStringEnumMemberName("buff")]
     Buff,
+    [JsonStringEnumMemberName("debuff")]
     Debuff,
 }
 
 [Flags]
-public enum EffectFlags
+public enum StatusEffectFlags
 {
     None = 0,
     Unremovable = 1 << 0,

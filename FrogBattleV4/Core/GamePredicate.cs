@@ -4,9 +4,9 @@ namespace FrogBattleV4.Core;
 /// An object that determines whether an instance of type <typeparamref name="T"/> matches certain conditions.
 /// </summary>
 /// <typeparam name="T">Type of elements to evaluate against.</typeparam>
-public abstract class GamePredicate<T>
+public interface IGamePredicate<in T>
 {
-    public abstract bool Evaluate(T value);
+    bool Evaluate(T value);
 }
 
 /// <summary>
@@ -21,7 +21,7 @@ public static class GamePredicate
     /// <param name="value">Value to evaluate against.</param>
     /// <typeparam name="T">Type of values the predicate supports.</typeparam>
     /// <returns>True if the predicate is null -or- the predicate was evaluated successfully.</returns>
-    public static bool SafeEvaluate<T>(this GamePredicate<T>? predicate, T value)
+    public static bool SafeEvaluate<T>(this IGamePredicate<T>? predicate, T value)
     {
         return predicate is null || predicate.Evaluate(value);
     }

@@ -9,6 +9,7 @@ public sealed partial class BattleManager
 {
     public event EventHandler? BattleStarted;
     public event EventHandler? BattleEnded;
+    public event EventHandler<TurnEventArgs>? TurnStarted; 
     // the target took damage from the sender
     public event EventHandler<DamageTakenEventArgs>? DamageTaken;
     // the target received healing from the sender
@@ -24,7 +25,7 @@ public sealed partial class BattleManager
     // the sender advanced the turn of the target
     public event EventHandler<TurnAdvancedEventArgs>? TurnAdvanced;
     // the sender queued a turn for the target
-    public event EventHandler<ActionEnqueuedEventArgs>? TurnQueued;
+    public event EventHandler<ActionEnqueuedEventArgs>? ActionEnqueued;
 
     private void OnBattleStarted()
     {
@@ -34,6 +35,11 @@ public sealed partial class BattleManager
     private void OnBattleEnded()
     {
         BattleEnded?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void OnTurnStarted(TurnEventArgs e)
+    {
+        TurnStarted?.Invoke(this, e);
     }
 
     private void OnDamageTaken(DamageTakenEventArgs e)
@@ -71,10 +77,15 @@ public sealed partial class BattleManager
         TurnAdvanced?.Invoke(this, e);
     }
 
-    private void OnTurnQueued(ActionEnqueuedEventArgs e)
+    private void OnActionEnqueued(ActionEnqueuedEventArgs e)
     {
-        TurnQueued?.Invoke(this, e);
+        ActionEnqueued?.Invoke(this, e);
     }
+}
+
+public class TurnEventArgs : EventArgs
+{
+    public required EntityUid Actor { get; init; }
 }
 
 public class DamageTakenEventArgs : BattleCommandEventArgs, IDeltaEventArgs
@@ -101,19 +112,23 @@ public class PoolMutatedEventArgs : BattleCommandEventArgs, IDeltaEventArgs
 
 public class EffectAppliedEventArgs : BattleCommandEventArgs
 {
-    public required StatusEffectId Id { get; init; }
+    public required StatusEffectId EffectId { get; init; }
+    public required StatusEffectType EffectType { get; init; }
     public required int Turns { get; init; }
     public required int Stacks { get; init; }
 }
 
 public class EffectRemovedEventArgs : BattleCommandEventArgs
 {
-    public required StatusEffectId Id { get; init; }
+    public required StatusEffectId EffectId { get; init; }
     public required int TurnsLeft { get; init; }
     public required int Stacks { get; init; }
 }
 
-public class EffectResistedEventArgs : BattleCommandEventArgs;
+public class EffectResistedEventArgs : BattleCommandEventArgs
+{
+    public required StatusEffectId EffectId { get; init; }
+}
 
 public class TurnAdvancedEventArgs : BattleCommandEventArgs
 {

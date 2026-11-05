@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FrogBattleV4;
 using FrogBattleV4.Core;
 using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Abilities.ShardClasses;
@@ -33,16 +33,50 @@ foreach (var kvp in FighterRegistry.Global)
     Console.Out.WriteLine("(end)");
 }
 
+Console.Out.WriteLine("Registered effects:");
+foreach (var kvp in StatusEffectRegistry.Global)
+{
+    Console.Out.WriteLine($"{kvp.Value.DisplayName}");
+    Console.Out.WriteLine("(end)");
+}
+
 var provider = new SetDecisionProvider();
 var member = new FighterId(new ResourceId("frorgbattle", "fighter1"));
 var manager = BattleManager.GetBuilder()
     .AddTeam(provider).AddMembers([member, member])
-    .AddTeam(provider).AddMembers([member, member, member])
+    .AddTeam(provider).AddMembers([member])
     .Build();
 
 manager.BattleStarted += Extensions.HandleBattleStarted;
+manager.TurnStarted += (sender, e) =>
+{
+    var env = (sender as BattleManager)!.GetEnvironment();
+    Console.Out.WriteLine($"""
+                           Stats of {e.Actor}:
+                               Def = {new StatQuery
+                               {
+                                   Stat = StatName.Def,
+                                   Subject = e.Actor,
+                               }.Calculate(env)}
+                           """);
+};
+manager.EffectApplied += (_, e) =>
+{
+    Logger.WriteLine($"{e.Stacks} stack(s) of {e.EffectId} applied for {e.Turns} turns by {e.Sender} to {e.Target}!");
+};
+manager.EffectResisted += (_, e) =>
+{
+    Logger.WriteLine($"{e.Target} resisted effect {e.EffectId} from {e.Sender}!");
+};
 
-await manager.RunAsync(CancellationToken.None);
+try
+{
+    await manager.RunAsync(CancellationToken.None);
+}
+catch (ApplicationException)
+{
+    Console.Out.WriteLine("Thank you for playing!");
+}
 
 file class SetDecisionProvider : IDecisionProvider, IComparer<ShardId>
 {
@@ -99,6 +133,7 @@ file static class Extensions
 
     public static void HandleBattleStarted(object? sender, EventArgs args)
     {
+        return;
         foreach (var kvp in (sender as BattleManager)!.Entities)
         {
             var counter = kvp.Value.Counters[new CounterName("elation")];

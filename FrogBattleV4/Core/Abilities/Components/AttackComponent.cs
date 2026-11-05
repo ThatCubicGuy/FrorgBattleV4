@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Text.Json.Serialization;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat.Commands;
@@ -57,9 +56,7 @@ public sealed record AttackProperties(bool CanCrit = true);
 [JsonDerivedType(typeof(PoolValuePercentage), "pool_value_percent")]
 public abstract class DamageFormula
 {
-    private DamageFormula()
-    {
-    }
+    private DamageFormula() { }
 
     /// <summary>
     /// A number between 0 and 1 that determines damage falloff per target rank.
@@ -68,6 +65,7 @@ public abstract class DamageFormula
     public required double RankFalloff { get; init; }
 
     public abstract double Resolve(ShardResolutionScope scope, BattleEnvironment env);
+
     private double GetFalloffModifier(ShardResolutionScope scope) => Math.Pow(1 - RankFalloff, scope.Targeting.Rank);
 
     public sealed class Flat : DamageFormula

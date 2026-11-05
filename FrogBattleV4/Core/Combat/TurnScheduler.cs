@@ -4,7 +4,6 @@ using System.Linq;
 
 namespace FrogBattleV4.Core.Combat;
 
-// TODO (Nova): need redesign to enable predetermined selection requests
 public class TurnScheduler
 {
     private readonly PriorityQueue<ScheduledTurn, PriorityKey> _turnTimeline = new();

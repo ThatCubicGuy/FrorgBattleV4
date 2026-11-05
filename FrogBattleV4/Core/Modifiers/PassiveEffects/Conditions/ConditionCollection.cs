@@ -7,10 +7,15 @@ namespace FrogBattleV4.Core.Modifiers.PassiveEffects.Conditions;
 
 public record ConditionCollection(ImmutableList<IConditionComponent> Conditions) : IConditionComponent
 {
+    public static readonly ConditionCollection Empty = new(ImmutableList<IConditionComponent>.Empty);
+
     public AccumulationType Accumulation { get; init; } = AccumulationType.Min;
 
     public int GetContribution(EntityUid subject, EntityUid? reference, BattleEnvironment env)
     {
+        // Empty conditions list makes the passive act as a permanent status effect.
+        // Useful for stats.
+        if (Conditions.Count == 0) return 1;
         var contributions = Conditions.Select(cc => cc.GetContribution(subject, reference, env));
         return Accumulation switch
         {

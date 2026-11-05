@@ -40,7 +40,7 @@ public record ModifierStack(
     {
         var total = baseAmount;
         total += this[ModifierOperation.BaseAddValue];
-        total += this[ModifierOperation.AddBasePercent] * baseAmount;
+        total += this[ModifierOperation.AddBasePercent] * total;
         total *= this[ModifierOperation.MultiplyTotal];
         total += this[ModifierOperation.FinalAddValue];
         return total;
