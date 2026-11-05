@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace FrogBattleV4.Core.Calculation;
 
 public record DamageData(
@@ -14,8 +16,10 @@ public record DamageData(
     public bool Permits(DamageData data) => Type.Permits(data.Type) && Source.Permits(data.Source);
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter<DamageStatChannel>))]
 public enum DamageStatChannel
 {
+    [JsonStringEnumMemberName("crit_rate")]
     CritRate = 1,
     // Leaves potential for adding things like HitRate and whatnot
 }

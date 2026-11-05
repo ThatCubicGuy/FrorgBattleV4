@@ -8,5 +8,6 @@ namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 /// </summary>
 public interface IMutatorComponent
 {
+    // TODO (Nova): Don't pass mutable status effect instance as parameter
     void Tick(TurnMoment moment, StatusEffectInstance effect, CommandBuilder builder);
 }

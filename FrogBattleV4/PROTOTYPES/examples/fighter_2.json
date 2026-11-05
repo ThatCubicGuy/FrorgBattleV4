@@ -1,0 +1,55 @@
+{
+  "name": "SPEEEED",
+  "stats": {
+    "max_hp": 400000,
+    "atk": 1000,
+    "def": 400,
+    "spd": 120,
+    "max_energy": 120,
+    "crit_damage": 2
+  },
+  "shards": [
+    "frorgbattle:shard_attack_bullet",
+    "frorgbattle:shard_debuff_1",
+    "frorgbattle:shard_empower_1",
+    "frorgbattle:shard_target_1"
+  ],
+  "pools": {},
+  "counters": {
+    "elation": {
+      "max": 5,
+      "trigger": 3
+    }
+  },
+  "passive_modifiers": [],
+  "reactions": [
+    {
+      "trigger": "damage_taken",
+      "target": "this",
+      "predicate": {
+        "source": "link"
+      },
+      "functions": [
+        {
+          "function": "modify_counter",
+          "counter": "elation",
+          "operation": "increment"
+        }
+      ]
+    },
+    {
+      "trigger": "damage_taken",
+      "sender": "this",
+      "predicate": {
+        "source": "link"
+      },
+      "functions": [
+        {
+          "function": "modify_counter",
+          "counter": "elation",
+          "operation": "decrement"
+        }
+      ]
+    }
+  ]
+}

@@ -13,7 +13,7 @@
         "source": "link"
       },
       "properties": {
-        "can_crit": false
+        "can_crit": true
       }
     }
   ],

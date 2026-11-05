@@ -8,6 +8,7 @@ namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 
 public class StatusEffectInstance : IModifierProvider
 {
+    private bool _justAdded = true;
     private int _turns;
     private int _stacks;
     public required StatusEffectId Id { get; init; }
@@ -37,14 +38,20 @@ public class StatusEffectInstance : IModifierProvider
 
     public void OnTick(TurnMoment moment, CommandBuilder builder)
     {
-        if (moment == (Definition.Properties.HasFlag(StatusEffectFlags.StartTick) ? TurnMoment.Start : TurnMoment.End))
-        {
-            Turns -= 1;
-        }
-
         foreach (var mutator in Definition.Mutators)
         {
             mutator.Tick(moment, this, builder);
+        }
+
+        if (_justAdded)
+        {
+            _justAdded = false;
+            return;
+        }
+
+        if (moment == (Definition.Properties.HasFlag(StatusEffectFlags.StartTick) ? TurnMoment.Start : TurnMoment.End))
+        {
+            Turns -= 1;
         }
     }
 

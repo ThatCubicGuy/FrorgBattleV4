@@ -21,30 +21,61 @@ public class AttackComponent : IShardCommandComponent
         };
         builder.Emit(new DamageCommand
         {
-            NormalAmount = new DamageQuery
-            {
-                BaseValue = baseValue,
-                Data = Data,
-                IsCrit = false,
-                Context = ctx,
-            }.Calculate(env),
-            CriticalAmount = new DamageQuery
-            {
-                BaseValue = baseValue,
-                Data = Data,
-                IsCrit = Properties.CanCrit,
-                Context = ctx,
-            }.Calculate(env),
-            CriticalChance = Properties.CanCrit ? new DamageStatQuery
-            {
-                Data = Data,
-                Channel = DamageStatChannel.CritRate,
-                Subject = scope.User,
-                Reference = scope.Targeting.Target,
-            }.Calculate(env) : 0,
+            NormalAmount = GetDamageValue(baseValue, false, env, ctx),
+            CriticalAmount = GetDamageValue(baseValue, true, env, ctx),
+            CriticalChance = GetCritChance(env, ctx),
             Data = Data,
             Relation = ctx,
         });
+    }
+
+    private double GetDamageValue(double baseValue, bool isCrit, BattleEnvironment env, in RelationContext ctx)
+    {
+        return new DamageQuery
+        {
+            BaseValue = baseValue,
+            Data = Data,
+            IsCrit = isCrit,
+            Context = ctx,
+        }.Calculate(env) * GetDefMultiplier(env, ctx) * (isCrit ? GetCritMultiplier(env, ctx) : 1);
+    }
+
+    private static double GetDefMultiplier(BattleEnvironment env, in RelationContext ctx)
+    {
+        return 2000 / double.Max(2000, 2000 + new StatQuery
+        {
+            Stat = StatName.Def,
+            Subject = ctx.Target,
+            Reference = ctx.Actor,
+        }.Calculate(env));
+    }
+
+    private static double GetCritMultiplier(BattleEnvironment env, in RelationContext ctx)
+    {
+        return 1 + new StatQuery
+        {
+            Stat = StatName.CritDamage,
+            Subject = ctx.Actor,
+            Reference = ctx.Target,
+        }.Calculate(env);
+    }
+
+    private double GetCritChance(BattleEnvironment env, in RelationContext ctx)
+    {
+        return Properties.CanCrit
+            ? new DamageStatQuery
+            {
+                Data = Data,
+                Channel = DamageStatChannel.CritRate,
+                Subject = ctx.Actor,
+                Reference = ctx.Target,
+            }.Calculate(env) + new StatQuery
+            {
+                Stat = StatName.CritRate,
+                Subject = ctx.Actor,
+                Reference = ctx.Target,
+            }.Calculate(env)
+            : 0;
     }
 }
 

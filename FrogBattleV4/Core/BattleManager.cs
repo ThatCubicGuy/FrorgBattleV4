@@ -56,7 +56,7 @@ public sealed partial class BattleManager
         }
 
         OnBattleStarted();
-        IAction previous = null!;
+        IAction? previous = null;
         while (!cancellationToken.IsCancellationRequested && Scheduler.MoveNext())
         {
             var env = GetEnvironment();
@@ -64,7 +64,7 @@ public sealed partial class BattleManager
 
             var mutatorBuilder = new CommandBuilder();
 
-            // Tick previous entity's end mutators
+            // Tick previous entity's end mutators & effects
             if (previous is not null) Entities[previous.Actor].Tick(TurnMoment.End, mutatorBuilder);
             // Tick current entity's start mutators
             Entities[action.Actor].Tick(TurnMoment.Start, mutatorBuilder);
@@ -102,7 +102,14 @@ public sealed partial class BattleManager
 
             turnCommandBuilder.Build(_commandResolver);
 
-            // TODO (Nova): requeue turns
+            previous = action;
+
+            // Reschedule actions
+            Scheduler.Schedule(new ScheduledTurn(action.Actor, 10000 / new StatQuery
+            {
+                Subject = action.Actor,
+                Stat = StatName.Spd,
+            }.Calculate(env), Teams[Entities[action.Actor].Team].Provider));
         }
 
         if (cancellationToken.IsCancellationRequested)

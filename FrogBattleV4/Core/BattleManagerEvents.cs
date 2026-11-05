@@ -92,6 +92,7 @@ public class DamageTakenEventArgs : BattleCommandEventArgs, IDeltaEventArgs
 {
     public required double Amount { get; init; }
     public required DamageData Data { get; init; }
+    public required bool IsCrit { get; init; }
     double IDeltaEventArgs.Delta => Amount;
 }
 

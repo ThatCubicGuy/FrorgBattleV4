@@ -4,13 +4,15 @@
     "max_hp": 400000,
     "atk": 1000,
     "def": 400,
-    "max_energy": 120
+    "spd": 100,
+    "max_energy": 120,
+    "crit_damage": 2
   },
   "shards": [
-    "frorgbattle:attack_slash",
-    "frorgbattle:debuff_shard_1",
-    "frorgbattle:empower_shard_1",
-    "frorgbattle:target_shard_1"
+    "frorgbattle:shard_attack_slash",
+    "frorgbattle:shard_debuff_1",
+    "frorgbattle:shard_empower_1",
+    "frorgbattle:shard_target_1"
   ],
   "pools": {},
   "counters": {

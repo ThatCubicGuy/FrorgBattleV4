@@ -26,7 +26,7 @@ public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiabl
         PoolName.Hp,
     ];
 
-    private readonly Dictionary<StatusEffectId, StatusEffectInstance> _statusEffects = [];
+    private readonly Dictionary<StatusEffectId, StatusEffectInstance> _activeEffects = [];
 
     /// <summary>
     /// ResourceId of the behavior definition for this entity.
@@ -39,7 +39,7 @@ public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiabl
     public ImmutableDictionary<CounterName, Counter> Counters { get; } = BaseCounters(definition, team);
     public ImmutableList<PassiveModifier> PassiveModifiers { get; } = BasePassives(definition, team);
 
-    public IReadOnlyCollection<StatusEffectInstance> StatusEffects => _statusEffects.Values;
+    public IReadOnlyCollection<StatusEffectInstance> ActiveEffects => _activeEffects.Values;
 
     public void TakeDamage(double damage, DamageData damageData)
     {
@@ -86,29 +86,37 @@ public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiabl
     // TODO (Nova): don't like this way of implementing this functionality
     public void Tick(TurnMoment moment, Abilities.CommandBuilder builder)
     {
-        foreach (var effect in StatusEffects)
+        var markedForDeath = new List<StatusEffectId>();
+
+        foreach (var effect in ActiveEffects)
         {
             effect.OnTick(moment, builder);
+            if (effect.ShouldRemove()) markedForDeath.Add(effect.Id);
+        }
+
+        foreach (var effect in markedForDeath)
+        {
+            _activeEffects.Remove(effect);
         }
     }
 
     public bool TryGetStatusEffect(StatusEffectId id, [MaybeNullWhen(false)] out StatusEffectInstance instance) =>
-        _statusEffects.TryGetValue(id, out instance);
+        _activeEffects.TryGetValue(id, out instance);
 
     public void AddStatusEffect(StatusEffectInstance effect)
     {
         var id = effect.Id;
-        if (_statusEffects.TryGetValue(id, out var instance))
+        if (_activeEffects.TryGetValue(id, out var instance))
         {
             instance.Stacks += effect.Stacks;
             instance.Turns = effect.Turns;
             return;
         }
 
-        _statusEffects[id] = effect;
+        _activeEffects[id] = effect;
     }
 
-    public bool RemoveStatusEffect(StatusEffectId effect) => _statusEffects.Remove(effect);
+    public bool RemoveStatusEffect(StatusEffectId effect) => _activeEffects.Remove(effect);
 
     /// <summary>
     /// Returns a new set of default pools (Hp, Energy, Shield, Overheal)
@@ -175,7 +183,7 @@ public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiabl
     private static ImmutableList<PassiveModifier> BasePassives(Fighter definition, Team team)
     {
         var result = new List<PassiveModifier>(definition.Stats.Count + definition.PassiveModifiers.Length);
-Logger.WriteLine(definition.Stats.Count.ToString());
+
         result.AddRange(definition.Stats.Select(kvp => new PassiveModifier
         {
             Modifiers =

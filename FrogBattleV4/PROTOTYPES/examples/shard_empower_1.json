@@ -1,0 +1,71 @@
+{
+  "type": "empower",
+  "modifiers": [
+    {
+      "modifier_type": "damage",
+      "damage": {
+        "type": "slash",
+        "source": "link"
+      },
+      "crit_only": false,
+      "entity": "this",
+      "direction": "outgoing",
+      "values": {
+        "base_add_value": 0,
+        "add_base_percent": 0.6,
+        "multiply_total": 1,
+        "final_add_value": 0
+      }
+    },
+    {
+      "modifier_type": "stat",
+      "stat": "crit_rate",
+      "values": {
+        "base_add_value": 0.1,
+        "add_base_percent": 0,
+        "multiply_total": 1,
+        "final_add_value": 0
+      }
+    },
+    {
+      "modifier_type": "stat",
+      "stat": "crit_damage",
+      "values": {
+        "base_add_value": 1,
+        "add_base_percent": 0,
+        "multiply_total": 1,
+        "final_add_value": 0
+      }
+    },
+    {
+      "modifier_type": "damage_property",
+      "damage": {
+        "type": "bullet",
+        "source": "link"
+      },
+      "channel": "crit_rate",
+      "entity": "this",
+      "values": {
+        "base_add_value": 1,
+        "add_base_percent": 0,
+        "multiply_total": 1,
+        "final_add_value": 0
+      }
+    }
+  ],
+  "name": "Empower Shard",
+  "description": "Empower shard hardcoded for testing.",
+  "function": "enhance",
+  "requirements": [
+    {
+      "type": "pool",
+      "pool": "mana",
+      "max_value": 10
+    },
+    {
+      "type": "stat",
+      "stat": "dex",
+      "min_value": 0
+    }
+  ]
+}

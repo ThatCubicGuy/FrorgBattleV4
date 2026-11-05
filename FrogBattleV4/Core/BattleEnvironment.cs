@@ -125,7 +125,7 @@ public record BattleEnvironment
         var passiveMods = data.PassiveModifiers;
 
         return _arenaModifiers
-            .Concat(data.StatusEffects)
+            .Concat(data.ActiveEffects)
             .Concat(passiveMods)
             .Concat(_teams[data.Team].Modifiers);
     }
@@ -171,7 +171,7 @@ public record BattleEnvironment
     public IEnumerable<StatusEffectInstance> GetStatusEffects(EntityUid entity)
     {
         EnsureExists(entity);
-        return _entities[entity].StatusEffects;
+        return _entities[entity].ActiveEffects;
     }
 
     private void EnsureExists(EntityUid entity)

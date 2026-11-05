@@ -8,9 +8,9 @@
         "chance": 1
       },
       "data": {
-        "effect": "frorgbattle:def_reduction_effect",
-        "turns": 3,
-        "stacks": 1
+        "effect": "frorgbattle:effect_def_reduction",
+        "turns": 1,
+        "stacks": 3
       }
     }
   ],

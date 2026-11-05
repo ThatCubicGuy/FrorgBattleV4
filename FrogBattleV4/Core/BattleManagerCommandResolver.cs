@@ -13,7 +13,8 @@ public sealed partial class BattleManager
         {
             var (actor, target) = command.Relation;
             var damageData = command.Data;
-            var damage = manager._rng.Chance(command.CriticalChance)
+            var isCrit = manager._rng.Chance(command.CriticalChance);
+            var damage = isCrit
                 ? command.CriticalAmount
                 : command.NormalAmount;
 
@@ -24,6 +25,7 @@ public sealed partial class BattleManager
                 Sender = actor,
                 Target = target,
                 Amount = damage,
+                IsCrit = isCrit,
                 Data = damageData,
             });
         }
@@ -107,7 +109,7 @@ public sealed partial class BattleManager
             var (actor, target) = command.Relation;
             var data = command.Data;
 
-            var effectsToRemove = manager.Entities[target].StatusEffects
+            var effectsToRemove = manager.Entities[target].ActiveEffects
                 .Where(effect => data.Predicate.Evaluate(effect) &&
                                  !effect.Definition.Properties.HasFlag(StatusEffectFlags.Unremovable))
                 // Use ToList() to avoid CollectionChanged exceptions at runtime

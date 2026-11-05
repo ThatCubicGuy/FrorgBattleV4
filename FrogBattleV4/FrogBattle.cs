@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using FrogBattleV4.Input;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -7,7 +8,7 @@ namespace FrogBattleV4;
 public class FrogBattle : Game
 {
     private GraphicsDeviceManager _graphics;
-    private SpriteBatch _spriteBatch;
+    private SpriteBatch _spriteBatch = null!;
 
     public FrogBattle()
     {
@@ -28,7 +29,7 @@ public class FrogBattle : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         // TODO: use this.Content to load your game content here
-        
+
         base.LoadContent();
     }
 
