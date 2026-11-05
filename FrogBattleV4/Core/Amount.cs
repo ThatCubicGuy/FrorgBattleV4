@@ -7,7 +7,7 @@ namespace FrogBattleV4.Core;
 
 public readonly struct Amount : INumber<Amount>
 {
-    private const long Decimals = 1000;
+    private const long Decimals = 1000L;
     private readonly long _l;
 
     private Amount(long value) => _l = value;
@@ -32,14 +32,31 @@ public readonly struct Amount : INumber<Amount>
     // Formatting needs special logic - Amount supposedly has decimals
     public string ToString(string? format, IFormatProvider? formatProvider)
     {
-        throw new NotImplementedException();
-        return _l.ToString(format, formatProvider);
+        format ??= "D";
+        formatProvider ??= NumberFormatInfo.GetInstance(formatProvider);
+
+        return format.ToUpperInvariant()[0] switch
+        {
+            'D' => // Decimal //
+                (_l / Decimals).ToString(format, formatProvider),
+            'C' or 'F' or 'P' => // Currency // Fixed point // Percent //
+                ((decimal)_l / Decimals).ToString(format, formatProvider),
+            _ => throw new NotSupportedException(),
+        };
     }
 
     public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
     {
-        throw new NotImplementedException();
-        return _l.TryFormat(destination, out charsWritten, format, provider);
+        provider ??= NumberFormatInfo.GetInstance(provider);
+
+        return char.ToUpperInvariant(format[0]) switch
+        {
+            'D' => // Decimal //
+                (_l / Decimals).TryFormat(destination, out charsWritten, format, provider),
+            'C' or 'F' or 'P' => // Currency // Fixed point // Percent //
+                ((decimal)_l / Decimals).TryFormat(destination, out charsWritten, format, provider),
+            _ => throw new NotSupportedException(),
+        };
     }
 
     public static Amount Parse(string s, IFormatProvider? provider) => TryParse(s, provider, out var result)
