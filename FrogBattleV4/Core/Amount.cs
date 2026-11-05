@@ -18,22 +18,13 @@ public readonly struct Amount : INumber<Amount>
     public static Amount AdditiveIdentity => Zero;
     public static Amount MultiplicativeIdentity => One;
 
-    int IComparable.CompareTo(object? obj)
-    {
-        return obj is not Amount other
+    int IComparable.CompareTo(object? obj) =>
+        obj is not Amount other
             ? throw new ArgumentException($"Object must be of type {nameof(Amount)} to compare.", nameof(obj))
             : CompareTo(other);
-    }
 
-    public int CompareTo(Amount other)
-    {
-        return _value.CompareTo(other._value);
-    }
-
-    public bool Equals(Amount other)
-    {
-        return _value.Equals(_value);
-    }
+    public int CompareTo(Amount other) => _value.CompareTo(other._value);
+    public bool Equals(Amount other) => _value.Equals(_value);
 
     // Formatting needs special logic - Amount supposedly has decimals
     public string ToString(string? format, IFormatProvider? formatProvider)
@@ -48,12 +39,24 @@ public readonly struct Amount : INumber<Amount>
         return _value.TryFormat(destination, out charsWritten, format, provider);
     }
 
-    public static Amount Parse(string s, IFormatProvider? provider)
-    {
-        return new Amount(long.Parse(s, provider));
-    }
+    public static Amount Parse(string s, IFormatProvider? provider) => new(long.Parse(s, provider));
+    public static Amount Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => new(long.Parse(s, provider) * Decimals);
+    public static Amount Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) => new(long.Parse(s, style, provider) * Decimals);
+    public static Amount Parse(string s, NumberStyles style, IFormatProvider? provider) => new(long.Parse(s, style, provider) * Decimals);
 
     public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out Amount result)
+    {
+        if (long.TryParse(s, provider, out long value))
+        {
+            result = new Amount(value);
+            return true;
+        }
+
+        result = default;
+        return false;
+    }
+
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Amount result)
     {
         if (long.TryParse(s, provider, out long value))
         {
@@ -89,152 +92,35 @@ public readonly struct Amount : INumber<Amount>
         return false;
     }
 
-    public static Amount Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
-    {
-        return new Amount(long.Parse(s, provider) * Decimals);
-    }
-
-    public static Amount Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider)
-    {
-        return new Amount(long.Parse(s, style, provider) * Decimals);
-    }
-
-    public static Amount Parse(string s, NumberStyles style, IFormatProvider? provider)
-    {
-        return new Amount(long.Parse(s, style, provider) * Decimals);
-    }
-
-    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Amount result)
-    {
-        if (long.TryParse(s, provider, out long value))
-        {
-            result = new Amount(value);
-            return true;
-        }
-
-        result = default;
-        return false;
-    }
-
-    public static bool operator ==(Amount left, Amount right)
-    {
-        return left.Equals(right);
-    }
-
-    public static bool operator !=(Amount left, Amount right)
-    {
-        return !(left == right);
-    }
-
-    public static bool operator >(Amount left, Amount right)
-    {
-        return left.CompareTo(right) > 0;
-    }
-
-    public static bool operator >=(Amount left, Amount right)
-    {
-        return left.CompareTo(right) >= 0;
-    }
-
-    public static bool operator <(Amount left, Amount right)
-    {
-        return left.CompareTo(right) < 0;
-    }
-
-    public static bool operator <=(Amount left, Amount right)
-    {
-        return left.CompareTo(right) <= 0;
-    }
-
-    public static Amount operator +(Amount value)
-    {
-        return new Amount(+value._value);
-    }
-
-    public static Amount operator -(Amount value)
-    {
-        return new Amount(-value._value);
-    }
-
-    public static Amount operator +(Amount left, Amount right)
-    {
-        return new Amount(left._value + right._value);
-    }
-
-    public static Amount operator -(Amount left, Amount right)
-    {
-        return new Amount(left._value - right._value);
-    }
-
-    public static Amount operator ++(Amount value)
-    {
-        return new Amount(value._value + 1);
-    }
-
-    public static Amount operator --(Amount value)
-    {
-        return new Amount(value._value - 1);
-    }
-
-    public static Amount operator *(Amount left, Amount right)
-    {
-        return new Amount(left._value * right._value / Decimals);
-    }
-
-    public static Amount operator /(Amount left, Amount right)
-    {
-        return new Amount(left._value * Decimals / right._value);
-    }
-
+    public static bool operator ==(Amount left, Amount right) => left.Equals(right);
+    public static bool operator !=(Amount left, Amount right) => !(left == right);
+    public static bool operator >(Amount left, Amount right) => left.CompareTo(right) > 0;
+    public static bool operator >=(Amount left, Amount right) => left.CompareTo(right) >= 0;
+    public static bool operator <(Amount left, Amount right) => left.CompareTo(right) < 0;
+    public static bool operator <=(Amount left, Amount right) => left.CompareTo(right) <= 0;
+    public static Amount operator +(Amount value) => new(+value._value);
+    public static Amount operator -(Amount value) => new(-value._value);
+    public static Amount operator +(Amount left, Amount right) => new(left._value + right._value);
+    public static Amount operator -(Amount left, Amount right) => new(left._value - right._value);
+    public static Amount operator ++(Amount value) => new(value._value + 1);
+    public static Amount operator --(Amount value) => new(value._value - 1);
+    public static Amount operator *(Amount left, Amount right) => new(left._value * right._value / Decimals);
+    public static Amount operator /(Amount left, Amount right) => new(left._value * Decimals / right._value);
     public static Amount operator %(Amount left, Amount right)
     {
         throw new NotSupportedException("Modulo is not supported for rational numbers.");
     }
 
-    public static Amount Abs(Amount value)
-    {
-        return new Amount(long.Abs(value._value));
-    }
+    public static Amount Abs(Amount value) => new(long.Abs(value._value));
 
-    public static bool IsPositive(Amount value)
-    {
-        return long.IsPositive(value._value);
-    }
-
-    public static bool IsNegative(Amount value)
-    {
-        return long.IsNegative(value._value);
-    }
-
-    public static bool IsInteger(Amount value)
-    {
-        return value._value % Decimals == 0;
-    }
-
-    public static bool IsEvenInteger(Amount value)
-    {
-        return IsInteger(value) && long.IsEvenInteger(value._value / Decimals);
-    }
-
-    public static bool IsOddInteger(Amount value)
-    {
-        return IsInteger(value) && long.IsOddInteger(value._value / Decimals);
-    }
-
-    public static bool IsZero(Amount value)
-    {
-        return value.Equals(Zero);
-    }
-
-    public static Amount MinMagnitude(Amount x, Amount y)
-    {
-        return new Amount(long.MinMagnitude(x._value, y._value));
-    }
-
-    public static Amount MaxMagnitude(Amount x, Amount y)
-    {
-        return new Amount(long.MaxMagnitude(x._value, y._value));
-    }
+    public static bool IsPositive(Amount value) => long.IsPositive(value._value);
+    public static bool IsNegative(Amount value) => long.IsNegative(value._value);
+    public static bool IsInteger(Amount value) => value._value % Decimals == 0;
+    public static bool IsEvenInteger(Amount value) => IsInteger(value) && long.IsEvenInteger(value._value / Decimals);
+    public static bool IsOddInteger(Amount value) => IsInteger(value) && long.IsOddInteger(value._value / Decimals);
+    public static bool IsZero(Amount value) => value.Equals(Zero);
+    public static Amount MinMagnitude(Amount x, Amount y) => new(long.MinMagnitude(x._value, y._value));
+    public static Amount MaxMagnitude(Amount x, Amount y) => new(long.MaxMagnitude(x._value, y._value));
 
     static bool INumberBase<Amount>.IsComplexNumber(Amount value) => false;
     static bool INumberBase<Amount>.IsImaginaryNumber(Amount value) => false;
