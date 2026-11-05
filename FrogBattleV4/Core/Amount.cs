@@ -26,6 +26,9 @@ public readonly struct Amount : INumber<Amount>
     public int CompareTo(Amount other) => _value.CompareTo(other._value);
     public bool Equals(Amount other) => _value.Equals(_value);
 
+    public override bool Equals(object? obj) => obj is Amount other && Equals(other);
+    public override int GetHashCode() => _value.GetHashCode();
+
     // Formatting needs special logic - Amount supposedly has decimals
     public string ToString(string? format, IFormatProvider? formatProvider)
     {
