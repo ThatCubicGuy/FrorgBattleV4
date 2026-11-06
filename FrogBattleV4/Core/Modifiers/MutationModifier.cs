@@ -2,7 +2,7 @@ using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.Modifiers;
 
-public class PoolMutModifier : MutationModifier<MutateQuery>
+public class MutationModifier : MutationModifier<MutateQuery>
 {
     public required MutateData Data { get; init; }
     /// <summary>

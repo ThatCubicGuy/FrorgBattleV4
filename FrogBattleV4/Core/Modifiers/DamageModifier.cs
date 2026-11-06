@@ -15,7 +15,7 @@ public class DamageModifier : MutationModifier<DamageQuery>
     }
 }
 
-public class DamageStatModifier : AttributeModifier<DamageStatQuery>
+public class DamagePropertyModifier : AttributeModifier<DamageStatQuery>
 {
     [JsonPropertyName("damage")]
     public required DamageData Data { get; init; }

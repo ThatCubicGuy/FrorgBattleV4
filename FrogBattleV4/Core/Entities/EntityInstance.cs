@@ -190,10 +190,12 @@ public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiabl
             [
                 new StatModifier
                 {
-                    Stat = kvp.Key, ModifierStack = new ModifierStack(kvp.Value),
+                    Stat = kvp.Key,
+                    // Create a new BaseAddValue modifier stack for each stat
+                    ModifierValues = new ModifierStack(kvp.Value),
                 },
             ],
-            Conditions = ConditionCollection.Empty,
+            Conditions = [],
         }));
         result.AddRange(definition.PassiveModifiers);
 

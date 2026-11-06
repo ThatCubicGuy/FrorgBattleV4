@@ -9,17 +9,17 @@ namespace FrogBattleV4.Core.Modifiers;
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "modifier_type")]
 [JsonDerivedType(typeof(StatModifier), "stat")]
 [JsonDerivedType(typeof(DamageModifier), "damage")]
-[JsonDerivedType(typeof(PoolMutModifier), "mutation")]
-[JsonDerivedType(typeof(PoolStatModifier), "pool_property")]
-[JsonDerivedType(typeof(DamageStatModifier), "damage_property")]
+[JsonDerivedType(typeof(MutationModifier), "mutation")]
+[JsonDerivedType(typeof(PoolPropertyModifier), "pool_property")]
+[JsonDerivedType(typeof(DamagePropertyModifier), "damage_property")]
 // TODO (Nova): prefer not to inherit IModifierProvider interface here
 public interface IModifierRule : IModifierProvider
 {
     ModifierStack IModifierProvider.GetContributingModifiers(IQuery query, BattleEnvironment env,
-        in ModifierContext ctx) => AppliesTo(query, ctx) ? ModifierStack : ModifierStack.None;
+        in ModifierContext ctx) => AppliesTo(query, ctx) ? ModifierValues : ModifierStack.None;
 
     [JsonPropertyName("values")]
-    ModifierStack ModifierStack { get; }
+    ModifierStack ModifierValues { get; }
 
     /// <summary>
     /// Determines whether this modifier applies to the given query.
@@ -38,7 +38,7 @@ public interface IModifierRule : IModifierProvider
 public abstract class ModifierRule<TQuery> : IModifierRule where TQuery : IQuery
 {
     [JsonPropertyName("values")]
-    public required ModifierStack ModifierStack { get; init; }
+    public required ModifierStack ModifierValues { get; init; }
 
     bool IModifierRule.AppliesTo(IQuery query, in ModifierContext ctx)
     {

@@ -1,15 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Modifiers.PassiveEffects.Conditions;
 
-public record ConditionCollection(ImmutableList<IConditionComponent> Conditions) : IConditionComponent, IReadOnlyCollection<IConditionComponent>
+[CollectionBuilder(typeof(ConditionCollection), nameof(Create))]
+public record ConditionCollection(ImmutableArray<IConditionComponent> Conditions) : IConditionComponent, IReadOnlyCollection<IConditionComponent>
 {
-    public static readonly ConditionCollection Empty = new(ImmutableList<IConditionComponent>.Empty);
+    public static readonly ConditionCollection Empty = new(ImmutableArray<IConditionComponent>.Empty);
 
     public AccumulationType Accumulation { get; init; } = AccumulationType.Min;
 
@@ -17,7 +20,7 @@ public record ConditionCollection(ImmutableList<IConditionComponent> Conditions)
     {
         // Empty conditions list makes the passive act as a permanent status effect.
         // Useful for stats.
-        if (Conditions.Count == 0) return 1;
+        if (Conditions.Length == 0) return 1;
         var contributions = Conditions.Select(cc => cc.GetContribution(subject, reference, env));
         return Accumulation switch
         {
@@ -29,9 +32,14 @@ public record ConditionCollection(ImmutableList<IConditionComponent> Conditions)
         };
     }
 
-    public IEnumerator<IConditionComponent> GetEnumerator() => Conditions.GetEnumerator();
+    public IEnumerator<IConditionComponent> GetEnumerator() => ((IEnumerable<IConditionComponent>)Conditions).GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Conditions).GetEnumerator();
-    public int Count => Conditions.Count;
+    public int Count => Conditions.Length;
+
+    public static ConditionCollection Create([ParamCollection] params ReadOnlySpan<IConditionComponent> components)
+    {
+        return components.Length == 0 ? Empty : new ConditionCollection(components.ToImmutableArray());
+    }
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<AccumulationType>))]

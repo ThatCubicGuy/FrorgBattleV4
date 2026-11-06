@@ -2,7 +2,7 @@ using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.Modifiers;
 
-public class PoolStatModifier : AttributeModifier<PoolStatQuery>
+public class PoolPropertyModifier : AttributeModifier<PoolStatQuery>
 {
     public required PoolName Pool { get; init; }
     public required PoolStatChannel Channel { get; init; }
