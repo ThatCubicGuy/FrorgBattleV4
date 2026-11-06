@@ -31,4 +31,12 @@ public class UidTest
         var a = new Uid<int>();
         Assert.AreEqual(a, a);
     }
+
+    [TestMethod]
+    public void Equals_DifferentTypes_False()
+    {
+        var a = new Uid<int>();
+        var b = new Uid<char>();
+        Assert.AreNotEqual<object>(a, b);
+    }
 }

@@ -9,7 +9,9 @@ public abstract class BattleCommandEventArgs : EventArgs, IBattleCommandEventArg
 }
 
 // used for specifying type constraint on other IEventArgs interfaces
+#pragma warning disable CA1711 // EventArgs suffix here is unambiguous
 public interface IBattleCommandEventArgs
+#pragma warning restore CA1711
 {
     EntityUid Sender { get; }
     EntityUid Target { get; }

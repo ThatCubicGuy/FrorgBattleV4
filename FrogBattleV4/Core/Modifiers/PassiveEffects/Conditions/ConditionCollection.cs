@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq;
@@ -5,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Modifiers.PassiveEffects.Conditions;
 
-public record ConditionCollection(ImmutableList<IConditionComponent> Conditions) : IConditionComponent
+public record ConditionCollection(ImmutableList<IConditionComponent> Conditions) : IConditionComponent, IReadOnlyCollection<IConditionComponent>
 {
     public static readonly ConditionCollection Empty = new(ImmutableList<IConditionComponent>.Empty);
 
@@ -26,6 +28,10 @@ public record ConditionCollection(ImmutableList<IConditionComponent> Conditions)
                 (int)Accumulation, typeof(AccumulationType)),
         };
     }
+
+    public IEnumerator<IConditionComponent> GetEnumerator() => Conditions.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Conditions).GetEnumerator();
+    public int Count => Conditions.Count;
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter<AccumulationType>))]

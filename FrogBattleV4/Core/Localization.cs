@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Globalization;
 using System.IO;
 using System.Text.Json;
 
@@ -47,6 +48,6 @@ public static class Localization
     [Pure]
     public static string GetTranslationFormatted(string formatKey, params object[] args)
     {
-        return string.Format(GetTranslation(formatKey), args);
+        return string.Format(CultureInfo.CurrentCulture, GetTranslation(formatKey), args);
     }
 }

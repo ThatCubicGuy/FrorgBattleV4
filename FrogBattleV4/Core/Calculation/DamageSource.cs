@@ -10,7 +10,6 @@ public readonly record struct DamageSource(string Identifier) : IExpandableEnum
 
     #region Common Sources
 
-    public static readonly DamageSource All = default;
     public static readonly DamageSource Link = new(nameof(Link).ToSnakeCase());
     public static readonly DamageSource FollowUp = new(nameof(FollowUp).ToSnakeCase());
     public static readonly DamageSource SoulLink = new(nameof(SoulLink).ToSnakeCase());
@@ -25,5 +24,5 @@ public readonly record struct DamageSource(string Identifier) : IExpandableEnum
     /// <returns>True if a modifier of this source can boost damage from
     /// source <paramref name="source"/>, false otherwise.</returns>
     [System.Diagnostics.Contracts.Pure]
-    public bool Permits(DamageSource source) => this == source || this == All || source == All;
+    public bool Permits(DamageSource source) => this == source || this == default;
 }

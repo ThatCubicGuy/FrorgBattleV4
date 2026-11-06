@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FrogBattleV4.Core;
@@ -12,10 +13,11 @@ using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Registries;
 using FrogBattleV4.Core.Decisions;
+using FrogBattleV4.JsonDeserialization;
 
-using var game = new FrogBattleV4.FrogBattle();
-game.Run();
-return;
+// using var game = new FrogBattleV4.FrogBattle();
+// game.Run();
+
 // TODO: Everything lmao
 Console.WriteLine("Nothing here yet!");
 

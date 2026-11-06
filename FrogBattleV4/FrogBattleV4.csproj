@@ -6,10 +6,15 @@
         <TieredCompilation>false</TieredCompilation>
         <Nullable>enable</Nullable>
         <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+        <Authors>dawn.of.a.nova</Authors>
+        <Description>Turn based fighting game with a ton of versatility given by data-driven design.</Description>
     </PropertyGroup>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
+    </PropertyGroup>
+    <PropertyGroup>
+	<AnalysisMode>Minimum</AnalysisMode>
     </PropertyGroup>
     <ItemGroup>
         <None Remove="Icon.ico"/>
@@ -26,8 +31,5 @@
     <ItemGroup>
         <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.*"/>
         <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="UI\" />
     </ItemGroup>
 </Project>

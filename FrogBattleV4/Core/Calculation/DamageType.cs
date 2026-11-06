@@ -10,7 +10,6 @@ public readonly record struct DamageType(string Identifier) : IExpandableEnum
 
     #region Common Types
 
-    public static readonly DamageType All = default;
     public static readonly DamageType True = new(nameof(True).ToSnakeCase());
     public static readonly DamageType Blunt = new(nameof(Blunt).ToSnakeCase());
     public static readonly DamageType Slash = new(nameof(Slash).ToSnakeCase());
@@ -28,5 +27,5 @@ public readonly record struct DamageType(string Identifier) : IExpandableEnum
     /// <returns>True if a modifier of this type can boost damage from
     /// type <paramref name="type"/>, false otherwise.</returns>
     [System.Diagnostics.Contracts.Pure]
-    public bool Permits(DamageType type) => this == type || this == All || type == All;
+    public bool Permits(DamageType type) => this == type || this == default;
 }

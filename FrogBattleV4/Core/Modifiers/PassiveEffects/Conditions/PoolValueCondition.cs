@@ -17,27 +17,28 @@ public class PoolValueCondition : IConditionComponent
     /// The starting value that the interval starts being calculated from.
     /// Default is 0.
     /// </summary>
-    public required double MinValue { get; init; } = 0;
+    public double MinValue { get; init; }
 
     /// <summary>
     /// The final value at which the interval stops being calculated.
+    /// Default is infinity.
     /// </summary>
-    public required double MaxValue { get; init; }
+    public double MaxValue { get; init; } = double.PositiveInfinity;
 
     /// <summary>
     /// The step by which the contribution is calculated.
     /// Every Step amount that the value has over MinValue it increases by one, up to (MaxValue - MinValue) / Step.
     /// Cannot be zero.
     /// </summary>
-    /// <exception cref="ArgumentException">Step is zero.</exception>
+    /// <exception cref="ArgumentException">Step is not a finite, non-zero real number.</exception>
     public required double Step
     {
         get => _step;
         init
         {
-            if (value == 0) throw new ArgumentException("Step cannot be zero");
-            if (!double.IsRealNumber(value)) throw new ArgumentException("Step value must be real");
-            if (double.IsInfinity(value)) throw new ArgumentException("Step cannot be infinity");
+            if (value == 0) throw new ArgumentException("Step cannot be zero.");
+            if (double.IsInfinity(value)) throw new ArgumentException("Step cannot be infinity.");
+            if (!double.IsRealNumber(value)) throw new ArgumentException("Step value must be real.");
             _step = value;
         }
     }
@@ -46,7 +47,7 @@ public class PoolValueCondition : IConditionComponent
     /// Specifies whether the MinValue, MaxValue and Step properties should be treated
     /// as a percentage of the pool's MaxValue instead of flat values.
     /// </summary>
-    public bool Percent { get; init; }
+    public bool IsPercent { get; init; }
 
     #endregion
 
@@ -55,7 +56,7 @@ public class PoolValueCondition : IConditionComponent
     {
         var value = env.GetPoolValue(subject, Pool);
 
-        if (Percent)
+        if (IsPercent)
         {
             value /= new PoolStatQuery
             {

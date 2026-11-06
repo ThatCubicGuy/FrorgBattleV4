@@ -5,7 +5,7 @@ namespace FrogBattleV4.Core.Abilities.Targeting;
 public class BounceTargeting : IShardTargeting
 {
     public required int Count { get; init; }
-    public int RankPenalty { get; init; } = 0;
+    public int RankPenalty { get; init; }
 
     public TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env)
     {
