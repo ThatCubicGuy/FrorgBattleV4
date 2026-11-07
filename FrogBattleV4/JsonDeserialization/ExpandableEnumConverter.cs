@@ -13,42 +13,16 @@ internal partial class ExpandableEnumConverter<TName> : JsonConverter<TName> whe
 {
     public override TName Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType != JsonTokenType.String)
-        {
-            throw new JsonException("Expected a string.");
-        }
-
-        var result = reader.GetString()!.Normalize();
-
-        if (!AlphanumericRegex().IsMatch(result))
-        {
-            throw new JsonException("Expected a string containing only lowercase alphanumeric characters.");
-        }
-
-        return new TName
-        {
-            Identifier = result,
-        };
+        return reader.TokenType == JsonTokenType.String
+            ? ReadName(ref reader)
+            : throw new JsonException("Expected a string.");
     }
 
     public override TName ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType != JsonTokenType.PropertyName)
-        {
-            throw new JsonException("Expected a property name.");
-        }
-        
-        var result = reader.GetString()!.Normalize();
-        
-        if (!AlphanumericRegex().IsMatch(result))
-        {
-            throw new JsonException("Expected a string containing only lowercase alphanumeric characters.");
-        }
-
-        return new TName
-        {
-            Identifier = result,
-        };
+        return reader.TokenType != JsonTokenType.PropertyName
+            ? ReadName(ref reader)
+            : throw new JsonException("Expected a string.");
     }
 
     public override void Write(Utf8JsonWriter writer, TName value, JsonSerializerOptions options)
@@ -59,6 +33,21 @@ internal partial class ExpandableEnumConverter<TName> : JsonConverter<TName> whe
     public override void WriteAsPropertyName(Utf8JsonWriter writer, TName value, JsonSerializerOptions options)
     {
         writer.WritePropertyName(value.Identifier);
+    }
+
+    private static TName ReadName(ref Utf8JsonReader reader)
+    {
+        var result = reader.GetString()!.Normalize();
+        
+        if (!AlphanumericRegex().IsMatch(result))
+        {
+            throw new JsonException("Expected a string containing only lowercase alphanumeric characters.");
+        }
+
+        return new TName
+        {
+            Identifier = result,
+        };
     }
 
     [GeneratedRegex("^[a-z][a-z0-9_]*$")]
