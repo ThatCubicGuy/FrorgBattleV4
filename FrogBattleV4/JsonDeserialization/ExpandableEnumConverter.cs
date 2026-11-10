@@ -20,7 +20,7 @@ internal partial class ExpandableEnumConverter<TName> : JsonConverter<TName> whe
 
     public override TName ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return reader.TokenType != JsonTokenType.PropertyName
+        return reader.TokenType == JsonTokenType.PropertyName
             ? ReadName(ref reader)
             : throw new JsonException("Expected a string.");
     }
