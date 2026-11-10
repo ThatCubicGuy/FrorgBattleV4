@@ -9,7 +9,8 @@ public class HealReactionFunction : CommandReactionFunction
     public required double Ratio { get; init; }
     public bool CanOverheal { get; init; }
 
-    protected override void HandleEvent(EntityUid holder, BattleEnvironment env, BattleCommandEventArgs args)
+    protected override void HandleEvent(EntityUid holder, BattleEnvironment env, BattleCommandEventArgs args,
+        CommandBuilder builder)
     {
         if (args is not IDeltaEventArgs delta) return;
 

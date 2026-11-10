@@ -18,6 +18,7 @@ public sealed partial class BattleManager
     private readonly FighterRegistry _fighterRegistry;
     private readonly ShardRegistry _shardRegistry;
     private readonly StatusEffectRegistry _statusEffectRegistry;
+    private CommandBuilder _commandBuilder;
 
     private BattleManager(
         ImmutableDictionary<EntityUid, EntityInstance> entities,
@@ -29,6 +30,7 @@ public sealed partial class BattleManager
         CreationTime = DateTime.UtcNow.Ticks;
         _rng = new SeededBattleRng(CreationTime.GetHashCode());
         _commandResolver = new CommandResolver(this);
+        _commandBuilder = new CommandBuilder();
 
         Entities = entities;
         Teams = teams;
@@ -61,16 +63,16 @@ public sealed partial class BattleManager
         {
             var env = GetEnvironment();
             var action = Scheduler.Current;
+            _commandBuilder = new CommandBuilder();
 
-            var mutatorBuilder = new CommandBuilder();
-
-            // Tick previous entity's end mutators & effects
-            if (previous is not null) Entities[previous.Actor].Tick(TurnMoment.End, mutatorBuilder);
+            // TODO (Nova): Status effect ticks only happen on *scheduled* turns, not instant actions
+            if (previous is not null) Entities[previous.Actor].Tick(TurnMoment.End, env, _commandBuilder);
+            previous = action;
             // Tick current entity's start mutators
-            Entities[action.Actor].Tick(TurnMoment.Start, mutatorBuilder);
+            Entities[action.Actor].Tick(TurnMoment.Start, env, _commandBuilder);
 
             // Mutator commands are executed separately
-            mutatorBuilder.Build(_commandResolver);
+            _commandBuilder.Flush(_commandResolver);
 
             OnTurnStarted(new TurnEventArgs
             {
@@ -87,22 +89,22 @@ public sealed partial class BattleManager
                 },
             ], [], 0);
 
-            var turnCommandBuilder = new CommandBuilder();
             // You can submit a shard link that contains unusable shards,
             // but if said shards don't become usable by the time
             // they need to be executed, the shard link stops.
             foreach (var shard in decision.Link.Select(_shardRegistry.Get).TakeWhile(s => s.IsUsable(state, env)))
             {
-                shard.Resolve(ref state, env, turnCommandBuilder, _rng);
+                shard.Resolve(ref state, env, _commandBuilder, _rng);
                 state = state with
                 {
                     CurrentShardIndex = state.CurrentShardIndex + 1,
                 };
             }
 
-            turnCommandBuilder.Build(_commandResolver);
-
-            previous = action;
+            // Flush shard link commands
+            _commandBuilder.Flush(_commandResolver);
+            // Flush reaction commands from shard link resolution
+            _commandBuilder.Flush(_commandResolver);
 
             // Reschedule actions
             Scheduler.Schedule(new ScheduledTurn(action.Actor, 10000 / new StatQuery

@@ -9,7 +9,7 @@ public class ModifyCounterReactionFunction : ReactionFunction
     public required CounterName Counter { get; init; }
     public required CounterOperation Operation { get; init; }
 
-    public override void HandleEvent(EntityUid holder, BattleEnvironment env, EventArgs args)
+    public override void HandleEvent(EntityUid holder, EventArgs args, BattleEnvironment env, CommandBuilder builder)
     {
         if (env.GetCounter(holder, Counter) is not { } counter) return;
 

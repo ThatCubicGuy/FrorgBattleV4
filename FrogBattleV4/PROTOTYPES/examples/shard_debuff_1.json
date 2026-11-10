@@ -20,8 +20,5 @@
     "max_rank": 3
   },
   "modifiers": [],
-  "name": "Debuff Shard",
-  "description": "Debuff shard hardcoded for testing.",
-  "function": "impair",
   "requirements": []
 }

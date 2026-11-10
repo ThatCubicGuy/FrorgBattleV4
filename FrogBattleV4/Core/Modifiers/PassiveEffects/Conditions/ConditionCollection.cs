@@ -36,7 +36,7 @@ public record ConditionCollection(ImmutableArray<IConditionComponent> Conditions
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Conditions).GetEnumerator();
     public int Count => Conditions.Length;
 
-    public static ConditionCollection Create([ParamCollection] params ReadOnlySpan<IConditionComponent> components)
+    public static ConditionCollection Create(params ReadOnlySpan<IConditionComponent> components)
     {
         return components.Length == 0 ? Empty : new ConditionCollection(components.ToImmutableArray());
     }

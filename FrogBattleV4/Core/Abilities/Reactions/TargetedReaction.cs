@@ -24,7 +24,7 @@ public abstract class TargetedReaction<TEventArgs> : Reaction<TEventArgs> where 
     /// </summary>
     public ReactionEntity? Target { get; init; }
 
-    protected sealed override bool Matches(EntityUid holder, BattleEnvironment env, TEventArgs args)
+    public sealed override bool Matches(EntityUid holder, BattleEnvironment env, TEventArgs args)
     {
         return Sender switch
         {

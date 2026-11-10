@@ -24,21 +24,21 @@ Console.WriteLine("Nothing here yet!");
 Console.Out.WriteLine("Registered shards:");
 foreach (var kvp in ShardRegistry.Global)
 {
-    Console.Out.WriteLine($"{kvp.Value.GetDetails()}");
+    Console.Out.WriteLine($"{kvp.GetDetails()}");
     Console.Out.WriteLine("(end)");
 }
 
 Console.Out.WriteLine("Registered fighters:");
 foreach (var kvp in FighterRegistry.Global)
 {
-    Console.Out.WriteLine($"{kvp.Value.GetDetails()}");
+    Console.Out.WriteLine($"{kvp.GetDetails()}");
     Console.Out.WriteLine("(end)");
 }
 
 Console.Out.WriteLine("Registered effects:");
 foreach (var kvp in StatusEffectRegistry.Global)
 {
-    Console.Out.WriteLine($"{kvp.Value.DisplayName}");
+    Console.Out.WriteLine($"{kvp.Key}");
     Console.Out.WriteLine("(end)");
 }
 
@@ -112,18 +112,18 @@ file class SetDecisionProvider : IDecisionProvider, IComparer<ShardId>
 
 file static class Extensions
 {
-    public static string GetDetails(this Fighter fighter)
+    public static string GetDetails(this KeyValuePair<FighterId, Fighter> kvp)
     {
         return $"""
-                Fighter "{fighter.Name}": [{string.Join(", ", fighter.Shards)}]
+                Fighter "{kvp.Key}": [{string.Join(", ", kvp.Value.Shards)}]
                 """;
     }
 
-    public static string GetDetails(this Shard shard)
+    public static string GetDetails(this KeyValuePair<ShardId, Shard> kvp)
     {
         return $"""
-                {shard.GetType().Name} "{shard.Name}" - {shard.Description}
-                Properties: {((shard as AffectShard)?.Components[0] as AttackComponent)?.Properties.CanCrit}
+                {kvp.Value.GetType().Name} "{kvp.Key}" - {kvp.Key}
+                Properties: {((kvp.Value as AffectShard)?.Components[0] as AttackComponent)?.Properties.CanCrit}
                 """;
     }
 

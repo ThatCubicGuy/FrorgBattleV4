@@ -1,8 +1,5 @@
 {
   "type": "target",
-  "name": "Target Shard",
-  "description": "Blast targeting shard (radius 1)",
-  "function": "target",
   "targeting": {
     "type": "blast",
     "radius": 1,

@@ -1,0 +1,30 @@
+{
+  "shard.frorgbattle.shard_affect_1.name": "Affect Shard",
+  "shard.frorgbattle.shard_affect_1.desc": "Affect shard hardcoded for testing.",
+  "shard.frorgbattle.shard_affect_1.func": "attack",
+
+  "shard.frorgbattle.shard_attack_bullet.name": "Attack shard - Bullet!",
+  "shard.frorgbattle.shard_attack_bullet.desc": "Deal some moderate bullet damage.",
+  "shard.frorgbattle.shard_attack_bullet.func": "attack",
+
+  "shard.frorgbattle.shard_attack_slash.name": "Attack shard - Slash!",
+  "shard.frorgbattle.shard_attack_slash.desc": "Deal some moderate slash damage.",
+  "shard.frorgbattle.shard_attack_slash.func": "attack",
+
+  "shard.frorgbattle.shard_empower_1.name": "Empower Shard",
+  "shard.frorgbattle.shard_empower_1.desc": "Empower shard hardcoded for testing.",
+  "shard.frorgbattle.shard_empower_1.func": "enhance",
+
+  "shard.frorgbattle.shard_debuff_1.name": "Debuff Shard",
+  "shard.frorgbattle.shard_debuff_1.desc": "Debuff shard hardcoded for testing.",
+  "shard.frorgbattle.shard_debuff_1.func": "impair",
+
+  "shard.frorgbattle.shard_target_1.name": "Target Shard",
+  "shard.frorgbattle.shard_target_1.desc": "Blast targeting shard (radius 1)",
+  "shard.frorgbattle.shard_target_1.func": "target",
+
+  "fighter.frorgbattle.fighter_1.name": "Lunar Hero Lucit",
+  "fighter.frorgbattle.fighter_2.name": "SPEEEEEEED",
+
+  "effect.frorgbattle.effect_def_reduction.name": "DEF Reduction"
+}

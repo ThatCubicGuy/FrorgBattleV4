@@ -36,11 +36,11 @@ public class StatusEffectInstance : IModifierProvider
     [Pure]
     public bool ShouldRemove() => Stacks <= 0 || (Turns <= 0 && !Definition.Properties.HasFlag(StatusEffectFlags.Infinite));
 
-    public void OnTick(TurnMoment moment, CommandBuilder builder)
+    public void OnTick(TurnMoment moment, BattleEnvironment env, CommandBuilder builder)
     {
         foreach (var mutator in Definition.Mutators)
         {
-            mutator.Tick(moment, this, builder);
+            mutator.Tick(moment, this, env, builder);
         }
 
         if (_justAdded)

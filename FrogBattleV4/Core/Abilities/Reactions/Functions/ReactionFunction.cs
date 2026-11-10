@@ -8,7 +8,8 @@ namespace FrogBattleV4.Core.Abilities.Reactions.Functions;
 [JsonDerivedType(typeof(ExecuteLinkReactionFunction), "execute_link")]
 [JsonDerivedType(typeof(SequenceReactionFunction), "sequence")]
 [JsonDerivedType(typeof(ModifyCounterReactionFunction), "modify_counter")]
+[JsonDerivedType(typeof(EnqueueActionReactionFunction), "enqueue_action")]
 public abstract class ReactionFunction
 {
-    public abstract void HandleEvent(EntityUid holder, BattleEnvironment env, EventArgs args);
+    public abstract void HandleEvent(EntityUid holder, EventArgs args, BattleEnvironment env, CommandBuilder builder);
 }

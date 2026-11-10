@@ -8,7 +8,8 @@ namespace FrogBattleV4.Core.Abilities.Reactions.Functions;
 public class ExecuteLinkReactionFunction : CommandReactionFunction
 {
     public required ImmutableArray<ShardId> Shards { get; init; }
-    protected override void HandleEvent(EntityUid holder, BattleEnvironment env, BattleCommandEventArgs args)
+    protected override void HandleEvent(EntityUid holder, BattleEnvironment env, BattleCommandEventArgs args,
+        CommandBuilder builder)
     {
         // TODO (Nova)
         var result = GetRelation(holder, env, args).Select(target =>

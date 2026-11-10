@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Abilities.Reactions;
 
-// TODO (Nova): rename types and discriminator values
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "trigger")]
 [JsonDerivedType(typeof(DamageTakenReaction), "damage_taken")]
 [JsonDerivedType(typeof(PoolMutatedReaction), "pool_mutated")]

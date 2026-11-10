@@ -48,8 +48,7 @@ public class TurnScheduler
     public void AdvanceEntity(EntityUid entity, double advancePercent)
     {
         var turn = _turnTimeline.UnorderedItems
-            .Select(tuple => tuple.Element)
-            .SingleOrDefault(turn => turn.Actor == entity);
+            .SingleOrDefault(turn => turn.Element.Actor == entity).Element;
 
         if (turn is not null) Advance(turn, advancePercent);
     }

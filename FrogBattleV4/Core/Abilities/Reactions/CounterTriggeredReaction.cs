@@ -6,7 +6,6 @@ namespace FrogBattleV4.Core.Abilities.Reactions;
 public class CounterTriggeredReaction : Reaction
 {
     public required CounterName Counter { get; init; }
-    protected override bool Matches(EntityUid holder, BattleEnvironment env) => true;
 
     public override void Accept(IReactionVisitor visitor) => visitor.Visit(this);
 }

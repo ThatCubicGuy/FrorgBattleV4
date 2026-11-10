@@ -137,38 +137,42 @@ public sealed partial class BattleManager
 
             public void Visit(DamageTakenReaction reaction)
             {
-                manager.DamageTaken += DelegateGenerator(reaction);
+                manager.DamageTaken += ReactionWrapper(reaction);
             }
 
             public void Visit(PoolMutatedReaction reaction)
             {
-                manager.PoolMutated += DelegateGenerator(reaction);
+                manager.PoolMutated += ReactionWrapper(reaction);
             }
 
             public void Visit(EffectAppliedReaction reaction)
             {
-                manager.EffectApplied += DelegateGenerator(reaction);
+                manager.EffectApplied += ReactionWrapper(reaction);
             }
 
             public void Visit(CounterTriggeredReaction reaction)
             {
                 manager.Entities[CurrentEntity].Counters[reaction.Counter].TriggerValueReached +=
-                    DelegateGenerator(reaction);
+                    ReactionWrapper(reaction);
             }
 
-            private EventHandler DelegateGenerator(Reaction reaction)
+            private EventHandler ReactionWrapper(Reaction reaction)
             {
                 // Snapshot the current entity inside a local variable
                 var entity = CurrentEntity;
                 return (_, args) =>
                 {
                     var env = manager.GetEnvironment();
-                    reaction.HandleEvent(entity, env, args);
+
+                    foreach (var function in reaction.Functions)
+                    {
+                        function.HandleEvent(entity, args, env, manager._commandBuilder);
+                    }
                 };
             }
 
             // need generics here because TEventArgs of EventHandler<TEventArgs> is not contravariant
-            private EventHandler<TEventArgs> DelegateGenerator<TEventArgs>(Reaction<TEventArgs> reaction)
+            private EventHandler<TEventArgs> ReactionWrapper<TEventArgs>(Reaction<TEventArgs> reaction)
                 where TEventArgs : EventArgs
             {
                 // Snapshot the current entity inside a local variable
@@ -176,7 +180,12 @@ public sealed partial class BattleManager
                 return (_, args) =>
                 {
                     var env = manager.GetEnvironment();
-                    reaction.HandleEvent(entity, env, args);
+
+                    if (!reaction.Matches(entity, env, args)) return;
+                    foreach (var function in reaction.Functions)
+                    {
+                        function.HandleEvent(entity, args, env, manager._commandBuilder);
+                    }
                 };
             }
         }

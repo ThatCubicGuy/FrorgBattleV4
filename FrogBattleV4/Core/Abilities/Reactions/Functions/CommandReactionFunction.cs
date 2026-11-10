@@ -6,16 +6,20 @@ using FrogBattleV4.Core.Calculation;
 
 namespace FrogBattleV4.Core.Abilities.Reactions.Functions;
 
+/// <summary>
+/// A command reaction function can only react to a command event -
+/// that is, it can only resolve when given a sender-target relation context.
+/// </summary>
 public abstract class CommandReactionFunction : ReactionFunction
 {
     [JsonPropertyName("entity")]
     public FunctionTarget AffectedEntity { get; init; }
 
-    public override void HandleEvent(EntityUid holder, BattleEnvironment env, EventArgs args)
+    public override void HandleEvent(EntityUid holder, EventArgs args, BattleEnvironment env, CommandBuilder builder)
     {
         if (args is not BattleCommandEventArgs battleArgs) return;
-        
-        HandleEvent(holder, env, battleArgs);
+
+        HandleEvent(holder, env, battleArgs, builder);
     }
 
     protected IEnumerable<RelationContext> GetRelation(EntityUid holder, BattleEnvironment env,
@@ -36,5 +40,6 @@ public abstract class CommandReactionFunction : ReactionFunction
         });
     }
 
-    protected abstract void HandleEvent(EntityUid holder, BattleEnvironment env, BattleCommandEventArgs args);
+    protected abstract void HandleEvent(EntityUid holder, BattleEnvironment env, BattleCommandEventArgs args,
+        CommandBuilder builder);
 }

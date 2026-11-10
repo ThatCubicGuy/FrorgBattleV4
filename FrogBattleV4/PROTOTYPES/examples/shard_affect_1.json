@@ -36,8 +36,5 @@
       }
     }
   ],
-  "name": "Affect Shard",
-  "description": "Affect shard hardcoded for testing.",
-  "function": "attack",
   "requirements": []
 }

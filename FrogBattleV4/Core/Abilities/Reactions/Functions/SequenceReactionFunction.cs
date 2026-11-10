@@ -8,13 +8,13 @@ public class SequenceReactionFunction : ReactionFunction
     public required ImmutableArray<ReactionFunction> Terms { get; init; }
     public int Repeat { get; init; } = 1;
 
-    public override void HandleEvent(EntityUid holder, BattleEnvironment env, EventArgs args)
+    public override void HandleEvent(EntityUid holder, EventArgs args, BattleEnvironment env, CommandBuilder builder)
     {
         for (var i = 0; i < Repeat; i++)
         {
             foreach (var function in Terms)
             {
-                function.HandleEvent(holder, env, args);
+                function.HandleEvent(holder, args, env, builder);
             }
         }
     }

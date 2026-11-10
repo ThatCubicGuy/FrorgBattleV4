@@ -12,17 +12,6 @@ public abstract class Reaction : IReaction
 {
     public required ImmutableArray<ReactionFunction> Functions { get; init; }
 
-    public void HandleEvent(EntityUid holder, BattleEnvironment env, EventArgs args)
-    {
-        if (!Matches(holder, env)) return;
-        foreach (var function in Functions)
-        {
-            function.HandleEvent(holder, env, args);
-        }
-    }
-
-    protected abstract bool Matches(EntityUid holder, BattleEnvironment env);
-
     public abstract void Accept(IReactionVisitor visitor);
 }
 
@@ -35,17 +24,8 @@ public abstract class Reaction<TEventArgs> : IReaction where TEventArgs : EventA
     // TODO (Nova)
     public required ImmutableArray<ReactionFunction> Functions { get; init; }
 
-    public void HandleEvent(EntityUid holder, BattleEnvironment env, TEventArgs args)
-    {
-        if (!Matches(holder, env, args)) return;
-        foreach (var function in Functions)
-        {
-            function.HandleEvent(holder, env, args);
-        }
-    }
-
     [Pure]
-    protected abstract bool Matches(EntityUid holder, BattleEnvironment env, TEventArgs args);
+    public abstract bool Matches(EntityUid holder, BattleEnvironment env, TEventArgs args);
 
     public abstract void Accept(IReactionVisitor visitor);
 }

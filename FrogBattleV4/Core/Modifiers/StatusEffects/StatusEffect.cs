@@ -6,9 +6,6 @@ namespace FrogBattleV4.Core.Modifiers.StatusEffects;
 
 public class StatusEffect
 {
-    [JsonPropertyName("name")]
-    public required string DisplayName { get; init; }
-    public string? Description { get; init; }
     public int MaxStacks { get; init; } = 1;
     public int? MaxDuration { get; init; }
     public StatusEffectType Type { get; init; } = StatusEffectType.None;

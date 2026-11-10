@@ -53,9 +53,6 @@
       }
     }
   ],
-  "name": "Empower Shard",
-  "description": "Empower shard hardcoded for testing.",
-  "function": "enhance",
   "requirements": [
     {
       "type": "pool",

@@ -23,8 +23,5 @@
     "max_rank": 3
   },
   "modifiers": [],
-  "name": "Attack (Slash)",
-  "description": "Do some slash damage.",
-  "function": "attack",
   "requirements": []
 }

@@ -34,8 +34,5 @@
       }
     }
   ],
-  "name": "Attack (Bullet)",
-  "description": "Do some bullet damage.",
-  "function": "attack",
   "requirements": []
 }

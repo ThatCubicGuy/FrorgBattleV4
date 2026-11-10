@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Modifiers;
@@ -84,13 +85,13 @@ public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiabl
     }
 
     // TODO (Nova): don't like this way of implementing this functionality
-    public void Tick(TurnMoment moment, Abilities.CommandBuilder builder)
+    public void Tick(TurnMoment moment, BattleEnvironment env, CommandBuilder builder)
     {
         var markedForDeath = new List<StatusEffectId>();
 
         foreach (var effect in ActiveEffects)
         {
-            effect.OnTick(moment, builder);
+            effect.OnTick(moment, env, builder);
             if (effect.ShouldRemove()) markedForDeath.Add(effect.Id);
         }
 
