@@ -71,6 +71,12 @@ public class TurnScheduler
         _actionTimeline.Enqueue(action);
     }
 
+    public void RemoveActionsOf(EntityUid entity)
+    {
+        var turn = _turnTimeline.UnorderedItems.Single(tuple => tuple.Element.Actor == entity).Element;
+        _turnTimeline.Remove(turn, out _, out _);
+    }
+
     public IOrderedEnumerable<TimelineItem> GetOrderedActions()
     {
         return _turnTimeline.UnorderedItems

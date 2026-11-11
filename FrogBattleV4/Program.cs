@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using FrogBattleV4;
 using FrogBattleV4.Core;
 using FrogBattleV4.Core.Abilities;
 using FrogBattleV4.Core.Abilities.Components;
@@ -13,7 +13,6 @@ using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Registries;
 using FrogBattleV4.Core.Decisions;
-using FrogBattleV4.JsonDeserialization;
 
 // using var game = new FrogBattleV4.FrogBattle();
 // game.Run();
@@ -67,11 +66,17 @@ try
 {
     await manager.RunAsync(CancellationToken.None);
 }
+catch (BattleManager.EntityDownedException e)
+{
+    Console.Out.WriteLine($"Entity {e.Entity} was downed!");
+}
 catch (ApplicationException)
 {
     Extensions.HandleBattleEnded(manager, EventArgs.Empty);
     Console.Out.WriteLine("Thank you for playing!");
 }
+
+Console.Out.WriteLine(Logger.GetLog());
 
 file class SetDecisionProvider : IDecisionProvider, IComparer<ShardId>
 {
@@ -161,7 +166,7 @@ file static class Extensions
 
     public static void ReportDamageTaken(object? sender, DamageTakenEventArgs e)
     {
-        Console.Out.WriteLine($"{e.Amount:F0}{(e.IsCrit ? '!' : "")} {e.Data.Type} damage taken " +
+        Console.Out.WriteLine($"{e.Amount:F0}{(e.IsCrit ? '!' : "")} {e.Metadata.Type} damage taken " +
                               $"by {e.Target} from {e.Sender}!");
     }
 

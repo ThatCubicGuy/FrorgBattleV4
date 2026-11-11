@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Combat.Commands;
@@ -12,6 +13,7 @@ public sealed partial class BattleManager
         public void Visit(DamageCommand command)
         {
             var (actor, target) = command.Relation;
+            EnsureLiving(actor, target);
             var damageData = command.Data;
             var isCrit = manager._rng.Chance(command.CriticalChance);
             var damage = isCrit
@@ -26,13 +28,23 @@ public sealed partial class BattleManager
                 Target = target,
                 Amount = damage,
                 IsCrit = isCrit,
-                Data = damageData,
+                Metadata = damageData,
             });
+
+            if (manager.Entities[target].Downed)
+            {
+                manager.OnEntityDowned(new EntityDownedEventArgs
+                {
+                    Sender = actor,
+                    Target = target,
+                });
+            }
         }
 
         public void Visit(HealCommand command)
         {
             var (actor, target) = command.Relation;
+            EnsureLiving(actor);
             var healData = command.Data;
             var healing = command.Amount;
 
@@ -50,6 +62,7 @@ public sealed partial class BattleManager
         public void Visit(MutateCommand command)
         {
             var (actor, target) = command.Relation;
+            EnsureLiving(actor, target);
             var data = command.Data;
             var oldValue = manager.Entities[target].Pools[data.TargetPool].Value;
 
@@ -68,6 +81,7 @@ public sealed partial class BattleManager
         public void Visit(ApplyEffectCommand command)
         {
             var (actor, target) = command.Relation;
+            EnsureLiving(actor, target);
             var data = command.Data;
 
             if (!manager._rng.Chance(command.ApplicationChance))
@@ -107,6 +121,7 @@ public sealed partial class BattleManager
         public void Visit(RemoveEffectCommand command)
         {
             var (actor, target) = command.Relation;
+            EnsureLiving(actor, target);
             var data = command.Data;
 
             var effectsToRemove = manager.Entities[target].ActiveEffects
@@ -141,6 +156,7 @@ public sealed partial class BattleManager
         public void Visit(AdvanceTurnCommand command)
         {
             var (actor, target) = command.Relation;
+            EnsureLiving(actor, target);
             var data = command.Data;
 
             manager.Scheduler.AdvanceEntity(target, data.AdvancePercent);
@@ -156,6 +172,7 @@ public sealed partial class BattleManager
         public void Visit(EnqueueActionCommand command)
         {
             var (actor, target) = command.Relation;
+            EnsureLiving(actor, target);
             var data = command.Data;
 
             manager.Scheduler.EnqueueInstant(new InstantAction(target, data.Decision));
@@ -166,5 +183,27 @@ public sealed partial class BattleManager
                 Target = target,
             });
         }
+
+        private void EnsureLiving(params EntityUid?[] entities)
+        {
+            var entity = entities.FirstOrDefault(IsDowned);
+            if (entity.HasValue)
+            {
+                throw new EntityDownedException(entity.Value);
+            }
+        }
+
+        private bool IsDowned(EntityUid? entity)
+        {
+            return entity.HasValue
+                ? manager.Entities[entity.Value].Downed
+                : throw new InvalidOperationException("The given entity cannot be null.");
+        }
+    }
+
+    public class EntityDownedException(EntityUid entity)
+        : ApplicationException("The given entity is downed and cannot be revived.")
+    {
+        public EntityUid Entity { get; } = entity;
     }
 }

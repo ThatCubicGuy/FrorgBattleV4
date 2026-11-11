@@ -1,10 +1,12 @@
 using System;
 using FrogBattleV4.Core.Calculation;
+using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core;
 
 // Note: There are some inconsistencies in event naming relating to who is the subject
+
 public sealed partial class BattleManager
 {
     public event EventHandler? BattleStarted;
@@ -14,6 +16,9 @@ public sealed partial class BattleManager
     public event EventHandler<DamageTakenEventArgs>? DamageTaken;
     // the target received healing from the sender
     public event EventHandler<HealingReceivedEventArgs>? HealingReceived;
+    // the target was downed by an attack from the sender
+    public event EventHandler<EntityDownedEventArgs>? EntityDowned;
+    public event EventHandler<EntityRevivedEventArgs>? EntityRevived;
     // the sender mutated the pool of the target
     public event EventHandler<PoolMutatedEventArgs>? PoolMutated;
     // the sender applied an effect to the target
@@ -50,6 +55,20 @@ public sealed partial class BattleManager
     private void OnHealingReceived(HealingReceivedEventArgs e)
     {
         HealingReceived?.Invoke(this, e);
+    }
+
+    private void OnEntityDowned(EntityDownedEventArgs e)
+    {
+        // Remove the actions of whatever entity was downed
+        Scheduler.RemoveActionsOf(e.Target);
+        EntityDowned?.Invoke(this, e);
+    }
+
+    private void OnEntityRevived(EntityRevivedEventArgs e)
+    {
+        // Reschedule the revived entity's actions
+        Scheduler.Schedule(GetScheduledAction(e.Target));
+        EntityRevived?.Invoke(this, e);
     }
 
     private void OnPoolMutated(PoolMutatedEventArgs e)
@@ -91,7 +110,7 @@ public class TurnEventArgs : EventArgs
 public class DamageTakenEventArgs : BattleCommandEventArgs, IDeltaEventArgs
 {
     public required double Amount { get; init; }
-    public required DamageData Data { get; init; }
+    public required DamageMetadata Metadata { get; init; }
     public required bool IsCrit { get; init; }
     double IDeltaEventArgs.Delta => Amount;
 }
@@ -102,6 +121,10 @@ public class HealingReceivedEventArgs : BattleCommandEventArgs, IDeltaEventArgs
     public required HealData Data { get; init; }
     double IDeltaEventArgs.Delta => Amount;
 }
+
+public class EntityDownedEventArgs : BattleCommandEventArgs;
+
+public class EntityRevivedEventArgs : BattleCommandEventArgs;
 
 public class PoolMutatedEventArgs : BattleCommandEventArgs, IDeltaEventArgs
 {

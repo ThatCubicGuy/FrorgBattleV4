@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
@@ -48,13 +49,9 @@ public sealed partial class BattleManager
     public async Task RunAsync(CancellationToken cancellationToken)
     {
         // TODO (Nova): incomplete
-        foreach (var uid in Entities.Keys)
+        foreach (var turn in GetScheduledActions(Entities.Keys))
         {
-            Scheduler.Schedule(new ScheduledTurn(uid, 10000 / new StatQuery
-            {
-                Subject = uid,
-                Stat = StatName.Spd,
-            }.Calculate(GetEnvironment()), Teams[Entities[uid].Team].Provider));
+            Scheduler.Schedule(turn);
         }
 
         OnBattleStarted();
@@ -104,7 +101,7 @@ public sealed partial class BattleManager
             // Flush shard link commands
             _commandBuilder.Flush(_commandResolver);
             // Flush reaction commands from shard link resolution
-            _commandBuilder.Flush(_commandResolver);
+            _commandBuilder.FlushClean(_commandResolver);
 
             // Reschedule actions
             Scheduler.Schedule(new ScheduledTurn(action.Actor, 10000 / new StatQuery
@@ -121,6 +118,26 @@ public sealed partial class BattleManager
         }
 
         OnBattleEnded();
+    }
+
+    private ScheduledTurn GetScheduledAction(EntityUid entity)
+    {
+        return new ScheduledTurn(entity, 10000 / new StatQuery
+        {
+            Subject = entity,
+            Stat = StatName.Spd,
+        }.Calculate(GetEnvironment()), Teams[Entities[entity].Team].Provider);
+    }
+
+    private IEnumerable<ScheduledTurn> GetScheduledActions(IEnumerable<EntityUid> entities)
+    {
+        // Small optimization to avoid getting a new environment for each entity
+        var env = GetEnvironment();
+        return entities.Select(entity => new ScheduledTurn(entity, 10000 / new StatQuery
+        {
+            Subject = entity,
+            Stat = StatName.Spd,
+        }.Calculate(env), Teams[Entities[entity].Team].Provider));
     }
 
     /// <summary>

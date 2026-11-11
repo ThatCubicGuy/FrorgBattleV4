@@ -97,7 +97,7 @@ public record BattleEnvironment
     public IEnumerable<EntityUid> GetNeighbors(EntityUid entity)
     {
         EnsureExists(entity);
-        return _teams[_entities[entity].Team].GetOnFieldMembers();
+        return _teams[_entities[entity].Team].GetOnFieldMembers().Where(e => !_entities[e].Downed);
     }
 
     public IEnumerable<EntityUid> GetEnemies(EntityUid entity)
@@ -187,7 +187,7 @@ public record BattleEnvironment
     /// The exception that is thrown when an entity ID does not match any known entity.
     /// </summary>
     /// <param name="entity">The EntityUid that didn't match any entity in the current context.</param>
-    public class EntityMissingException(EntityUid entity) : Exception
+    public class EntityMissingException(EntityUid entity) : ApplicationException
     {
         private readonly EntityUid _entity = entity;
 
@@ -200,7 +200,7 @@ public record BattleEnvironment
     /// The exception that is thrown when trying to add an entity beyond an accepted limit.
     /// </summary>
     /// <param name="limit">The limit that was exceeded.</param>
-    public class EntityLimitException(EntityUid entity, long limit) : Exception
+    public class EntityLimitException(EntityUid entity, long limit) : ApplicationException
     {
         private readonly EntityUid _entity = entity;
         private readonly long _limit = limit;

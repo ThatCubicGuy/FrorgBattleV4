@@ -7,7 +7,6 @@ using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Modifiers;
 using FrogBattleV4.Core.Modifiers.PassiveEffects;
-using FrogBattleV4.Core.Modifiers.PassiveEffects.Conditions;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Entities;
@@ -36,13 +35,15 @@ public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiabl
 
     public required TeamUid Team { get; init; }
 
+    public bool Downed { get; private set; }
+
     public ImmutableDictionary<PoolName, Pool> Pools { get; } = BasePools(definition, team);
     public ImmutableDictionary<CounterName, Counter> Counters { get; } = BaseCounters(definition, team);
     public ImmutableList<PassiveModifier> PassiveModifiers { get; } = BasePassives(definition, team);
 
     public IReadOnlyCollection<StatusEffectInstance> ActiveEffects => _activeEffects.Values;
 
-    public void TakeDamage(double damage, DamageData damageData)
+    public void TakeDamage(double damage, DamageMetadata damageMetadata)
     {
         // Barriers block all damage taken in one instance
         if (Counters[CounterName.Barrier].TryDecrement()) return;
@@ -65,10 +66,19 @@ public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiabl
             // If damage was greater than the pool value, we keep going
             Pools[poolId].Value = 0;
         }
+
+        // If we didn't survive the attack, mark this entity as downed
+        if (Pools[PoolName.Hp].Value <= 0)
+        {
+            Downed = true;
+        }
     }
 
     public void TakeHealing(double healing, HealData healData)
     {
+        // Check if we can be revived
+        if (Downed && !healData.Revives) return;
+
         var hpPool = Pools[PoolName.Hp];
 
         // Calculate how much we can saturate the HP pool
@@ -82,6 +92,12 @@ public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiabl
 
         // Add to HP pool irrespective of the above conditions.
         hpPool.Value += healing;
+
+        // Set downed to false if we're above 0 hp
+        if (Downed && hpPool.Value > 0)
+        {
+            Downed = false;
+        }
     }
 
     // TODO (Nova): don't like this way of implementing this functionality
