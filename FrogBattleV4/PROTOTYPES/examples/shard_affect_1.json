@@ -8,7 +8,7 @@
         "amount": 250,
         "rank_falloff": 0.2
       },
-      "data": {
+      "metadata": {
         "type": "slash",
         "source": "link"
       },

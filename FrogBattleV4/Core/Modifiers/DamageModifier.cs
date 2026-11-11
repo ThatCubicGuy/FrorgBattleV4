@@ -6,23 +6,31 @@ namespace FrogBattleV4.Core.Modifiers;
 public class DamageModifier : MutationModifier<DamageQuery>
 {
     [JsonPropertyName("damage")]
-    public required DamageData Data { get; init; }
+    public required DamageMetadata Metadata { get; init; }
     public bool CritOnly { get; init; }
 
     protected override bool AppliesTo(DamageQuery query)
     {
-        return (!CritOnly || query.IsCrit) && Data.Permits(query.Data);
+        return (!CritOnly || query.IsCrit) && Metadata.Permits(query.Metadata);
     }
 }
 
 public class DamagePropertyModifier : AttributeModifier<DamageStatQuery>
 {
     [JsonPropertyName("damage")]
-    public required DamageData Data { get; init; }
+    public required DamageMetadata Metadata { get; init; }
     public required DamageStatChannel Channel { get; init; }
 
     protected override bool AppliesTo(DamageStatQuery query)
     {
-        return query.Channel == Channel && Data.Permits(query.Data);
+        return query.Channel == Channel && Metadata.Permits(query.Metadata);
     }
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter<DamageStatChannel>))]
+public enum DamageStatChannel
+{
+    [JsonStringEnumMemberName("crit_rate")]
+    CritRate = 1,
+    // Leaves potential for adding things like HitRate and whatnot
 }

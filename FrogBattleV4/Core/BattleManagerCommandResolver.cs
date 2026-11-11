@@ -28,7 +28,7 @@ public sealed partial class BattleManager
                 Target = target,
                 Amount = damage,
                 IsCrit = isCrit,
-                Metadata = damageData,
+                Metadata = command.Metadata,
             });
 
             if (manager.Entities[target].Downed)

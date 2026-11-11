@@ -5,7 +5,7 @@ namespace FrogBattleV4.Core.Abilities.Reactions.Functions;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "function")]
 [JsonDerivedType(typeof(HealReactionFunction), "heal")]
-[JsonDerivedType(typeof(ExecuteLinkReactionFunction), "execute_link")]
+[JsonDerivedType(typeof(FollowUpReactionFunction), "execute_link")]
 [JsonDerivedType(typeof(SequenceReactionFunction), "sequence")]
 [JsonDerivedType(typeof(ModifyCounterReactionFunction), "modify_counter")]
 [JsonDerivedType(typeof(EnqueueActionReactionFunction), "enqueue_action")]

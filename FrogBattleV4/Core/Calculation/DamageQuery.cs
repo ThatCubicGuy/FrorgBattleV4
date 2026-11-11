@@ -1,3 +1,5 @@
+using FrogBattleV4.Core.Modifiers;
+
 namespace FrogBattleV4.Core.Calculation;
 
 /// <summary>
@@ -5,12 +7,12 @@ namespace FrogBattleV4.Core.Calculation;
 /// </summary>
 public class DamageQuery : CommandQuery
 {
-    public required DamageData Data { get; init; }
+    public required DamageMetadata Metadata { get; init; }
     public required bool IsCrit { get; init; }
 }
 
 public class DamageStatQuery : AttributeQuery
 {
-    public required DamageData Data { get; init; }
+    public required DamageMetadata Metadata { get; init; }
     public required DamageStatChannel Channel { get; init; }
 }

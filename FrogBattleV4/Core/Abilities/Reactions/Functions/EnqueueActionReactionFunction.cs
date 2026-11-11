@@ -9,12 +9,13 @@ namespace FrogBattleV4.Core.Abilities.Reactions.Functions;
 public class EnqueueActionReactionFunction : CommandReactionFunction
 {
     public required ImmutableArray<ShardId> Link { get; init; }
+    public required ActionType Type { get; init; }
     protected override void HandleEvent(EntityUid holder, BattleEnvironment env, BattleCommandEventArgs args,
         CommandBuilder builder)
     {
         var commands = GetRelation(holder, env, args).Select(context => new EnqueueActionCommand
         {
-            Data = new EnqueueActionData(new TurnDecision(Link, context.Target)),
+            Data = new EnqueueActionData(new TurnDecision(Link, context.Target), Type),
             Relation = context with { Target = context.Actor },
         });
 

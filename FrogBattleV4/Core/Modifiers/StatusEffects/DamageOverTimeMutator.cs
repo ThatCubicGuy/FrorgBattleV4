@@ -10,7 +10,7 @@ public class DamageOverTimeMutator : IMutatorComponent
 {
     // TODO (Nova): Modify DamageFormula namespace
     public required DamageFormula Damage { get; init; }
-    public required DamageData Data { get; init; }
+    public required DamageMetadata Metadata { get; init; }
     public void Tick(TurnMoment moment, StatusEffectInstance effect, BattleEnvironment env, CommandBuilder builder)
     {
         // Damage over time only happens at the start of the turn
@@ -32,7 +32,8 @@ public class DamageOverTimeMutator : IMutatorComponent
                 Actor = effect.Applicant,
                 Target = effect.Holder,
             },
-            Data = Data,
+            Metadata = Metadata,
+            Data = DamageData.None,
         });
     }
 }

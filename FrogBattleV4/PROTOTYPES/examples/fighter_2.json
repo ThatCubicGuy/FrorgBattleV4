@@ -1,7 +1,6 @@
 {
-  "name": "SPEEEED",
   "stats": {
-    "max_hp": 400000,
+    "max_hp": 1000,
     "atk": 1000,
     "def": 400,
     "spd": 120,

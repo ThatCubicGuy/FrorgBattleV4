@@ -2,14 +2,15 @@ using System;
 using System.Text.Json.Serialization;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat.Commands;
+using FrogBattleV4.Core.Modifiers;
 
 namespace FrogBattleV4.Core.Abilities.Components;
 
 public class AttackComponent : IShardCommandComponent
 {
     public required DamageFormula Formula { get; init; }
-    public required DamageData Data { get; init; }
-    public AttackProperties Properties { get; init; } = new();
+    public required DamageMetadata Metadata { get; init; }
+    public AttackProperties Properties { get; init; } = new(DamageData.None);
 
     public void GenerateCommands(ShardResolutionScope scope, BattleEnvironment env, CommandBuilder builder)
     {
@@ -24,7 +25,8 @@ public class AttackComponent : IShardCommandComponent
             NormalAmount = GetDamageValue(baseValue, false, env, ctx),
             CriticalAmount = GetDamageValue(baseValue, true, env, ctx),
             CriticalChance = GetCritChance(env, ctx),
-            Data = Data,
+            Metadata = Metadata,
+            Data = Properties.Data,
             Relation = ctx,
         });
     }
@@ -34,7 +36,7 @@ public class AttackComponent : IShardCommandComponent
         return new DamageQuery
         {
             BaseValue = baseValue,
-            Data = Data,
+            Metadata = Metadata,
             IsCrit = isCrit,
             Context = ctx,
         }.Calculate(env) * GetDefMultiplier(env, ctx) * (isCrit ? GetCritMultiplier(env, ctx) : 1);
@@ -42,7 +44,7 @@ public class AttackComponent : IShardCommandComponent
 
     private static double GetDefMultiplier(BattleEnvironment env, in RelationContext ctx)
     {
-        return 2000 / double.Max(2000, 2000 + new StatQuery
+        return 3000 / double.Max(3000, 3000 + new StatQuery
         {
             Stat = StatName.Def,
             Subject = ctx.Target,
@@ -65,7 +67,7 @@ public class AttackComponent : IShardCommandComponent
         return Properties.CanCrit
             ? new DamageStatQuery
             {
-                Data = Data,
+                Metadata = Metadata,
                 Channel = DamageStatChannel.CritRate,
                 Subject = ctx.Actor,
                 Reference = ctx.Target,
@@ -79,7 +81,7 @@ public class AttackComponent : IShardCommandComponent
     }
 }
 
-public sealed record AttackProperties(bool CanCrit = true);
+public sealed record AttackProperties(DamageData Data, bool CanCrit = true);
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(Flat), "flat")]

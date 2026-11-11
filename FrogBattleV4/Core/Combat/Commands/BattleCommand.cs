@@ -1,9 +1,7 @@
 namespace FrogBattleV4.Core.Combat.Commands;
 
-// TODO (Nova): "Data" does not seem to have a consistent meaning across TData parameters.
-
 /// <inheritdoc/>
-/// <typeparam name="TData">Data relating to the shard action.</typeparam>
+/// <typeparam name="TData">Data modifying what the shard action does.</typeparam>
 public abstract class BattleCommand<TData> : BattleCommand where TData : notnull
 {
     public required TData Data { get; init; }

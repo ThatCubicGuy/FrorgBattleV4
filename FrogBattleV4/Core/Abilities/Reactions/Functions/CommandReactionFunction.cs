@@ -22,6 +22,15 @@ public abstract class CommandReactionFunction : ReactionFunction
         HandleEvent(holder, env, battleArgs, builder);
     }
 
+    /// <summary>
+    /// Gets the relation contexts relevant to this reaction function based on the AffectedEntity property.
+    /// The holder is always the actor.
+    /// </summary>
+    /// <param name="holder">Entity which launched this reaction function.</param>
+    /// <param name="env">Environment to get participants from.</param>
+    /// <param name="args">CommandEventArgs for this reaction.</param>
+    /// <returns>A collection of relation contexts with the targets of this function.</returns>
+    /// <exception cref="NotSupportedException">Unknown FunctionTarget value.</exception>
     protected IEnumerable<RelationContext> GetRelation(EntityUid holder, BattleEnvironment env,
         IBattleCommandEventArgs args)
     {
