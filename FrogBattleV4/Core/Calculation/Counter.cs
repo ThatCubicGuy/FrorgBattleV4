@@ -54,7 +54,7 @@ public sealed class Counter()
     public long CurrentValue
     {
         get => _currentValue;
-        set
+        private set
         {
             var oldValue = _currentValue;
             _currentValue = MaxValue.HasValue ? Math.Clamp(value, 0L, MaxValue.Value) : Math.Max(value, 0L);
