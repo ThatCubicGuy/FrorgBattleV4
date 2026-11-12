@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace FrogBattleV4.Core.Abilities.Targeting;
 
@@ -7,6 +8,7 @@ namespace FrogBattleV4.Core.Abilities.Targeting;
 /// </summary>
 public class AreaOfEffectTargeting : IShardTargeting
 {
+    [JsonPropertyName("penalty")]
     public required int RankPenalty { get; init; }
 
     public TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env)

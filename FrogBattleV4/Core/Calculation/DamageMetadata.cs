@@ -12,6 +12,8 @@ public record DamageMetadata(
     DamageType Type = default,
     DamageSource Source = default)
 {
+    public static readonly DamageMetadata Default = new();
+
     /// <summary>
     /// Determines whether a modifier of this metadata can boost damage from metadata <paramref name="metadata"/>.
     /// </summary>

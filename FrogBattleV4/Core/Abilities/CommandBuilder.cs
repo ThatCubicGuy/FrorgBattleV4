@@ -25,7 +25,14 @@ public sealed class CommandBuilder
 
         foreach (var command in commands)
         {
-            command.Accept(visitor);
+            try
+            {
+                command.Accept(visitor);
+            }
+            catch (BattleManager.EntityDownedException e)
+            {
+                Logger.WriteLog(e.Message + $" ({e.Entity})");
+            }
         }
     }
 

@@ -6,7 +6,7 @@ namespace FrogBattleV4.Core.Modifiers;
 public class DamageModifier : MutationModifier<DamageQuery>
 {
     [JsonPropertyName("damage")]
-    public required DamageMetadata Metadata { get; init; }
+    public DamageMetadata Metadata { get; init; } = DamageMetadata.Default;
     public bool CritOnly { get; init; }
 
     protected override bool AppliesTo(DamageQuery query)

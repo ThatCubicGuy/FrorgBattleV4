@@ -1,8 +1,7 @@
 {
   "type": "target",
   "targeting": {
-    "type": "blast",
-    "radius": 1,
+    "type": "area_of_effect",
     "penalty": 1
   },
   "requirements": []

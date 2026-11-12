@@ -8,13 +8,13 @@ using FrogBattleV4.Core.Decisions;
 
 namespace FrogBattleV4.Core.Combat;
 
-public class Team : UniquelyIdentifiable<TeamUid>
+public class TeamInstance : UniquelyIdentifiable<TeamUid>
 {
     private readonly List<EntityUid> _members = [];
     private readonly List<EntityUid> _offFieldMembers = [];
     private readonly Pool _manaPool = new(1000);
 
-    public Team(IDecisionProvider playerDecisionProvider, IEnumerable<IModifierProvider>? modifiers = null)
+    public TeamInstance(IDecisionProvider playerDecisionProvider, IEnumerable<IModifierProvider>? modifiers = null)
     {
         ArgumentNullException.ThrowIfNull(playerDecisionProvider);
         Provider = playerDecisionProvider;

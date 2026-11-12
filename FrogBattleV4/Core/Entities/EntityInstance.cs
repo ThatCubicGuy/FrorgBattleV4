@@ -14,7 +14,7 @@ namespace FrogBattleV4.Core.Entities;
 /// <summary>
 /// Mutable in game data for any individual entity.
 /// </summary>
-public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiable<EntityUid>
+public class EntityInstance(Fighter definition, TeamInstance team) : UniquelyIdentifiable<EntityUid>
 {
     /// <summary>
     /// Determines the order in which fighter pools absorb damage.
@@ -142,7 +142,7 @@ public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiabl
     /// <param name="definition">Definition to get the pools from.</param>
     /// <param name="team">Team that this entity is a part of. Needed for common pools.</param>
     /// <returns>An ImmutableDictionary containing a new set of pools.</returns>
-    private static ImmutableDictionary<PoolName, Pool> BasePools(Fighter definition, Team team)
+    private static ImmutableDictionary<PoolName, Pool> BasePools(Fighter definition, TeamInstance team)
     {
         var maxHp = definition.Stats[StatName.MaxHp];
         var maxEnergy = definition.Stats[StatName.MaxEnergy];
@@ -177,7 +177,7 @@ public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiabl
     /// <param name="definition">Definition to get the counters from.</param>
     /// <param name="team">Team that this entity is a part of. Needed for common counters.</param>
     /// <returns>An ImmutableDictionary containing a new set of counters.</returns>
-    private static ImmutableDictionary<CounterName, Counter> BaseCounters(Fighter definition, Team team)
+    private static ImmutableDictionary<CounterName, Counter> BaseCounters(Fighter definition, TeamInstance team)
     {
         var result = new Dictionary<CounterName, Counter>
         {
@@ -197,7 +197,7 @@ public class EntityInstance(Fighter definition, Team team) : UniquelyIdentifiabl
         return result.ToImmutableDictionary();
     }
 
-    private static ImmutableList<PassiveModifier> BasePassives(Fighter definition, Team team)
+    private static ImmutableList<PassiveModifier> BasePassives(Fighter definition, TeamInstance team)
     {
         var result = new List<PassiveModifier>(definition.Stats.Count + definition.PassiveModifiers.Length);
 

@@ -45,7 +45,7 @@ var provider = new SetDecisionProvider();
 var member = new FighterId(new ResourceId("frorgbattle", "fighter_1"));
 var member2 = new FighterId(new ResourceId("frorgbattle", "fighter_2"));
 var manager = BattleManager.GetBuilder()
-    .AddTeam(provider).AddMembers([member, member])
+    .AddTeam(provider).AddMembers([member, member2, member])
     .AddTeam(provider).AddMembers([member, member, member2])
     .Build();
 
@@ -90,6 +90,7 @@ file class SetDecisionProvider : IDecisionProvider, IComparer<ShardId>
         var enemies = request.Environment
             .GetEnemies(request.User)
             .ToArray();
+        Logger.WriteLog($"Enemies of {request.User} = {string.Join(',', enemies)}");
         Randomize(shards);
         return Task.FromResult(new TurnDecision([.. shards], enemies[enemies.Length / 2]));
     }
@@ -154,6 +155,7 @@ file static class Extensions
 
     public static void HandleBattleEnded(object? sender, EventArgs args)
     {
+        Console.Out.WriteLine("Battle ended!");
         foreach (var kvp in (sender as BattleManager)!.Entities)
         {
             Console.Out.WriteLine("{0} ({2}HP): {1}", kvp.Key, kvp.Value.ActiveEffects.Count, kvp.Value.Pools[PoolName.Hp].Value);
@@ -179,7 +181,7 @@ file static class Extensions
         Console.Out.WriteLine(
             $"""
              Stats of {e.Actor}:
-                 MaxHp = {new StatQuery
+                 Hp = {(sender as BattleManager)!.Entities[e.Actor].Pools[PoolName.Hp].Value:F0}/{new StatQuery
                  {
                      Stat = StatName.MaxHp,
                      Subject = e.Actor,

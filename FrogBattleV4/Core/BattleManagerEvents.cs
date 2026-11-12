@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat;
 using FrogBattleV4.Core.Modifiers.StatusEffects;
@@ -61,6 +62,14 @@ public sealed partial class BattleManager
     {
         // Remove the actions of whatever entity was downed
         Scheduler.RemoveActionsOf(e.Target);
+
+        // Check if the team still has members
+        if (Teams[Entities[e.Target].Team].GetOnFieldMembers().All(entity => Entities[entity].Downed))
+        {
+            // For now there's only 2 teams so we interrupt once one loses all members
+            Scheduler.Interrupt();
+        }
+
         EntityDowned?.Invoke(this, e);
     }
 

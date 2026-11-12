@@ -20,7 +20,7 @@ public sealed partial class BattleManager
     public class Builder
     {
         private readonly Dictionary<EntityUid, EntityInstance> _fighters = [];
-        private readonly List<Team> _teams = [];
+        private readonly List<TeamInstance> _teams = [];
         private readonly FighterRegistry _fighterRegistry;
         private readonly ShardRegistry _shardRegistry;
         private readonly StatusEffectRegistry _statusEffectRegistry;
@@ -48,7 +48,7 @@ public sealed partial class BattleManager
                 throw new InvalidOperationException("Cannot add a team when the previous team contains no members.");
             }
 
-            _teams.Add(new Team(provider));
+            _teams.Add(new TeamInstance(provider));
             return this;
         }
 

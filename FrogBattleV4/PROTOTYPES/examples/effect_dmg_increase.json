@@ -1,0 +1,15 @@
+{
+  "max_stacks": 3,
+  "modifiers": [
+    {
+      "modifier_type": "damage",
+      "direction": "incoming",
+      "entity": "this",
+      "damage": {},
+      "values": {
+        "multiply_total": 1.1
+      }
+    }
+  ],
+  "mutators": []
+}

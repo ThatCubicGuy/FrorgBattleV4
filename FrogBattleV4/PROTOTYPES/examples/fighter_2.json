@@ -1,11 +1,11 @@
 {
   "stats": {
-    "max_hp": 1000,
+    "max_hp": 3000,
     "atk": 1000,
     "def": 400,
     "spd": 120,
     "max_energy": 120,
-    "crit_damage": 2
+    "crit_damage": 3
   },
   "shards": [
     "frorgbattle:shard_attack_bullet",

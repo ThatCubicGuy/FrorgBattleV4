@@ -14,34 +14,31 @@ namespace FrogBattleV4.Core;
 
 public record BattleEnvironment
 {
+    private readonly ImmutableDictionary<EntityUid, EntityInstance> _entities;
+    private readonly ImmutableDictionary<TeamUid, TeamInstance> _teams;
     private readonly Registry<FighterId, Fighter> _fighterRegistry;
     private readonly Registry<ShardId, Shard> _shardRegistry;
-    private readonly ImmutableDictionary<EntityUid, EntityInstance> _entities;
-    private readonly ImmutableDictionary<TeamUid, Team> _teams;
     private readonly ImmutableList<IModifierProvider> _arenaModifiers;
 
-    public BattleEnvironment(ImmutableDictionary<EntityUid, EntityInstance> entities,
-        ImmutableDictionary<TeamUid, Team> teams,
+    public BattleEnvironment(
+        ImmutableDictionary<EntityUid, EntityInstance> entities,
+        ImmutableDictionary<TeamUid, TeamInstance> teams,
         Registry<FighterId, Fighter> fighterRegistry,
         Registry<ShardId, Shard> shardRegistry,
         ImmutableList<IModifierProvider> arenaModifiers)
     {
+        _entities = entities;
+        _teams = teams;
         _fighterRegistry = fighterRegistry;
         _shardRegistry = shardRegistry;
         _arenaModifiers = arenaModifiers;
-        _entities = entities;
-        _teams = teams;
     }
-
-    #region Properties
 
     /// <summary>
     /// Subjective modifiers are modifiers that should only apply to the current user.
     /// Used to propagate bonus modifiers from abilities and such.
     /// </summary>
-    public ImmutableList<IModifierProvider> SubjectiveModifiers { get; init; } = ImmutableList<IModifierProvider>.Empty;
-
-    #endregion
+    public ImmutableList<IModifierProvider> SubjectiveModifiers { get; private init; } = ImmutableList<IModifierProvider>.Empty;
 
     #region Methods
 
@@ -86,7 +83,7 @@ public record BattleEnvironment
     }
 
     /// <summary>
-    /// Returns every member from the same field (on the same "line") as <paramref name="entity"/>.
+    /// Returns every member from the same team (on the same "field") as <paramref name="entity"/>.
     /// </summary>
     /// <param name="entity">Entity UID.</param>
     /// <exception cref="InvalidOperationException">
@@ -104,7 +101,7 @@ public record BattleEnvironment
     {
         EnsureExists(entity);
         return _teams.Values
-            .SelectMany(team => team.GetOnFieldMembers())
+            .SelectMany(team => team.GetOnFieldMembers().Where(e => !_entities[e].Downed))
             .Except(GetNeighbors(entity));
     }
 

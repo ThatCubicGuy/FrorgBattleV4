@@ -57,59 +57,51 @@ public static class DeferredRegistry
 
     public class Shards : Loader<ShardId, Shard>
     {
-        internal Shards(string ns) : base(ns, BaseDirectoryName)
+        internal Shards(string ns) : base(ns, "shards")
         {
         }
 
-        private static string BaseDirectoryName => "shards";
         protected override JsonTypeInfo<Shard> TypeInfo => AppSerializerContext.Default.Shard;
 
         public FrozenDictionary<ShardId, Shard> LoadAll()
         {
-            return LoadAllFiles(BaseDirectoryName, SkipInvalidFiles).ToFrozenDictionary();
+            return LoadAllFiles(SkipInvalidFiles).ToFrozenDictionary();
         }
     }
 
     public class Fighters : Loader<FighterId, Fighter>
     {
-        internal Fighters(string ns) : base(ns, BaseDirectoryName)
+        internal Fighters(string ns) : base(ns, "fighters")
         {
         }
 
-        private static string BaseDirectoryName => "fighters";
         protected override JsonTypeInfo<Fighter> TypeInfo => AppSerializerContext.Default.Fighter;
 
         public FrozenDictionary<FighterId, Fighter> LoadAll()
         {
-            return LoadAllFiles(BaseDirectoryName, SkipInvalidFiles).ToFrozenDictionary();
+            return LoadAllFiles(SkipInvalidFiles).ToFrozenDictionary();
         }
     }
 
     public class StatusEffects : Loader<StatusEffectId, StatusEffect>
     {
-        internal StatusEffects(string ns) : base(ns, BaseDirectoryName)
+        internal StatusEffects(string ns) : base(ns, "status_effects")
         {
         }
 
-        private static string BaseDirectoryName => "status_effects";
         protected override JsonTypeInfo<StatusEffect> TypeInfo => AppSerializerContext.Default.StatusEffect;
 
         public FrozenDictionary<StatusEffectId, StatusEffect> LoadAll()
         {
-            return LoadAllFiles(BaseDirectoryName, SkipInvalidFiles).ToFrozenDictionary();
+            return LoadAllFiles(SkipInvalidFiles).ToFrozenDictionary();
         }
     }
 
     // TODO (Nova): Loaders shouldn't directly create a new registry if they are namespaced
-    public abstract class Loader<TKey, TValue> where TKey : struct, IResourceId
+    public abstract class Loader<TKey, TValue>(string ns, string baseDirectory)
+        where TKey : struct, IResourceId
     {
         private readonly Dictionary<TKey, TValue> _items = new();
-        private readonly string _namespace;
-
-        protected Loader(string ns, string baseDir)
-        {
-            _namespace = ns;
-        }
 
         protected abstract JsonTypeInfo<TValue> TypeInfo { get; }
 
@@ -128,7 +120,6 @@ public static class DeferredRegistry
         /// <summary>
         /// Searches the base folder and loads every valid file found.
         /// </summary>
-        /// <param name="directory"></param>
         /// <param name="skipInvalidFiles">Whether invalid files should be skipped or throw an exception.</param>
         /// <exception cref="JsonException">
         /// One of the files was invalid and <paramref name="skipInvalidFiles"/> is false.
@@ -136,10 +127,10 @@ public static class DeferredRegistry
         /// <exception cref="InvalidOperationException">
         /// A duplicate ID was encountered after resolving filenames to resource IDs.
         /// </exception>
-        protected Dictionary<TKey, TValue> LoadAllFiles(string directory, bool skipInvalidFiles = false)
+        protected Dictionary<TKey, TValue> LoadAllFiles(bool skipInvalidFiles = false)
         {
             var items = new Dictionary<TKey, TValue>();
-            foreach (var file in Directory.EnumerateFiles(directory, "*", SearchOption.TopDirectoryOnly))
+            foreach (var file in Directory.EnumerateFiles(baseDirectory, "*", SearchOption.TopDirectoryOnly))
             {
                 try
                 {
@@ -154,7 +145,7 @@ public static class DeferredRegistry
                 catch (JsonException e)
                 {
                     if (!skipInvalidFiles) throw;
-                    Logger.WriteLine(e.Message);
+                    Logger.WriteLog(e.Message);
                 }
             }
 
@@ -174,7 +165,7 @@ public static class DeferredRegistry
 
             return new TKey
             {
-                Value = new ResourceId(_namespace, filename),
+                Value = new ResourceId(ns, filename),
             };
         }
     }

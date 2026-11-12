@@ -23,7 +23,7 @@ public sealed partial class BattleManager
 
     private BattleManager(
         ImmutableDictionary<EntityUid, EntityInstance> entities,
-        ImmutableDictionary<TeamUid, Team> teams,
+        ImmutableDictionary<TeamUid, TeamInstance> teams,
         FighterRegistry fighterRegistry,
         ShardRegistry shardRegistry,
         StatusEffectRegistry statusEffectRegistry)
@@ -41,7 +41,7 @@ public sealed partial class BattleManager
     }
 
     public ImmutableDictionary<EntityUid, EntityInstance> Entities { get; private set; }
-    public ImmutableDictionary<TeamUid, Team> Teams { get; private set; }
+    public ImmutableDictionary<TeamUid, TeamInstance> Teams { get; private set; }
 
     public long CreationTime { get; }
     private TurnScheduler Scheduler { get; } = new();
@@ -62,7 +62,7 @@ public sealed partial class BattleManager
             var action = Scheduler.Current;
             _commandBuilder = new CommandBuilder();
 
-            // TODO (Nova): Status effect ticks only happen on *scheduled* turns, not instant actions
+            // TODO (Nova): Status effect ticks should only happen on *scheduled* turns, not instant actions
             if (previous is not null) Entities[previous.Actor].Tick(TurnMoment.End, env, _commandBuilder);
             previous = action;
             // Tick current entity's start mutators
@@ -70,6 +70,9 @@ public sealed partial class BattleManager
 
             // Mutator commands are executed separately
             _commandBuilder.Flush(_commandResolver);
+
+            // Also check whether this entity was downed by DoT
+            if (Entities[action.Actor].Downed) continue;
 
             OnTurnStarted(new TurnEventArgs
             {
@@ -102,6 +105,9 @@ public sealed partial class BattleManager
             _commandBuilder.Flush(_commandResolver);
             // Flush reaction commands from shard link resolution
             _commandBuilder.FlushClean(_commandResolver);
+
+            // Check whether the battle should continue
+            
 
             // Reschedule actions
             Scheduler.Schedule(new ScheduledTurn(action.Actor, 10000 / new StatQuery

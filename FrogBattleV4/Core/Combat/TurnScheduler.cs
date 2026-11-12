@@ -10,6 +10,7 @@ public class TurnScheduler
     private readonly Queue<InstantAction> _actionTimeline = new();
     private long _globalSequence;
     private double _now;
+    private bool _interrupt;
     // Initialize with null! to retain nullability annotations when setting _current
     private IAction _current = null!;
 
@@ -26,6 +27,8 @@ public class TurnScheduler
     /// <returns>True if there are still turns remaining, false if there is nothing left.</returns>
     public bool MoveNext()
     {
+        if (_interrupt) return false;
+
         if (_actionTimeline.TryDequeue(out var action))
         {
             _current = action;
@@ -38,6 +41,26 @@ public class TurnScheduler
         _current = turn;
         _now = priority.ActionValue;
         return true;
+    }
+
+    /// <summary>
+    /// Interrupts the current action queue.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The action queue was already interrupted.</exception>
+    public void Interrupt()
+    {
+        if (_interrupt) throw new InvalidOperationException("Actions already interrupted.");
+        _interrupt = true;
+    }
+
+    /// <summary>
+    /// Resumes the action queue after an interrupt.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The action queue was not interrupted.</exception>
+    public void Resume()
+    {
+        if (!_interrupt) throw new InvalidOperationException("Cannot resume actions when not interrupted.");
+        _interrupt = false;
     }
 
     /// <summary>
