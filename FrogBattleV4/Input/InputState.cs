@@ -14,30 +14,7 @@ public readonly struct InputState
     }
 
     public InputStatus this[InputAction action] =>
-        (_previous.HasFlag(AsBit(action)), _current.HasFlag(AsBit(action))) switch
-        {
-            (false, false) => InputStatus.Idle,
-            (false, true) => InputStatus.Pressed,
-            (true, true) => InputStatus.Held,
-            (true, false) => InputStatus.Released,
-        };
-
-    public InputState With(InputAction action, InputStatus status)
-    {
-        var (previous, current) = status switch
-        {
-            // Unset previous and current
-            InputStatus.Idle => (_previous & ~AsBit(action), _current & ~AsBit(action)),
-            // Unset previous, set current
-            InputStatus.Pressed => (_previous & ~AsBit(action), _current | AsBit(action)),
-            // Set previous and current
-            InputStatus.Held => (_previous | AsBit(action), _current | AsBit(action)),
-            // Set previous, unset current
-            InputStatus.Released => (_previous | AsBit(action), _current & ~AsBit(action)),
-            _ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
-        };
-        return new InputState(previous, current);
-    }
+        InputStatusExtensions.GetStatus(_previous.HasFlag(AsBit(action)), _current.HasFlag(AsBit(action)));
 
     /// <summary>
     /// Returns a new InputState with the same values as the current one except for the given action.
@@ -57,6 +34,23 @@ public readonly struct InputState
             InputStatus.Pressed or InputStatus.Released => this,
             _ => throw new InvalidOperationException("Unreachable."),
         };
+    }
+
+    private InputState With(InputAction action, InputStatus status)
+    {
+        var (previous, current) = status switch
+        {
+            // Unset previous and current
+            InputStatus.Idle => (_previous & ~AsBit(action), _current & ~AsBit(action)),
+            // Unset previous, set current
+            InputStatus.Pressed => (_previous & ~AsBit(action), _current | AsBit(action)),
+            // Set previous and current
+            InputStatus.Held => (_previous | AsBit(action), _current | AsBit(action)),
+            // Set previous, unset current
+            InputStatus.Released => (_previous | AsBit(action), _current & ~AsBit(action)),
+            _ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
+        };
+        return new InputState(previous, current);
     }
 
     private static InputActions AsBit(InputAction action) => action switch
