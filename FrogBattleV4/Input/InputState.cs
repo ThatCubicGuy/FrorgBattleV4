@@ -26,15 +26,27 @@ public readonly struct InputState
     {
         var (previous, current) = status switch
         {
+            // Unset previous and current
             InputStatus.Idle => (_previous & ~AsBit(action), _current & ~AsBit(action)),
+            // Unset previous, set current
             InputStatus.Pressed => (_previous & ~AsBit(action), _current | AsBit(action)),
+            // Set previous and current
             InputStatus.Held => (_previous | AsBit(action), _current | AsBit(action)),
+            // Set previous, unset current
             InputStatus.Released => (_previous | AsBit(action), _current & ~AsBit(action)),
             _ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
         };
         return new InputState(previous, current);
     }
 
+    /// <summary>
+    /// Returns a new InputState with the same values as the current one except for the given action.
+    /// The value of the current InputState for that action is only overridden if it is either
+    /// InputStatus.Idle or InputStatus.Held, giving priority to Pressed and Released.
+    /// </summary>
+    /// <param name="action">Action to try overriding.</param>
+    /// <param name="status">InputStatus to try setting it to.</param>
+    /// <returns>A new InputState.</returns>
     public InputState WithRestricted(InputAction action, InputStatus status)
     {
         return this[action] switch
@@ -43,7 +55,7 @@ public readonly struct InputState
             InputStatus.Idle or InputStatus.Held => With(action, status),
             // Pressed and Released cannot be overridden
             InputStatus.Pressed or InputStatus.Released => this,
-            _ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
+            _ => throw new InvalidOperationException("Unreachable."),
         };
     }
 

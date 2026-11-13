@@ -18,8 +18,10 @@ public class Keymap : IKeymap
     public InputState Translate(KeyboardState previous, KeyboardState current)
     {
         return _map.Keys.Where(key =>
+                // Scan only non-idle keys (to avoid messier priority)
                 GetStatus(previous[key], current[key]) != InputStatus.Idle)
             .Aggregate(default(InputState), (state, key) =>
+                // Pressed and Released states take priority over Idle and Held
                 state.WithRestricted(_map[key], GetStatus(previous[key], current[key])));
     }
 
@@ -34,14 +36,37 @@ public class Keymap : IKeymap
     {
         private readonly Dictionary<Keys, InputAction> _map = new(Enum.GetValues<Keys>().Length);
 
+        /// <summary>
+        /// Map several keys to one given input action.
+        /// </summary>
+        /// <param name="action">Action to map the following keys to.</param>
+        /// <param name="keys">Keys to associate with the given action.</param>
+        /// <returns>This builder instance.</returns>
+        /// <exception cref="ArgumentException">
+        /// One of the specified keys has already been mapped to another action.
+        /// </exception>
         public KeymapBuilder Map(InputAction action, params Keys[] keys)
         {
-            foreach (var key in keys)
+            try
             {
-                _map.Add(key, action);
-            }
+                foreach (var key in keys)
+                {
+                    _map.Add(key, action);
+                }
 
-            return this;
+                return this;
+            }
+            catch (ArgumentException e)
+            {
+                // Undo this operation to avoid leaving the builder in a
+                // sorta-invalid state (or have it seem that way to the caller)
+                foreach (var key in keys)
+                {
+                    _map.Remove(key);
+                }
+
+                throw new ArgumentException("Duplicate key mapping is not allowed.", nameof(keys), e);
+            }
         }
 
         public Keymap Build()
