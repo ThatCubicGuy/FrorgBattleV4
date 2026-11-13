@@ -14,9 +14,9 @@ using FrogBattleV4.Core.Entities;
 using FrogBattleV4.Core.Registries;
 using FrogBattleV4.Core.Decisions;
 
-// using var game = new FrogBattleV4.FrogBattle();
-// game.Run();
-
+using var game = new FrogBattle();
+game.Run();
+return;
 // TODO: Everything lmao
 Console.WriteLine("Nothing here yet!");
 

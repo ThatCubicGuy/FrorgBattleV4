@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using FrogBattleV4.Input;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -39,6 +40,7 @@ public class FrogBattle : Game
             Exit();
 
         // TODO: Add your update logic here
+        GameInput.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -48,6 +50,26 @@ public class FrogBattle : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
+
+        if (GameInput.GetState()[InputAction.Up].IsPressed())
+        {
+            GraphicsDevice.Clear(Color.Red);
+        }
+
+        if (GameInput.GetState()[InputAction.Down].IsPressed())
+        {
+            GraphicsDevice.Clear(Color.Blue);
+        }
+
+        if (GameInput.GetState()[InputAction.Left].IsPressed())
+        {
+            GraphicsDevice.Clear(Color.Green);
+        }
+
+        if (GameInput.GetState()[InputAction.Right].IsPressed())
+        {
+            GraphicsDevice.Clear(Color.Yellow);
+        }
 
         base.Draw(gameTime);
     }
