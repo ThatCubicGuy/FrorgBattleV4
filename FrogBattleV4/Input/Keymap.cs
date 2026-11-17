@@ -19,15 +19,10 @@ public class Keymap : IKeymap
     {
         return _map.Keys.Where(key =>
                 // Scan only non-idle keys (to avoid messier priority)
-                GetStatus(previous[key], current[key]) != InputStatus.Idle)
+                GameInput.GetStatus(previous[key], current[key]) != InputStatus.Idle)
             .Aggregate(default(InputState), (state, key) =>
                 // Pressed and Released states take priority over Idle and Held
-                state.WithRestricted(_map[key], GetStatus(previous[key], current[key])));
-    }
-
-    private static InputStatus GetStatus(KeyState previous, KeyState current)
-    {
-        return InputStatusExtensions.GetStatus(previous, current);
+                state.With(_map[key], GameInput.GetStatus(previous[key], current[key])));
     }
 
     public static KeymapBuilder GetBuilder() => new();

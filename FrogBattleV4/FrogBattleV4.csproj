@@ -5,9 +5,9 @@
         <PublishReadyToRun>false</PublishReadyToRun>
         <TieredCompilation>false</TieredCompilation>
         <Nullable>enable</Nullable>
-        <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
         <Authors>dawn.of.a.nova</Authors>
         <Description>Turn based fighting game with a ton of versatility given by data-driven design.</Description>
+        <TargetFramework>net10.0</TargetFramework>
     </PropertyGroup>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>

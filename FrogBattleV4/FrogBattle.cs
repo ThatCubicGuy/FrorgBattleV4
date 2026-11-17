@@ -1,4 +1,5 @@
 ﻿using FrogBattleV4.Input;
+using FrogBattleV4.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -9,6 +10,9 @@ public class FrogBattle : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch = null!;
+    private RectangularMenu _menu = null!;
+    private Sprite _cellSprite;
+    private Sprite _cursorSprite;
 
     public FrogBattle()
     {
@@ -27,8 +31,10 @@ public class FrogBattle : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-        // TODO: use this.Content to load your game content here
+        var cellTexture = Content.Load<Texture2D>("textures/gui/Cell");
+        var cursorTexture = Content.Load<Texture2D>("textures/gui/Cursor");
+        _cellSprite = new Sprite(new Point(100, 100), cellTexture);
+        _cursorSprite = new Sprite(new Point(100, 150), cursorTexture);
 
         base.LoadContent();
     }
@@ -50,26 +56,29 @@ public class FrogBattle : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
+        _spriteBatch.Begin();
 
-        if (GameInput.GetState()[InputAction.Up].IsPressed())
+        if (GameInput.GetState().IsPressed(InputAction.Up))
         {
             GraphicsDevice.Clear(Color.Red);
         }
 
-        if (GameInput.GetState()[InputAction.Down].IsPressed())
+        if (GameInput.GetState().IsPressed(InputAction.Down))
         {
             GraphicsDevice.Clear(Color.Blue);
         }
 
-        if (GameInput.GetState()[InputAction.Left].IsPressed())
+        if (GameInput.GetState().IsPressed(InputAction.Left))
         {
             GraphicsDevice.Clear(Color.Green);
         }
 
-        if (GameInput.GetState()[InputAction.Right].IsPressed())
+        if (GameInput.GetState().IsPressed(InputAction.Right))
         {
             GraphicsDevice.Clear(Color.Yellow);
         }
+
+        _spriteBatch.End();
 
         base.Draw(gameTime);
     }
