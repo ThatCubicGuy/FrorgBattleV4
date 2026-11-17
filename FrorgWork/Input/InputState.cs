@@ -1,6 +1,6 @@
 using System;
 
-namespace FrogBattleV4.Input;
+namespace FrorgWork.Input;
 
 public readonly struct InputState
 {

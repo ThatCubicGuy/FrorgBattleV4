@@ -1,22 +1,21 @@
-﻿using FrogBattleV4.Input;
+﻿#nullable disable
+using System;
 using FrogBattleV4.UI;
+using FrorgWork;
+using FrorgWork.Input;
+using FrorgWork.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace FrogBattleV4;
 
-public class FrogBattle : Game
+public class FrogBattle : FrorgGame
 {
-    private GraphicsDeviceManager _graphics;
-    private SpriteBatch _spriteBatch = null!;
-    private RectangularMenu _menu = null!;
-    private Sprite _cellSprite;
-    private Sprite _cursorSprite;
+    private ISelectableMenu _menu;
 
-    public FrogBattle()
+    public FrogBattle() : base("FrorgBattleV4", 640, 480, false)
     {
-        _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
     }
@@ -26,15 +25,19 @@ public class FrogBattle : Game
         // TODO: Add your initialization logic here
 
         base.Initialize();
+
+        // _menu = new ShardMenu(4, 3, new Point(5, 80), Textures.MenuButton, Textures.MenuButtonHover);
+        // _menu = new JaggedShardMenu(new Point(5, 80), Textures.MenuButton, Textures.MenuButtonHover);
+        _menu = new SillyMenu(new Point(100, 100), Textures.MenuButton);
     }
 
     protected override void LoadContent()
     {
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
-        var cellTexture = Content.Load<Texture2D>("textures/gui/Cell");
-        var cursorTexture = Content.Load<Texture2D>("textures/gui/Cursor");
-        _cellSprite = new Sprite(new Point(100, 100), cellTexture);
-        _cursorSprite = new Sprite(new Point(100, 150), cursorTexture);
+        Textures = Textures with
+        {
+            MenuButton = Content.Load<Texture2D>("textures/gui/Cell"),
+            MenuButtonHover = Content.Load<Texture2D>("textures/gui/Cursor"),
+        };
 
         base.LoadContent();
     }
@@ -47,6 +50,10 @@ public class FrogBattle : Game
 
         // TODO: Add your update logic here
         GameInput.Update(gameTime);
+        foreach (var action in Enum.GetValues<InputAction>())
+        {
+            if (GameInput.GetState()[action] == InputStatus.Pressed) _menu.HandleInput(action);
+        }
 
         base.Update(gameTime);
     }
@@ -56,29 +63,11 @@ public class FrogBattle : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
-        _spriteBatch.Begin();
+        SpriteBatch.Begin();
 
-        if (GameInput.GetState().IsPressed(InputAction.Up))
-        {
-            GraphicsDevice.Clear(Color.Red);
-        }
+        _menu.Draw(SpriteBatch);
 
-        if (GameInput.GetState().IsPressed(InputAction.Down))
-        {
-            GraphicsDevice.Clear(Color.Blue);
-        }
-
-        if (GameInput.GetState().IsPressed(InputAction.Left))
-        {
-            GraphicsDevice.Clear(Color.Green);
-        }
-
-        if (GameInput.GetState().IsPressed(InputAction.Right))
-        {
-            GraphicsDevice.Clear(Color.Yellow);
-        }
-
-        _spriteBatch.End();
+        SpriteBatch.End();
 
         base.Draw(gameTime);
     }

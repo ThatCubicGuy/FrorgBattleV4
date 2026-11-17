@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrogBattleV4", "FrogBattleV4\FrogBattleV4.csproj", "{96A86BAE-0B54-4EB1-810F-0B6017B9F067}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrorgWork", "FrorgWork\FrorgWork.csproj", "{539F547C-DA5F-440E-8E50-F689C1B25E8B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,18 @@ Global
 		{96A86BAE-0B54-4EB1-810F-0B6017B9F067}.Release|x64.Build.0 = Release|Any CPU
 		{96A86BAE-0B54-4EB1-810F-0B6017B9F067}.Release|x86.ActiveCfg = Release|Any CPU
 		{96A86BAE-0B54-4EB1-810F-0B6017B9F067}.Release|x86.Build.0 = Release|Any CPU
+		{539F547C-DA5F-440E-8E50-F689C1B25E8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{539F547C-DA5F-440E-8E50-F689C1B25E8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{539F547C-DA5F-440E-8E50-F689C1B25E8B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{539F547C-DA5F-440E-8E50-F689C1B25E8B}.Debug|x64.Build.0 = Debug|Any CPU
+		{539F547C-DA5F-440E-8E50-F689C1B25E8B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{539F547C-DA5F-440E-8E50-F689C1B25E8B}.Debug|x86.Build.0 = Debug|Any CPU
+		{539F547C-DA5F-440E-8E50-F689C1B25E8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{539F547C-DA5F-440E-8E50-F689C1B25E8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{539F547C-DA5F-440E-8E50-F689C1B25E8B}.Release|x64.ActiveCfg = Release|Any CPU
+		{539F547C-DA5F-440E-8E50-F689C1B25E8B}.Release|x64.Build.0 = Release|Any CPU
+		{539F547C-DA5F-440E-8E50-F689C1B25E8B}.Release|x86.ActiveCfg = Release|Any CPU
+		{539F547C-DA5F-440E-8E50-F689C1B25E8B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

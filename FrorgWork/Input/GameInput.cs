@@ -1,8 +1,11 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace FrogBattleV4.Input;
+namespace FrorgWork.Input;
 
+/// <summary>
+/// Handles basic keyboard input (on/off actions) and supports mapping multiple keys to the same action.
+/// </summary>
 public static class GameInput
 {
     private static KeyboardState _previousKeyboardState;
@@ -10,7 +13,7 @@ public static class GameInput
     private static InputState _inputState;
 
     public static readonly Keymap DefaultKeymap = Keymap.GetBuilder()
-        .Map(InputAction.Confirm, Keys.Z, Keys.Enter)
+        .Map(InputAction.Confirm, Keys.Z, Keys.Enter, Keys.Space)
         .Map(InputAction.Cancel, Keys.X, Keys.LeftShift)
         .Map(InputAction.Up, Keys.W, Keys.Up)
         .Map(InputAction.Down, Keys.S, Keys.Down)

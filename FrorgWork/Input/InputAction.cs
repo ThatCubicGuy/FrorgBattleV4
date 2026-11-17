@@ -1,4 +1,4 @@
-namespace FrogBattleV4.Input;
+namespace FrorgWork.Input;
 
 public enum InputAction
 {

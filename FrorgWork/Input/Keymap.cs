@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework.Input;
 
-namespace FrogBattleV4.Input;
+namespace FrorgWork.Input;
 
 public class Keymap : IKeymap
 {

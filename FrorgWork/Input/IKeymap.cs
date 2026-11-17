@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework.Input;
 
-namespace FrogBattleV4.Input;
+namespace FrorgWork.Input;
 
 public interface IKeymap
 {
