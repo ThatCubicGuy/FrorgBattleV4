@@ -7,7 +7,7 @@ namespace FrogBattleV4.Core.Abilities.ShardClasses;
 /// </summary>
 public class TargetShard : Shard
 {
-    public required IShardTargeting Targeting { get; init; }
+    public required IAbilityTargeting Targeting { get; init; }
     public override void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder,
         IBattleRng rng)
     {

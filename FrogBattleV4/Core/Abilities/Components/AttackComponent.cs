@@ -1,18 +1,16 @@
-using System;
-using System.Text.Json.Serialization;
 using FrogBattleV4.Core.Calculation;
 using FrogBattleV4.Core.Combat.Commands;
 using FrogBattleV4.Core.Modifiers;
 
 namespace FrogBattleV4.Core.Abilities.Components;
 
-public class AttackComponent : IShardCommandComponent
+public class AttackComponent : ShardComponent
 {
-    public required DamageFormula Formula { get; init; }
+    public required AmountFormula Formula { get; init; }
     public required DamageMetadata Metadata { get; init; }
-    public AttackProperties Properties { get; init; } = new(DamageData.None);
+    public AttackProperties Properties { get; init; } = AttackProperties.Default;
 
-    public void GenerateCommands(ShardResolutionScope scope, BattleEnvironment env, CommandBuilder builder)
+    public override void GenerateCommands(ShardResolutionScope scope, BattleEnvironment env, CommandBuilder builder)
     {
         var baseValue = Formula.Resolve(scope, env);
         var ctx = new RelationContext
@@ -26,7 +24,7 @@ public class AttackComponent : IShardCommandComponent
             CriticalAmount = GetDamageValue(baseValue, true, env, ctx),
             CriticalChance = GetCritChance(env, ctx),
             Metadata = Metadata,
-            Data = Properties.Data,
+            Flags = Properties.Flags,
             Relation = ctx,
         });
     }
@@ -81,57 +79,12 @@ public class AttackComponent : IShardCommandComponent
     }
 }
 
-public sealed record AttackProperties(DamageData Data, bool CanCrit = true);
-
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
-[JsonDerivedType(typeof(Flat), "flat")]
-[JsonDerivedType(typeof(StatPercentage), "stat_percent")]
-[JsonDerivedType(typeof(PoolValuePercentage), "pool_value_percent")]
-public abstract class DamageFormula
+/// <summary>
+/// Defines extra properties for the attack.
+/// </summary>
+/// <param name="Flags">Damage-related properties.</param>
+/// <param name="CanCrit">Whether this attack can crit.</param>
+public sealed record AttackProperties(DamageFlags Flags, bool CanCrit = true)
 {
-    private DamageFormula() { }
-
-    /// <summary>
-    /// A number between 0 and 1 that determines damage falloff per target rank.
-    /// A higher number means lower damage to higher rank targets, down to zero.
-    /// </summary>
-    public required double RankFalloff { get; init; }
-
-    public abstract double Resolve(ShardResolutionScope scope, BattleEnvironment env);
-
-    private double GetFalloffModifier(ShardResolutionScope scope) => Math.Pow(1 - RankFalloff, scope.Targeting.Rank);
-
-    public sealed class Flat : DamageFormula
-    {
-        public required double Amount { get; init; }
-        public override double Resolve(ShardResolutionScope scope, BattleEnvironment env)
-        {
-            return Amount * GetFalloffModifier(scope);
-        }
-    }
-
-    public sealed class StatPercentage : DamageFormula
-    {
-        public required StatName Scalar { get; init; }
-        public required double Ratio { get; init; }
-        public override double Resolve(ShardResolutionScope scope, BattleEnvironment env)
-        {
-            return new StatQuery
-            {
-                Stat = Scalar,
-                Subject = scope.User,
-                Reference = scope.Targeting.Target,
-            }.Calculate(env) * Ratio * GetFalloffModifier(scope);
-        }
-    }
-
-    public sealed class PoolValuePercentage : DamageFormula
-    {
-        public required PoolName Pool { get; init; }
-        public required double Ratio { get; init; }
-        public override double Resolve(ShardResolutionScope scope, BattleEnvironment env)
-        {
-            return env.GetPoolValue(scope.User, Pool) * Ratio * GetFalloffModifier(scope);
-        }
-    }
+    public static readonly AttackProperties Default = new(DamageFlags.None);
 }

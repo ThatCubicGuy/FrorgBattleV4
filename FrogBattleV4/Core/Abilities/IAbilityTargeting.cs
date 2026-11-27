@@ -7,7 +7,7 @@ namespace FrogBattleV4.Core.Abilities;
 [JsonDerivedType(typeof(Targeting.BlastTargeting), "blast")]
 [JsonDerivedType(typeof(Targeting.BounceTargeting), "bounce")]
 [JsonDerivedType(typeof(Targeting.FilterTargeting), "filter")]
-public interface IShardTargeting
+public interface IAbilityTargeting
 {
-    TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env);
+    TargetingInstruction GenerateInstruction(TargetingContext targeting, BattleEnvironment env);
 }

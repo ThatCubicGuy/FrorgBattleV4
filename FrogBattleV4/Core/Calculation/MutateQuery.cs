@@ -5,5 +5,6 @@ namespace FrogBattleV4.Core.Calculation;
 /// </summary>
 public class MutateQuery : CommandQuery
 {
-    public required MutateData Data { get; init; }
+    public required PoolName Pool { get; init; }
+    public required PoolMutChannel Channel { get; init; }
 }

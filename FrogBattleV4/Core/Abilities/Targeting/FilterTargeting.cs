@@ -7,7 +7,7 @@ namespace FrogBattleV4.Core.Abilities.Targeting;
 /// a given predicate and a maximum rank and
 /// applies a rank penalty after filtering.
 /// </summary>
-public class FilterTargeting : IShardTargeting
+public class FilterTargeting : IAbilityTargeting
 {
     /// <summary>
     /// Targets every already selected target at the same rank.
@@ -31,7 +31,7 @@ public class FilterTargeting : IShardTargeting
     /// </summary>
     public EntityPredicate? Filter { get; init; }
 
-    public TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env)
+    public TargetingInstruction GenerateInstruction(TargetingContext targeting, BattleEnvironment env)
     {
         var (target, rank) = targeting;
         if (rank <= MaximumRank && env.IsPredicate(target, Filter))

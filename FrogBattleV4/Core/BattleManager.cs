@@ -82,7 +82,7 @@ public sealed partial class BattleManager
             var decision = await action.GetDecisionAsync(env, cancellationToken);
 
             var state = new LinkResolutionState(action.Actor, [
-                new ShardTargetingContext
+                new TargetingContext
                 {
                     Target = decision.MainTarget,
                     Rank = 0,

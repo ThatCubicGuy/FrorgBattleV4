@@ -168,7 +168,7 @@ file static class Extensions
 
     public static void ReportDamageTaken(object? sender, DamageTakenEventArgs e)
     {
-        Console.Out.WriteLine($"{e.Amount:F0}{(e.IsCrit ? '!' : "")} {e.Metadata.Type} damage taken " +
+        Console.Out.WriteLine($"{e.Amount:F0}{(e.IsCrit ? '!' : "")} {e.Metadata.Form} damage taken " +
                               $"by {e.Target} from {e.Sender}!");
     }
 

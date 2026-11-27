@@ -5,12 +5,12 @@ using FrogBattleV4.Core.Modifiers.StatusEffects;
 
 namespace FrogBattleV4.Core.Abilities.Components;
 
-public class EffectComponent : IShardCommandComponent
+public class DebuffComponent : ShardComponent
 {
     public required EffectChanceFormula Chance { get; init; }
     public required ApplyEffectData Data { get; init; }
 
-    public void GenerateCommands(ShardResolutionScope scope, BattleEnvironment env, CommandBuilder builder)
+    public override void GenerateCommands(ShardResolutionScope scope, BattleEnvironment env, CommandBuilder builder)
     {
         builder.Emit(new ApplyEffectCommand
         {
@@ -55,6 +55,16 @@ public abstract record EffectChanceFormula
                     Actor = scope.User,
                     Target = scope.Targeting.Target,
                 },
+            }.Calculate(env) + new StatQuery
+            {
+                Stat = StatName.EffectHitRate,
+                Subject = scope.User,
+                Reference = scope.Targeting.Target,
+            }.Calculate(env) - new StatQuery
+            {
+                Stat = StatName.EffectRes,
+                Subject = scope.Targeting.Target,
+                Reference = scope.User,
             }.Calculate(env);
         }
     }

@@ -14,7 +14,7 @@ public sealed partial class BattleManager
         {
             var (actor, target) = command.Relation;
             EnsureLiving(actor, target);
-            var damageData = command.Data;
+            var damageData = command.Flags;
             var isCrit = manager._rng.Chance(command.CriticalChance);
             var damage = isCrit
                 ? command.CriticalAmount
@@ -45,7 +45,7 @@ public sealed partial class BattleManager
         {
             var (actor, target) = command.Relation;
             EnsureLiving(actor);
-            var healData = command.Data;
+            var healData = command.Flags;
             var healing = command.Amount;
 
             manager.Entities[target].TakeHealing(healing, healData);
@@ -55,7 +55,7 @@ public sealed partial class BattleManager
                 Sender = actor,
                 Target = target,
                 Amount = healing,
-                Data = healData,
+                Flags = healData,
             });
         }
 
@@ -63,18 +63,17 @@ public sealed partial class BattleManager
         {
             var (actor, target) = command.Relation;
             EnsureLiving(actor, target);
-            var data = command.Data;
-            var oldValue = manager.Entities[target].Pools[data.TargetPool].Value;
+            var oldValue = manager.Entities[target].Pools[command.TargetPool].Value;
 
-            manager.Entities[target].Pools[data.TargetPool].Value += command.TotalAmount;
+            manager.Entities[target].Pools[command.TargetPool].Value += command.TotalAmount;
 
             manager.OnPoolMutated(new PoolMutatedEventArgs
             {
                 Sender = actor,
                 Target = target,
-                Pool = data.TargetPool,
+                Pool = command.TargetPool,
                 OldValue = oldValue,
-                NewValue = manager.Entities[target].Pools[data.TargetPool].Value,
+                NewValue = manager.Entities[target].Pools[command.TargetPool].Value,
             });
         }
 
@@ -157,15 +156,14 @@ public sealed partial class BattleManager
         {
             var (actor, target) = command.Relation;
             EnsureLiving(actor, target);
-            var data = command.Data;
 
-            manager.Scheduler.AdvanceEntity(target, data.AdvancePercent);
+            manager.Scheduler.AdvanceEntity(target, command.AdvancePercent);
 
             manager.OnTurnAdvanced(new TurnAdvancedEventArgs
             {
                 Sender = actor,
                 Target = target,
-                AdvanceAmount = data.AdvancePercent,
+                AdvanceAmount = command.AdvancePercent,
             });
         }
 
@@ -173,9 +171,8 @@ public sealed partial class BattleManager
         {
             var (actor, target) = command.Relation;
             EnsureLiving(actor, target);
-            var data = command.Data;
 
-            manager.Scheduler.EnqueueInstant(new InstantAction(target, data.Decision));
+            manager.Scheduler.EnqueueInstant(new InstantAction(target, command.Decision));
 
             manager.OnActionEnqueued(new ActionEnqueuedEventArgs
             {

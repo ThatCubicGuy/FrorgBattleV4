@@ -9,7 +9,7 @@ namespace FrogBattleV4.Core.Modifiers;
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "modifier_type")]
 [JsonDerivedType(typeof(StatModifier), "stat")]
 [JsonDerivedType(typeof(DamageModifier), "damage")]
-[JsonDerivedType(typeof(MutationModifier), "mutation")]
+[JsonDerivedType(typeof(PoolMutModifier), "mutation")]
 [JsonDerivedType(typeof(PoolPropertyModifier), "pool_property")]
 [JsonDerivedType(typeof(DamagePropertyModifier), "damage_property")]
 // TODO (Nova): prefer not to inherit IModifierProvider interface here

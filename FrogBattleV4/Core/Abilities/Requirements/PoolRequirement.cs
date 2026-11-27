@@ -15,6 +15,5 @@ public class PoolRequirement : IShardRequirement
 
     public void GenerateFulfill(LinkResolutionState state, BattleEnvironment env, CommandBuilder builder)
     {
-        throw new System.NotImplementedException();
     }
 }

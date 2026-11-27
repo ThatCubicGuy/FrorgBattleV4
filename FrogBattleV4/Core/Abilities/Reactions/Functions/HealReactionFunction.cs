@@ -6,19 +6,19 @@ namespace FrogBattleV4.Core.Abilities.Reactions.Functions;
 
 public class HealReactionFunction : CommandReactionFunction
 {
-    private readonly HealData _healData = HealData.None;
+    private readonly HealFlags _healFlags = HealFlags.None;
     public required double Ratio { get; init; }
 
     public bool CanOverheal
     {
-        get => _healData.HasFlag(HealData.Overheals);
-        init => _healData &= value ? HealData.Overheals : ~HealData.Overheals;
+        get => _healFlags.HasFlag(HealFlags.Overheals);
+        init => _healFlags &= value ? HealFlags.Overheals : ~HealFlags.Overheals;
     }
 
     public bool CanRevive
     {
-        get => _healData.HasFlag(HealData.Revives);
-        init => _healData &= value ? HealData.Revives : ~HealData.Revives;
+        get => _healFlags.HasFlag(HealFlags.Revives);
+        init => _healFlags &= value ? HealFlags.Revives : ~HealFlags.Revives;
     }
 
     protected override void HandleEvent(EntityUid holder, BattleEnvironment env, BattleCommandEventArgs args,
@@ -30,7 +30,7 @@ public class HealReactionFunction : CommandReactionFunction
         {
             Amount = delta.Delta * Ratio,
             Relation = relation,
-            Data = _healData,
+            Flags = _healFlags,
         });
 
         foreach (var command in commands)

@@ -127,7 +127,7 @@ public class DamageTakenEventArgs : BattleCommandEventArgs, IDeltaEventArgs
 public class HealingReceivedEventArgs : BattleCommandEventArgs, IDeltaEventArgs
 {
     public required double Amount { get; init; }
-    public required HealData Data { get; init; }
+    public required HealFlags Flags { get; init; }
     double IDeltaEventArgs.Delta => Amount;
 }
 

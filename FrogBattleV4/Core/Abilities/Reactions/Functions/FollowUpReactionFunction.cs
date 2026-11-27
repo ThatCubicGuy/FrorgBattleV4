@@ -19,7 +19,8 @@ public class FollowUpReactionFunction : CommandReactionFunction
         {
             builder.Emit(new EnqueueActionCommand
             {
-                Data = new EnqueueActionData(decision, ActionType.FollowUp),
+                Decision = decision,
+                Type = ActionType.FollowUp,
                 // Enqueue an instant action for ourselves
                 Relation = new RelationContext
                 {

@@ -43,10 +43,10 @@ public class EntityInstance(Fighter definition, TeamInstance team) : UniquelyIde
 
     public IReadOnlyCollection<StatusEffectInstance> ActiveEffects => _activeEffects.Values;
 
-    public void TakeDamage(double damage, DamageData data)
+    public void TakeDamage(double damage, DamageFlags flags)
     {
         // Barriers block all damage taken in one instance
-        if (data.HasFlag(DamageData.IgnoresBarrier) && Counters[CounterName.Barrier].TryDecrement()) return;
+        if (flags.HasFlag(DamageFlags.IgnoresBarrier) && Counters[CounterName.Barrier].TryDecrement()) return;
 
         // Go down the line of damage-taking pools
         foreach (var poolId in DamagePriority)
@@ -74,10 +74,10 @@ public class EntityInstance(Fighter definition, TeamInstance team) : UniquelyIde
         }
     }
 
-    public void TakeHealing(double healing, HealData healData)
+    public void TakeHealing(double healing, HealFlags healFlags)
     {
         // Check if we can be revived
-        if (Downed && !healData.HasFlag(HealData.Revives)) return;
+        if (Downed && !healFlags.HasFlag(HealFlags.Revives)) return;
 
         var hpPool = Pools[PoolName.Hp];
 
@@ -85,7 +85,7 @@ public class EntityInstance(Fighter definition, TeamInstance team) : UniquelyIde
         var maxHealing = hpPool.Capacity - hpPool.Value;
 
         // If we overflow max HP and this healing supports Overheal, add to the Overheal pool
-        if (healing > maxHealing && healData.HasFlag(HealData.Overheals))
+        if (healing > maxHealing && healFlags.HasFlag(HealFlags.Overheals))
         {
             Pools[PoolName.Overheal].Value += healing - maxHealing;
         }

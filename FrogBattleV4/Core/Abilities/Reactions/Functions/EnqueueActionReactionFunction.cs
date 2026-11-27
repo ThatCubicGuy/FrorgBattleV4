@@ -15,7 +15,8 @@ public class EnqueueActionReactionFunction : CommandReactionFunction
     {
         var commands = GetRelation(holder, env, args).Select(context => new EnqueueActionCommand
         {
-            Data = new EnqueueActionData(new TurnDecision(Link, context.Target), Type),
+            Decision = new TurnDecision(Link, context.Target),
+            Type = Type,
             Relation = context with { Target = context.Actor },
         });
 

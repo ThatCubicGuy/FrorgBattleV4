@@ -27,7 +27,7 @@ public abstract class CostComponent : IShardRequirement
     public bool IsFulfilled(LinkResolutionState state, BattleEnvironment env)
     {
         return Type == CostType.Soft || GetCost(state, env).All(cost =>
-            !(cost.TotalAmount > env.GetPoolValue(cost.Relation.Target, cost.Data.TargetPool)));
+            !(cost.TotalAmount > env.GetPoolValue(cost.Relation.Target, cost.TargetPool)));
     }
 }
 

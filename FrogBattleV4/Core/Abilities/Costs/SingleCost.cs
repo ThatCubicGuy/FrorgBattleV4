@@ -7,14 +7,7 @@ namespace FrogBattleV4.Core.Abilities.Costs;
 
 public class SingleCost : CostComponent
 {
-    // Always set by required property initializer
-    private readonly MutateData _data = null!;
-
-    public required PoolName Pool
-    {
-        get => _data.TargetPool;
-        init => _data = new MutateData(value, PoolMutChannel.Cost);
-    }
+    public required PoolName Pool { get; init; }
 
     public required CostFormula Formula { get; init; }
 
@@ -26,11 +19,13 @@ public class SingleCost : CostComponent
             TotalAmount = new MutateQuery
             {
                 BaseValue = Formula.Resolve(state.User, env),
-                Data = _data,
+                Pool = Pool,
+                Channel = PoolMutChannel.Cost,
                 Context = ctx,
             }.Calculate(env),
-            Data = _data,
             Relation = ctx,
+            TargetPool = Pool,
+            Channel = PoolMutChannel.Cost,
         };
     }
 }

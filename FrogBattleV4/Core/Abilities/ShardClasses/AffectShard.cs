@@ -10,8 +10,8 @@ namespace FrogBattleV4.Core.Abilities.ShardClasses;
 /// </summary>
 public class AffectShard : Shard
 {
-    public required ImmutableArray<IShardCommandComponent> Components { get; init; }
-    public IShardTargeting Targeting { get; init; } = FilterTargeting.Identity;
+    public required ImmutableArray<ShardComponent> Components { get; init; }
+    public IAbilityTargeting Targeting { get; init; } = FilterTargeting.Identity;
     public ImmutableArray<IModifierRule> Modifiers { get; init; } = [];
     public override void Resolve(ref LinkResolutionState state, BattleEnvironment env, CommandBuilder builder,
         IBattleRng rng)

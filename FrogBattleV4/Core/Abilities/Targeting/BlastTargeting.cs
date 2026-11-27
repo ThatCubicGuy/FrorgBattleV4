@@ -8,7 +8,7 @@ namespace FrogBattleV4.Core.Abilities.Targeting;
 /// Selects targets adjacent to other selected ones
 /// below a maximum rank.
 /// </summary>
-public class BlastTargeting : IShardTargeting
+public class BlastTargeting : IAbilityTargeting
 {
     /// <summary>
     /// Maximum distance from the main target to select new targets.
@@ -21,7 +21,7 @@ public class BlastTargeting : IShardTargeting
     [JsonPropertyName("penalty")]
     public int RankPenaltyPerSlot { get; init; } = 1;
 
-    public TargetingInstruction GenerateInstruction(ShardTargetingContext targeting, BattleEnvironment env)
+    public TargetingInstruction GenerateInstruction(TargetingContext targeting, BattleEnvironment env)
     {
         var (target, rank) = targeting;
 
@@ -31,7 +31,7 @@ public class BlastTargeting : IShardTargeting
         return new TargetingInstruction.Fixed(allies
             .Skip(Math.Max(0, idx - Radius))
             .Take(2 * Radius + 1)
-            .Select((member, i) => new ShardTargetingContext
+            .Select((member, i) => new TargetingContext
             {
                 Target = member,
                 Rank = rank + Math.Abs(idx - i) * RankPenaltyPerSlot,

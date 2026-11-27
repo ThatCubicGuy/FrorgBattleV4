@@ -12,13 +12,6 @@ namespace FrogBattleV4.Core.Abilities;
 /// <param name="CurrentShardIndex">Index of the currently resolving shard.</param>
 public sealed record LinkResolutionState(
     EntityUid User,
-    IEnumerable<ShardTargetingContext> Selections,
+    IEnumerable<TargetingContext> Selections,
     IEnumerable<IModifierProvider> Modifiers,
     int CurrentShardIndex);
-
-/// <summary>
-/// Small scope object for a single shard command's resolution.
-/// </summary>
-/// <param name="User">User of the shard.</param>
-/// <param name="Targeting">Target of the shard.</param>
-public record ShardResolutionScope(EntityUid User, ShardTargetingContext Targeting);
